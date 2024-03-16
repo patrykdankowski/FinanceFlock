@@ -40,6 +40,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         if (!errorMessages.isEmpty()) {
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext.buildConstraintViolationWithTemplate(errorMessages.toString()).addConstraintViolation();
+            return false;
         }
 
         return isPasswordValid;
