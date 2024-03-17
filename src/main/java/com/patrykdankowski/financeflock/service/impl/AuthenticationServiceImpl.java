@@ -6,7 +6,8 @@ import com.patrykdankowski.financeflock.entity.Role;
 import com.patrykdankowski.financeflock.entity.User;
 import com.patrykdankowski.financeflock.repository.RoleRepository;
 import com.patrykdankowski.financeflock.repository.UserRepository;
-import com.patrykdankowski.financeflock.service.AuthService;
+import com.patrykdankowski.financeflock.security.JwtTokenProvider;
+import com.patrykdankowski.financeflock.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,17 +17,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     @Override
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
                 loginDto.getEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "Logged in";
+        return jwtTokenProvider.generateJwtToken(authentication);
     }
 
     @Override
