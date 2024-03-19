@@ -1,7 +1,11 @@
 package com.patrykdankowski.financeflock.security.validation;
 
+import com.patrykdankowski.financeflock.exception.PasswordValidationException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
     @Override
@@ -22,25 +26,23 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
 
         boolean isPasswordValid = hasUpperCase && hasSpecialChar && hasDigit && isLongEnough;
 
-        StringBuilder errorMessages = new StringBuilder();
+        List<String> errorMessages = new ArrayList<>();
 
         if (!isLongEnough) {
-            errorMessages.append("Password must be at least 10 characters long. ");
+            errorMessages.add("Password must be at least 10 characters long. ");
         }
         if (!hasSpecialChar) {
-            errorMessages.append("Password must contain at least 1 special character. ");
+            errorMessages.add("Password must contain at least 1 special character. ");
         }
         if (!hasDigit) {
-            errorMessages.append("Password must contain at least 1 digit. ");
+            errorMessages.add("Password must contain at least 1 digit. ");
         }
         if (!hasUpperCase) {
-            errorMessages.append("Password must contain at least 1 uppercase letter. ");
+            errorMessages.add("Password must contain at least 1 uppercase letter. ");
         }
 
         if (!errorMessages.isEmpty()) {
-            constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate(errorMessages.toString()).addConstraintViolation();
-            return false;
+            throw new PasswordValidationException(errorMessages);
         }
 
         return isPasswordValid;

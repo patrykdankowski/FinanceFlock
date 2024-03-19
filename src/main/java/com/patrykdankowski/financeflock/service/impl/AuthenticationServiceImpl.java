@@ -4,6 +4,7 @@ import com.patrykdankowski.financeflock.dto.LoginDto;
 import com.patrykdankowski.financeflock.dto.RegisterDto;
 import com.patrykdankowski.financeflock.entity.Role;
 import com.patrykdankowski.financeflock.entity.User;
+import com.patrykdankowski.financeflock.exception.EmailAlreadyExistsException;
 import com.patrykdankowski.financeflock.repository.RoleRepository;
 import com.patrykdankowski.financeflock.repository.UserRepository;
 import com.patrykdankowski.financeflock.security.JwtTokenProvider;
@@ -42,8 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public String register(RegisterDto registerDto) {
         if(userRepository.existsUserByEmail(registerDto.getEmail())){
-            // zrobic customowy wyjatek
-            throw new RuntimeException("Email already exists in db;");
+            throw new EmailAlreadyExistsException(registerDto.getEmail());
         }
         var user = new User();
         Role roleUser = roleRepository.findByName("ROLE_USER").get();
