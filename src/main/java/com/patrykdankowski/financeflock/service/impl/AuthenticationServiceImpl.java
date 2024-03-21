@@ -10,6 +10,8 @@ import com.patrykdankowski.financeflock.repository.UserRepository;
 import com.patrykdankowski.financeflock.security.JwtTokenProvider;
 import com.patrykdankowski.financeflock.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,7 +37,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String login(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getEmail(), loginDto.getPassword()));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtTokenProvider.generateJwtToken(authentication);
     }

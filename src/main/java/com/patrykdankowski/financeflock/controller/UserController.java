@@ -17,14 +17,16 @@ public class UserController {
 
     private final UserRepository userRepository;
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/test")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         user.setCreatedAt(LocalDateTime.now());
 
         User userSaved = userRepository.save(user);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userSaved);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/test/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);

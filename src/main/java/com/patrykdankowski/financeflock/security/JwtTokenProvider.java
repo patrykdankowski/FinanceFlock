@@ -1,12 +1,12 @@
 package com.patrykdankowski.financeflock.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.patrykdankowski.financeflock.exception.CustomJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -49,20 +49,23 @@ public class JwtTokenProvider {
                     .parse(token);
             return true;
         } catch (MalformedJwtException malformedJwtException) {
-            // zrobic customowy exceptiony
-            throw new RuntimeException();
-            // HttpStatus.Bad.Request, niewła
-        } catch (ExpiredJwtException expiredJwtException) {
-            throw new RuntimeException();
-            //Bad Request, expired jwt token
-        } catch (UnsupportedJwtException unsupportedJwtException) {
-            throw new RuntimeException();
-            // bad request, unsupported token
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new RuntimeException();
-            // bad request, jwt claims string is null/empty
-        }
+            throw new CustomJwtException(HttpStatus.BAD_REQUEST, "Invalid JWT Token");
 
+        } catch (ExpiredJwtException expiredJwtException) {
+            throw new CustomJwtException(HttpStatus.BAD_REQUEST, "Expired JWT Token");
+
+        } catch (UnsupportedJwtException unsupportedJwtException) {
+            throw new CustomJwtException(HttpStatus.BAD_REQUEST, "Unsupported JWT Token");
+
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new CustomJwtException(HttpStatus.BAD_REQUEST, "JWT claims is null or empty");
+
+        } catch (SignatureException signatureException) {
+            throw new CustomJwtException(HttpStatus.UNAUTHORIZED, "The token's signature did not match the expected signature");
+
+        } catch (ClaimJwtException claimJwtException) {
+            throw new CustomJwtException(HttpStatus.FORBIDDEN, "JWT claims in the token is not valid");
+        }
     }
 
     public String getUsernameFromJwtToken(String token) {
