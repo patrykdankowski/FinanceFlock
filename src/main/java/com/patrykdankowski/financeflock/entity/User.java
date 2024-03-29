@@ -35,5 +35,8 @@ public class User {
     private Set<Role> roles;
 
 
+    //
+    //
+    //
 //    private LocalDateTime lastLoggedInAt;
 }
