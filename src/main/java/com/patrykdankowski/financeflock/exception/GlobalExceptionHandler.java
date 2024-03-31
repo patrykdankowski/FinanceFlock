@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.exception;
 
+import com.patrykdankowski.financeflock.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -10,9 +11,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Date;
+
+import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_SUB_USERS;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -124,6 +127,39 @@ public class GlobalExceptionHandler {
                 customJwtException.getMessage(),
                 customJwtException.getHttpStatus());
     }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorDetails> handleNoHandlerFoundException(NoHandlerFoundException noHandlerFoundException) {
+        return setErrorDetails(
+                "Endpoint not found",
+                noHandlerFoundException.getMessage(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(MaxSubUsersCountException.class)
+    public ResponseEntity<ErrorDetails> handleMaxSubUsersCountException(MaxSubUsersCountException maxSubUsersCountException) {
+        String details = String.format("You are only allowed to add up %d sub users. Remove one of existing sub users first", MAX_SUB_USERS);
+        return setErrorDetails(
+                "You've reached the maximum amount of sub users",
+                details,
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleSubUserNotBelongToMainUserException(UserNotFoundException userNotFoundException) {
+        return setErrorDetails("Something went wrong",
+               "User with given Id doesnt exist in our db",
+                HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(SubUserNotBelongToMainUserException.class)
+    public ResponseEntity<ErrorDetails> handleSubUserNotBelongToMainUserException(SubUserNotBelongToMainUserException subUserNotBelongToMainUserException) {
+        return setErrorDetails("Cannot remove",
+                subUserNotBelongToMainUserException.getMessage(),
+                HttpStatus.BAD_REQUEST);
+    }
+
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);

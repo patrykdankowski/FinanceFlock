@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.security.validation;
+package com.patrykdankowski.financeflock.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,5 +1,6 @@
-package com.patrykdankowski.financeflock.exception;
+package com.patrykdankowski.financeflock.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 public class ErrorDetails {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date timeStamp;
     private String message;
     private String details;

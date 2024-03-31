@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.config;
 
 import com.patrykdankowski.financeflock.security.JwtAuthenticationEntryPoint;
 import com.patrykdankowski.financeflock.security.JwtAuthenticationFilter;
-import com.patrykdankowski.financeflock.security.validation.JwtAccessDenied;
+import com.patrykdankowski.financeflock.security.JwtAccessDenied;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,10 +42,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/test/**").permitAll()
-                                .anyRequest().authenticated())
+                                .requestMatchers("/users/test").authenticated()
+                                .anyRequest().permitAll())
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDenied))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
