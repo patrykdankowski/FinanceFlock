@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
-    private static final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
-
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

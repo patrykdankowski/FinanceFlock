@@ -14,75 +14,55 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_SUB_USERS;
+import static com.patrykdankowski.financeflock.constants.AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE;
+import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    public static final String ENTER_VALID_JWT_TOKEN_MESSAGE = "Enter valid JWT token";
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorDetails> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception) {
-
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Enter valid email",
-//                exception.getMessage() + " already exists in our database",
-//                HttpStatus.CONFLICT);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    public ResponseEntity<ErrorDetails> handleEmailAlreadyExistsException(EmailAlreadyExistsException emailAlreadyExistsException) {
         return setErrorDetails("Enter valid email",
-                exception.getMessage() + " already exists in our database",
+                emailAlreadyExistsException.getMessage() + " already exists in our database",
                 HttpStatus.CONFLICT);
 
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorDetails> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
-//        ErrorDetails errorDetails = new ErrorDetails(
-//                new Date(),
-//                "The request body is missing or incorrect",
-//                "Enter right credentials",
-//                HttpStatus.BAD_REQUEST
-//        );
-//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorDetails> handleHttpMessageNotReadable() {
         return setErrorDetails("The request body is missing or incorrect",
                 "Enter right credentials",
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(PasswordValidationException.class)
-    public ResponseEntity<ErrorDetails> handlePasswordValidationException(PasswordValidationException exception) {
+    public ResponseEntity<ErrorDetails> handlePasswordValidationException(PasswordValidationException passwordValidationException) {
 
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Password is not valid",
-//                exception.getMessage(),
-//                HttpStatus.BAD_REQUEST);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-        return setErrorDetails("Password is not valid",
-                exception.getMessage(),
+
+        return setErrorDetails("Exception occurred during registration",
+                passwordValidationException.getMessage(),
                 HttpStatus.BAD_REQUEST);
 
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException exception) {
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Your email " + exception.getMessage() + "is not valid",
-//                "Enter valid email",
-//                HttpStatus.BAD_REQUEST);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-        return setErrorDetails("Password is not valid",
-                exception.getMessage(),
+    public ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
+        List<String> result = methodArgumentNotValidException.getFieldErrors()
+                .stream().map(
+                        error -> error.getDefaultMessage()
+                ).collect(Collectors.toList());
+        return setErrorDetails("Exception occurred during validation",
+                result.toString(),
                 HttpStatus.BAD_REQUEST);
 
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorDetails> handleNotValidException(Authentication authentication) {
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Access denied",
-//                "You dont have permission to enter here with " + authentication.getAuthorities(),
-//                HttpStatus.FORBIDDEN);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+
         return setErrorDetails("Access denied",
                 "You dont have permission to enter here with " + authentication.getAuthorities(),
                 HttpStatus.FORBIDDEN);
@@ -91,12 +71,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDetails> handleNotValidCredentialsException() {
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Enter valid credentials",
-//                "Username or password is incorrect",
-//                HttpStatus.UNAUTHORIZED);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
-        return setErrorDetails("Password is not valid",
+
+        return setErrorDetails("Exception occurred during logging in",
                 "Username or password is incorrect",
                 HttpStatus.UNAUTHORIZED);
 
@@ -104,12 +80,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException) {
-//        var errorDetails = new ErrorDetails(new Date(),
-//                "Enter valid credentials",
-//                "Username or password is incorrect",
-//                HttpStatus.UNAUTHORIZED);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+    public ResponseEntity<ErrorDetails> handleUsernameNotFoundException() {
+
         return setErrorDetails("Enter valid credentials",
                 "Username or password is incorrect",
                 HttpStatus.UNAUTHORIZED);
@@ -118,11 +90,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomJwtException.class)
     public ResponseEntity<ErrorDetails> handleJwtExceptions(CustomJwtException customJwtException) {
 
-//        var errorDetails = new ErrorDetails(new Date(),
-//                ENTER_VALID_JWT_TOKEN_MESSAGE,
-//                customJwtException.getMessage(),
-//                customJwtException.getHttpStatus());
-//        return new ResponseEntity<>(errorDetails, customJwtException.getHttpStatus());
         return setErrorDetails(ENTER_VALID_JWT_TOKEN_MESSAGE,
                 customJwtException.getMessage(),
                 customJwtException.getHttpStatus());
@@ -137,26 +104,29 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(MaxSubUsersCountException.class)
-    public ResponseEntity<ErrorDetails> handleMaxSubUsersCountException(MaxSubUsersCountException maxSubUsersCountException) {
-        String details = String.format("You are only allowed to add up %d sub users. Remove one of existing sub users first", MAX_SUB_USERS);
+    @ExceptionHandler(MaxUserCountInBudgetGroupException.class)
+    public ResponseEntity<ErrorDetails> handleMaxSubUsersCountException() {
+        String details = String.format("You are only allowed to add up %d  users. Remove one of existing users first", MAX_BUDGET_GROUP_SIZE - 1);
         return setErrorDetails(
-                "You've reached the maximum amount of sub users",
+                "You've reached the maximum amount of users in group",
                 details,
                 HttpStatus.FORBIDDEN
         );
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleSubUserNotBelongToMainUserException(UserNotFoundException userNotFoundException) {
+    public ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+
+
         return setErrorDetails("Something went wrong",
-               "User with given Id doesnt exist in our db",
+                userNotFoundException.getMessage(),
                 HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(SubUserNotBelongToMainUserException.class)
-    public ResponseEntity<ErrorDetails> handleSubUserNotBelongToMainUserException(SubUserNotBelongToMainUserException subUserNotBelongToMainUserException) {
-        return setErrorDetails("Cannot remove",
-                subUserNotBelongToMainUserException.getMessage(),
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorDetails> handleIllegalStateException(IllegalStateException illegalStateException) {
+        return setErrorDetails("Exception occurred",
+                illegalStateException.getMessage(),
                 HttpStatus.BAD_REQUEST);
     }
 

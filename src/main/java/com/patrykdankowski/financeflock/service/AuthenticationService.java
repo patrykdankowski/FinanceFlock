@@ -5,9 +5,12 @@ import com.patrykdankowski.financeflock.dto.RegisterDto;
 import com.patrykdankowski.financeflock.entity.Role;
 import com.patrykdankowski.financeflock.entity.User;
 import com.patrykdankowski.financeflock.exception.EmailAlreadyExistsException;
+import com.patrykdankowski.financeflock.exception.UserNotFoundException;
 import com.patrykdankowski.financeflock.repository.UserRepository;
 import com.patrykdankowski.financeflock.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,11 +34,13 @@ public class AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        updateLastLoginAsync(authentication);
+
         return jwtTokenProvider.generateJwtToken(authentication);
     }
 
     public String register(RegisterDto registerDto) {
-        if(userRepository.existsUserByEmail(registerDto.getEmail())){
+        if (userRepository.existsUserByEmail(registerDto.getEmail())) {
             throw new EmailAlreadyExistsException(registerDto.getEmail());
         }
         var user = new User();
@@ -44,9 +49,23 @@ public class AuthenticationService {
         user.setRole(Role.USER);
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-        user.setMainUser(null);
 
         userRepository.save(user);
         return "Registered";
     }
+
+
+    @Async
+    protected void updateLastLoginAsync(Authentication authentication) {
+        //TODO duplikacja kodu + zastanowić się czy warto asynchroniecznie
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
+        }
+        String userMail = authentication.getName();
+        User user = userRepository.findByEmail(userMail)
+                .orElseThrow(() -> new UserNotFoundException(userMail));
+        user.setLastLoggedInAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
 }

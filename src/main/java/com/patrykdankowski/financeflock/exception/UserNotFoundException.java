@@ -1,13 +1,12 @@
 package com.patrykdankowski.financeflock.exception;
 
-public class UserNotFoundException extends RuntimeException{
-    private String email;
-    private Long id;
+public class UserNotFoundException extends RuntimeException {
 
     public UserNotFoundException(String email) {
-        this.email = email;
+        super(String.format("User with given email %s does not exist in out database", email));
     }
+
     public UserNotFoundException(Long id) {
-        this.id = id;
+        super(String.format("User with given id %d does not exist in out database", id));
     }
 }

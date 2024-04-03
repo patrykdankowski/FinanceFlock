@@ -2,5 +2,6 @@ package com.patrykdankowski.financeflock.entity;
 
 public enum Role {
     USER,
-    ADMIN
+    GROUP_ADMIN,
+    GROUP_MEMBER
 }

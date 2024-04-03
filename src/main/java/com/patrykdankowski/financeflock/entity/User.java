@@ -32,6 +32,8 @@ public class User {
 
     private String email;
 
+    private LocalDateTime lastLoggedInAt;
+
     @CreatedDate
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -39,28 +41,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "main_user_id")
-    private User mainUser;
-
-    @JsonBackReference
-    @OneToMany(mappedBy = "mainUser", cascade = CascadeType.ALL)
-    private Set<User> subUsers = new HashSet<>();
-
-
-//    private LocalDateTime lastLoggedInAt;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private BudgetGroup budgetGroup;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id != null && this.id.equals(user.id);
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(getName(), user.getName()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getCreatedAt(), user.getCreatedAt()) && getRole() == user.getRole();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getName(), getEmail(), getCreatedAt(), getRole());
     }
+
 }
