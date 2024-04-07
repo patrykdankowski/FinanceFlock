@@ -1,5 +1,7 @@
 package com.patrykdankowski.financeflock.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patrykdankowski.financeflock.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,13 +10,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.patrykdankowski.financeflock.constants.AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE;
@@ -49,11 +54,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
+    public ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) throws JsonProcessingException {
         List<String> result = methodArgumentNotValidException.getFieldErrors()
                 .stream().map(
                         error -> error.getDefaultMessage()
                 ).collect(Collectors.toList());
+
+//        Map<String, String> result = new HashMap<>();
+//        methodArgumentNotValidException.getBindingResult().getAllErrors().forEach(
+//                error -> {
+//                    String field = ((FieldError) error).getField();
+//                    String message = error.getDefaultMessage();
+//                    result.put(field, message);
+//                }
+
+//        );
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String jsonErrors = objectMapper.writeValueAsString(result);
         return setErrorDetails("Exception occurred during validation",
                 result.toString(),
                 HttpStatus.BAD_REQUEST);
@@ -129,7 +146,6 @@ public class GlobalExceptionHandler {
                 illegalStateException.getMessage(),
                 HttpStatus.BAD_REQUEST);
     }
-
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);

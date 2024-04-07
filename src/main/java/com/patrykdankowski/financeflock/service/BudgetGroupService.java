@@ -1,7 +1,6 @@
 package com.patrykdankowski.financeflock.service;
 
 import com.patrykdankowski.financeflock.dto.BudgetGroupDto;
-import com.patrykdankowski.financeflock.dto.EmailDto;
 import com.patrykdankowski.financeflock.dto.UserDto;
 import com.patrykdankowski.financeflock.entity.BudgetGroup;
 import com.patrykdankowski.financeflock.entity.Role;
@@ -11,9 +10,8 @@ import com.patrykdankowski.financeflock.repository.BudgetGroupRepository;
 import com.patrykdankowski.financeflock.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,14 +25,18 @@ import static com.patrykdankowski.financeflock.entity.Role.USER;
 public class BudgetGroupService {
     private final BudgetGroupRepository budgetGroupRepository;
     private final UserRepository userRepository;
+    private final UserContextService userContextService;
+    private final UserCacheService userCacheService;
+
 
     @Transactional
+    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     public void createBudgetGroup(BudgetGroupDto budgetGroupDto) {
-        Authentication authentication = getAuthentication();
+        Authentication authentication = userContextService.getAuthentication();
 
         String ownerEmail = authentication.getName();
-        User owner = userRepository.findByEmail(ownerEmail)
-                .orElseThrow(() -> new UserNotFoundException(ownerEmail));
+        User owner = userCacheService.getUserFromEmail(ownerEmail);
+
         owner.setRole(Role.GROUP_ADMIN);
         BudgetGroup budgetGroup = BudgetGroup.create(owner, budgetGroupDto);
         owner.setBudgetGroup(budgetGroup);
@@ -44,11 +46,11 @@ public class BudgetGroupService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     public void closeBudgetGroup() {
-        Authentication authentication = getAuthentication();
+        Authentication authentication = userContextService.getAuthentication();
         String ownerEmail = authentication.getName();
-        User owner = userRepository.findByEmail(ownerEmail)
-                .orElseThrow(() -> new UserNotFoundException(ownerEmail));
+        User owner = userCacheService.getUserFromEmail(ownerEmail);
         BudgetGroup budgetGroup = owner.getBudgetGroup();
         if (budgetGroup == null) {
             throw new IllegalStateException("There is no group to close");
@@ -70,11 +72,10 @@ public class BudgetGroupService {
 
     @Transactional
     public void addUserToGroup(String email) {
-        Authentication authentication = getAuthentication();
+        Authentication authentication = userContextService.getAuthentication();
 
         String ownerEmail = authentication.getName();
-        User owner = userRepository.findByEmail(ownerEmail)
-                .orElseThrow(() -> new UserNotFoundException(ownerEmail));
+        User owner = userCacheService.getUserFromEmail(ownerEmail);
 
         BudgetGroup budgetGroup = owner.getBudgetGroup();
         if (budgetGroup == null) {
@@ -100,11 +101,10 @@ public class BudgetGroupService {
 
     @Transactional
     public void removeUserFromGroup(String email) {
-        Authentication authentication = getAuthentication();
+        Authentication authentication = userContextService.getAuthentication();
 
         String ownerEmail = authentication.getName();
-        User owner = userRepository.findByEmail(ownerEmail)
-                .orElseThrow(() -> new UserNotFoundException(ownerEmail));
+        User owner = userCacheService.getUserFromEmail(ownerEmail);
 
         BudgetGroup budgetGroup = owner.getBudgetGroup();
         if (budgetGroup == null) {
@@ -122,11 +122,11 @@ public class BudgetGroupService {
 
     }
 
+    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     public List<UserDto> listOfUsersInGroup() {
-        Authentication authentication = getAuthentication();
+        Authentication authentication = userContextService.getAuthentication();
         String loggedUserEmail = authentication.getName();
-        User userLoggedIn = userRepository.findByEmail(loggedUserEmail)
-                .orElseThrow(() -> new UserNotFoundException(loggedUserEmail));
+        User userLoggedIn = userCacheService.getUserFromEmail(loggedUserEmail);
         BudgetGroup budgetGroup = userLoggedIn.getBudgetGroup();
         if (budgetGroup == null) {
             throw new IllegalStateException(userLoggedIn.getName() + " is not a member of a group");
@@ -139,11 +139,4 @@ public class BudgetGroupService {
     }
 
 
-    private static Authentication getAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
-        }
-        return authentication;
-    }
 }
