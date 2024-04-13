@@ -3,6 +3,7 @@ package com.patrykdankowski.financeflock.controller;
 import com.patrykdankowski.financeflock.dto.BudgetGroupDto;
 import com.patrykdankowski.financeflock.dto.EmailDto;
 import com.patrykdankowski.financeflock.dto.UserDto;
+import com.patrykdankowski.financeflock.dto.projections.UserDtoProjections;
 import com.patrykdankowski.financeflock.service.BudgetGroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,16 @@ public class BudgetGroupController {
         List<UserDto> list = budgetGroupService.listOfUsersInGroup();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(list);
+    }
+
+    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+    @GetMapping("/list")
+    public ResponseEntity<List<UserDtoProjections>> getList() {
+
+        List<UserDtoProjections> budgetGroupExpenses = budgetGroupService.getBudgetGroupExpenses();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(budgetGroupExpenses);
+
     }
 
 

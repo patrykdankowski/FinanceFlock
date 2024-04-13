@@ -35,5 +35,15 @@ public class UserService {
         //TODO -> informowanie założyciela przez wysłanie mail'a, że user opuścił grupę
     }
 
+    public boolean toggleShareData() {
+        Authentication authentication = userContextService.getAuthentication();
+        String userEmail = authentication.getName();
+        User user = userCacheService.getUserFromEmail(userEmail);
+
+        user.setShareData(!user.isShareData());
+        userRepository.save(user);
+        return user.isShareData();
+    }
+
 
 }

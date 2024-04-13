@@ -2,10 +2,11 @@ package com.patrykdankowski.financeflock.service;
 
 import com.patrykdankowski.financeflock.dto.BudgetGroupDto;
 import com.patrykdankowski.financeflock.dto.UserDto;
+import com.patrykdankowski.financeflock.dto.projections.UserDtoProjections;
 import com.patrykdankowski.financeflock.entity.BudgetGroup;
 import com.patrykdankowski.financeflock.entity.Role;
 import com.patrykdankowski.financeflock.entity.User;
-import com.patrykdankowski.financeflock.exception.UserNotFoundException;
+import com.patrykdankowski.financeflock.exception.ResourceNotFoundException;
 import com.patrykdankowski.financeflock.repository.BudgetGroupRepository;
 import com.patrykdankowski.financeflock.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,10 +15,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
+import static com.patrykdankowski.financeflock.constants.AppConstants.USER_NOT_FOUND;
 import static com.patrykdankowski.financeflock.entity.Role.USER;
 
 @Service
@@ -82,7 +85,7 @@ public class BudgetGroupService {
             throw new IllegalStateException(owner.getName() + " does not have a group");
         }
         User userToAdd = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+                .orElseThrow(() -> new ResourceNotFoundException(email, USER_NOT_FOUND));
 
 
         if (budgetGroup.getListOfMembers().contains(userToAdd)) {
@@ -111,7 +114,7 @@ public class BudgetGroupService {
             throw new IllegalStateException(owner.getName() + " is not a member of a group");
         }
         User userToRemove = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+                .orElseThrow(() -> new ResourceNotFoundException(email, USER_NOT_FOUND));
         if (!(budgetGroup.getListOfMembers().contains(userToRemove))) {
             throw new IllegalStateException("User is not a member of the group");
         }
@@ -136,6 +139,10 @@ public class BudgetGroupService {
                         user -> new UserDto(user)
                 ).collect(Collectors.toList())).orElseThrow(
         );
+    }
+
+    public List<UserDtoProjections> getBudgetGroupExpenses() {
+        return new ArrayList<>(userRepository.findAllByShareDataIsTrue());
     }
 
 

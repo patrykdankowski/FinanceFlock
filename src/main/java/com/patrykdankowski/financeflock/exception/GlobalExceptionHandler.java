@@ -1,7 +1,6 @@
 package com.patrykdankowski.financeflock.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patrykdankowski.financeflock.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +9,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.patrykdankowski.financeflock.constants.AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE;
@@ -28,10 +24,11 @@ import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorDetails> handleEmailAlreadyExistsException(EmailAlreadyExistsException emailAlreadyExistsException) {
-        return setErrorDetails("Enter valid email",
-                emailAlreadyExistsException.getMessage() + " already exists in our database",
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
+        return setErrorDetails(resourceNotFoundException.getMessage(),
+                resourceNotFoundException.getDetails(),
                 HttpStatus.CONFLICT);
 
     }
@@ -144,6 +141,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDetails> handleIllegalStateException(IllegalStateException illegalStateException) {
         return setErrorDetails("Exception occurred",
                 illegalStateException.getMessage(),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotBelongToUserException.class)
+    public ResponseEntity<ErrorDetails> handleIllegalStateException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
+        return setErrorDetails("Exception occurred",
+                "That resource does not belong to you",
                 HttpStatus.BAD_REQUEST);
     }
 

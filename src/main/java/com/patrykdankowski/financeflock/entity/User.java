@@ -9,7 +9,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -45,16 +47,21 @@ public class User {
     @JoinColumn(name = "group_id")
     private BudgetGroup budgetGroup;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User user)) return false;
-        return Objects.equals(getName(), user.getName()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getCreatedAt(), user.getCreatedAt()) && getRole() == user.getRole();
-    }
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Expense> expenseList = new ArrayList<>();
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getEmail(), getCreatedAt(), getRole());
-    }
+    private boolean shareData;
+
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (!(o instanceof User user)) return false;
+//        return Objects.equals(getName(), user.getName()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getCreatedAt(), user.getCreatedAt()) && getRole() == user.getRole();
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(getName(), getEmail(), getCreatedAt(), getRole());
+//    }
 
 }

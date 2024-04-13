@@ -11,15 +11,23 @@ import org.hibernate.validator.constraints.Length;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 public class ExpenseDto {
     @Length(min = 2)
-    @NotBlank
+    @NotBlank(groups = onCreate.class)
     private String description;
-    @Digits(integer = 7, fraction = 2)
+    @Digits(groups = onCreate.class, integer = 7, fraction = 2)
     private BigDecimal amount;
     private String location;
     private LocalDateTime expenseDate;
+
+    public interface onCreate {
+    }
+
+//    public interface onUpdate {
+//    }
+
 
 }

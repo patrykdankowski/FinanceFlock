@@ -24,5 +24,14 @@ public class UserController {
                 .body("Successfully left group");
     }
 
+    @PostMapping("/updateShareDataPreference")
+    @PreAuthorize("hasAnyAuthority('USER','GROUP_ADMIN','GROUP_MEMBER')")
+    public ResponseEntity<String> updateShareDataPreference() {
+        boolean isSharingData = userService.toggleShareData();
+        String message = isSharingData ? "You are now sharing your data" : "You are not sharing your data now";
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(message);
+    }
+
 
 }

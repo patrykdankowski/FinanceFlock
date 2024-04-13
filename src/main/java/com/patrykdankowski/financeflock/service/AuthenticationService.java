@@ -4,8 +4,7 @@ import com.patrykdankowski.financeflock.dto.LoginDto;
 import com.patrykdankowski.financeflock.dto.RegisterDto;
 import com.patrykdankowski.financeflock.entity.Role;
 import com.patrykdankowski.financeflock.entity.User;
-import com.patrykdankowski.financeflock.exception.EmailAlreadyExistsException;
-import com.patrykdankowski.financeflock.exception.UserNotFoundException;
+import com.patrykdankowski.financeflock.exception.ResourceNotFoundException;
 import com.patrykdankowski.financeflock.repository.UserRepository;
 import com.patrykdankowski.financeflock.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
+import static com.patrykdankowski.financeflock.constants.AppConstants.USER_NOT_FOUND;
+import static com.patrykdankowski.financeflock.constants.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +43,13 @@ public class AuthenticationService {
 
     public String register(RegisterDto registerDto) {
         if (userRepository.existsUserByEmail(registerDto.getEmail())) {
-            throw new EmailAlreadyExistsException(registerDto.getEmail());
+            throw new ResourceNotFoundException(registerDto.getEmail(),VALID_EMAIL_MESSAGE);
         }
         var user = new User();
         user.setName(registerDto.getName());
         user.setCreatedAt(LocalDateTime.now());
         user.setRole(Role.USER);
+        user.setShareData(true);
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
@@ -63,7 +66,7 @@ public class AuthenticationService {
         }
         String userMail = authentication.getName();
         User user = userRepository.findByEmail(userMail)
-                .orElseThrow(() -> new UserNotFoundException(userMail));
+                .orElseThrow(() -> new ResourceNotFoundException(userMail, USER_NOT_FOUND));
         user.setLastLoggedInAt(LocalDateTime.now());
         userRepository.save(user);
     }
