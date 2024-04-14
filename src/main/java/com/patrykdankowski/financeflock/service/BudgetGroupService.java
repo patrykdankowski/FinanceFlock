@@ -142,7 +142,10 @@ public class BudgetGroupService {
     }
 
     public List<UserDtoProjections> getBudgetGroupExpenses() {
-        return new ArrayList<>(userRepository.findAllByShareDataIsTrue());
+        Authentication authentication = userContextService.getAuthentication();
+        String loggedUserEmail = authentication.getName();
+        User userLoggedIn = userCacheService.getUserFromEmail(loggedUserEmail);
+        return new ArrayList<>(userRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(userLoggedIn.getBudgetGroup().getId()));
     }
 
 
