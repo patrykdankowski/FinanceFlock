@@ -1,3 +1,0 @@
-- Cache`owac select usera z bazy
-- Dodac redis do logowania -> n prób przy n blokowanie konta na x czasu
-- UserService / BudgetGroupService -> sporo kodu się duplikuje, refraktoryzacja asap

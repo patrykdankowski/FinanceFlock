@@ -1,7 +1,6 @@
 package com.patrykdankowski.financeflock.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.patrykdankowski.financeflock.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -22,11 +21,13 @@ import static com.patrykdankowski.financeflock.constants.AppConstants.ENTER_VALI
 import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+class GlobalExceptionHandler {
 
+    private GlobalExceptionHandler() {
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
+    ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
         return setErrorDetails(resourceNotFoundException.getMessage(),
                 resourceNotFoundException.getDetails(),
                 HttpStatus.CONFLICT);
@@ -34,14 +35,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorDetails> handleHttpMessageNotReadable() {
+    ResponseEntity<ErrorDetails> handleHttpMessageNotReadable() {
         return setErrorDetails("The request body is missing or incorrect",
                 "Enter right credentials",
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(PasswordValidationException.class)
-    public ResponseEntity<ErrorDetails> handlePasswordValidationException(PasswordValidationException passwordValidationException) {
+    ResponseEntity<ErrorDetails> handlePasswordValidationException(PasswordValidationException passwordValidationException) {
 
 
         return setErrorDetails("Exception occurred during registration",
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) throws JsonProcessingException {
+    ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) throws JsonProcessingException {
         List<String> result = methodArgumentNotValidException.getFieldErrors()
                 .stream().map(
                         error -> error.getDefaultMessage()
@@ -75,7 +76,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorDetails> handleNotValidException(Authentication authentication) {
+    ResponseEntity<ErrorDetails> handleNotValidException(Authentication authentication) {
 
         return setErrorDetails("Access denied",
                 "You dont have permission to enter here with " + authentication.getAuthorities(),
@@ -84,7 +85,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorDetails> handleNotValidCredentialsException() {
+    ResponseEntity<ErrorDetails> handleNotValidCredentialsException() {
 
         return setErrorDetails("Exception occurred during logging in",
                 "Username or password is incorrect",
@@ -94,15 +95,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleUsernameNotFoundException() {
+    ResponseEntity<ErrorDetails> handleUsernameNotFoundException() {
 
         return setErrorDetails("Enter valid credentials",
-                "Username or password is incorrect",
+                "User was not found",
                 HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(CustomJwtException.class)
-    public ResponseEntity<ErrorDetails> handleJwtExceptions(CustomJwtException customJwtException) {
+    ResponseEntity<ErrorDetails> handleJwtExceptions(CustomJwtException customJwtException) {
 
         return setErrorDetails(ENTER_VALID_JWT_TOKEN_MESSAGE,
                 customJwtException.getMessage(),
@@ -110,7 +111,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorDetails> handleNoHandlerFoundException(NoHandlerFoundException noHandlerFoundException) {
+    ResponseEntity<ErrorDetails> handleNoHandlerFoundException(NoHandlerFoundException noHandlerFoundException) {
         return setErrorDetails(
                 "Endpoint not found",
                 noHandlerFoundException.getMessage(),
@@ -119,7 +120,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUserCountInBudgetGroupException.class)
-    public ResponseEntity<ErrorDetails> handleMaxSubUsersCountException() {
+    ResponseEntity<ErrorDetails> handleMaxSubUsersCountException() {
         String details = String.format("You are only allowed to add up %d  users. Remove one of existing users first", MAX_BUDGET_GROUP_SIZE - 1);
         return setErrorDetails(
                 "You've reached the maximum amount of users in group",
@@ -129,7 +130,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+    ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
 
 
         return setErrorDetails("Something went wrong",
@@ -145,10 +146,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotBelongToUserException.class)
-    public ResponseEntity<ErrorDetails> handleIllegalStateException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
+    ResponseEntity<ErrorDetails> handleIllegalStateException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
         return setErrorDetails("Exception occurred",
                 "That resource does not belong to you",
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExists.class)
+    ResponseEntity<ErrorDetails> handleResourceAlreadyExistsException(ResourceAlreadyExists resourceAlreadyExists) {
+        return setErrorDetails(resourceAlreadyExists.getMessage() + "  already exists in out db",
+                "Please enter a different email address.",
+                HttpStatus.CONFLICT);
     }
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
