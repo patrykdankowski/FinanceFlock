@@ -1,12 +1,20 @@
 package com.patrykdankowski.financeflock.exception;
 
+import com.patrykdankowski.financeflock.constants.AppConstants;
+import lombok.Getter;
+
+@Getter
 public class UserNotFoundException extends RuntimeException {
+    private String details;
 
     public UserNotFoundException(String email) {
-        super(String.format("User with given email %s does not exist in out database", email));
+
+        this.details = String.format(AppConstants.USER_NOT_FOUND, email);
     }
 
-    public UserNotFoundException(Long id) {
-        super(String.format("User with given id %d does not exist in out database", id));
+    public UserNotFoundException(Long userId) {
+
+        this.details = String.format(AppConstants.USER_NOT_FOUND, userId);
     }
+
 }

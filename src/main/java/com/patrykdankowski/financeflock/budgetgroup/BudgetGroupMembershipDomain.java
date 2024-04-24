@@ -8,7 +8,7 @@ public interface BudgetGroupMembershipDomain {
 
     BudgetGroup addUserToGroup(String email);
 
-    void removeUserFromGroup(String email);
+    GroupUpdateResult removeUserFromGroup(String email);
 
     List<UserDtoResponse> listOfUsersInGroup();
 

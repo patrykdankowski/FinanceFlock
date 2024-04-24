@@ -26,10 +26,17 @@ class GlobalExceptionHandler {
     private GlobalExceptionHandler() {
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
-        return setErrorDetails(resourceNotFoundException.getMessage(),
-                resourceNotFoundException.getDetails(),
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+        return setErrorDetails("Cannot find user",
+                userNotFoundException.getDetails(),
+                HttpStatus.CONFLICT);
+
+    }
+    @ExceptionHandler(BudgetGroupNotFoundException.class)
+    ResponseEntity<ErrorDetails> handleBudgetGroupNotFoundException(BudgetGroupNotFoundException budgetGroupNotFoundException) {
+        return setErrorDetails("Cannot find budget group",
+                budgetGroupNotFoundException.getDetails(),
                 HttpStatus.CONFLICT);
 
     }
@@ -129,14 +136,6 @@ class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
-
-
-        return setErrorDetails("Something went wrong",
-                userNotFoundException.getMessage(),
-                HttpStatus.BAD_REQUEST);
-    }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorDetails> handleIllegalStateException(IllegalStateException illegalStateException) {

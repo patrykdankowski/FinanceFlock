@@ -1,10 +1,9 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.constants.AppConstants;
 import com.patrykdankowski.financeflock.constants.Role;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.exception.ResourceNotBelongToUserException;
-import com.patrykdankowski.financeflock.exception.ResourceNotFoundException;
+import com.patrykdankowski.financeflock.exception.UserNotFoundException;
 import com.patrykdankowski.financeflock.cache.UserCacheService;
 import com.patrykdankowski.financeflock.auth.UserContextService;
 import jakarta.transaction.Transactional;
@@ -63,13 +62,13 @@ class ExpenseFacade {
         User user = userCacheService.getUserFromEmail(userEmail);
         Expense toUpdate = expenseService.findExpenseById(id)
 
-                .orElseThrow(() -> new ResourceNotFoundException(id, AppConstants.EXPENSE_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
 
         if (user.getRole().equals(Role.GROUP_ADMIN) && (!user.getExpenseList().contains(toUpdate) || !toUpdate.getUser().equals(user))) {
             throw new ResourceNotBelongToUserException(userEmail, toUpdate.getId());
         } else if (!user.getExpenseList().contains(toUpdate) || !toUpdate.getUser().equals(user)) {
-            throw new ResourceNotFoundException(id, AppConstants.EXPENSE_NOT_FOUND);
+            throw new UserNotFoundException(id);
         }
 
         if (expenseDto.getExpenseDate() != null) {

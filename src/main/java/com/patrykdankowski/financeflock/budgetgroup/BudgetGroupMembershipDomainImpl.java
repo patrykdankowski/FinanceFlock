@@ -1,10 +1,12 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import  com.patrykdankowski.financeflock.auth.AuthenticationService;
+import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.exception.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,15 +14,16 @@ import java.util.stream.Collectors;
 import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
 import static com.patrykdankowski.financeflock.constants.Role.USER;
 
+@Service
 public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
 
     private final BudgetGroupService budgetGroupService;
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
-    public BudgetGroupMembershipDomainImpl(final BudgetGroupService budgetGroupService,
-                                           final UserService userService,
-                                           final AuthenticationService authenticationService) {
+    BudgetGroupMembershipDomainImpl(final BudgetGroupService budgetGroupService,
+                                    final UserService userService,
+                                    final AuthenticationService authenticationService) {
         this.budgetGroupService = budgetGroupService;
         this.userService = userService;
         this.authenticationService = authenticationService;
@@ -41,13 +44,13 @@ public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDom
         return budgetGroup;
     }
 
-    private static void assignRoleAndBudgetGroupForUser(final User userToAdd, final BudgetGroup budgetGroup, Role role) {
-        userToAdd.setRole(role);
-        userToAdd.setBudgetGroup(budgetGroup);
+    private void assignRoleAndBudgetGroupForUser(final User user, final BudgetGroup budgetGroup, final Role role) {
+        user.setRole(role);
+        user.setBudgetGroup(budgetGroup);
 
     }
 
-    private static void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
+    private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
         if (budgetGroup.getListOfMembers().contains(userToAdd)) {
             throw new IllegalStateException("User is already a member of the group");
         }
@@ -56,11 +59,11 @@ public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDom
         }
     }
 
-    private static void addUserToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
+    private void addUserToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
         budgetGroup.getListOfMembers().add(userToAdd);
     }
 
-    private static BudgetGroup validateAndGetBudgetGroup(final User userFromContext) {
+    private BudgetGroup validateAndGetBudgetGroup(final User userFromContext) {
         var groupToValidate = userFromContext.getBudgetGroup();
         if (groupToValidate == null) {
             throw new IllegalStateException("User does not belong to any budget group");
@@ -70,37 +73,54 @@ public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDom
 
 
     @Override
-    public void removeUserFromGroup(final String email) {
+    public GroupUpdateResult removeUserFromGroup(final String email) {
         var userFromContext = authenticationService.getUserFromContext();
 
 
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
-        }
+        BudgetGroup budgetGroup = validateAndGetUserGroup(userFromContext);
+        var userToRemove = validateAndGetUserToRemoveFromBudgetGroup(email, budgetGroup);
+
+        removeUserFromBudgetGroup(budgetGroup, userToRemove);
+        return new GroupUpdateResult(budgetGroup, userToRemove);
+
+    }
+
+    private  void removeUserFromBudgetGroup(final BudgetGroup budgetGroup, final User userToRemove) {
+        budgetGroup.getListOfMembers().remove(userToRemove);
+        assignRoleAndBudgetGroupForUser(userToRemove, null, USER);
+    }
+
+    private User validateAndGetUserToRemoveFromBudgetGroup(final String email, final BudgetGroup budgetGroup) {
         var userToRemove = userService.findUserByEmail(email);
         if (!(budgetGroup.getListOfMembers().contains(userToRemove))) {
             throw new IllegalStateException("User is not a member of the group");
         }
-        budgetGroup.getListOfMembers().remove(userToRemove);
-        userToRemove.setRole(USER);
-        userToRemove.setBudgetGroup(null);
-        budgetGroupService.saveBudgetGroup(budgetGroup);
+        return userToRemove;
     }
 
-    @Override
-    public List<UserDtoResponse> listOfUsersInGroup() {
-        var userFromContext = authenticationService.getUserFromContext();
-
-
+    private static BudgetGroup validateAndGetUserGroup(final User userFromContext) {
         BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
         if (budgetGroup == null) {
             throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
         }
+        return budgetGroup;
+    }
+
+    @Override
+    public List<UserDtoResponse> listOfUsersInGroup() {
+
+        var userFromContext = authenticationService.getUserFromContext();
+
+        BudgetGroup budgetGroup = validateAndGetUserGroup(userFromContext);
+
+        return getListOfMembers(budgetGroup);
+    }
+
+    private List<UserDtoResponse> getListOfMembers(final BudgetGroup budgetGroup) {
         return budgetGroupService.findBudgetGroupById(budgetGroup.getId()).map(
-                group -> group.getListOfMembers().stream().map(
-                        user -> new UserDtoResponse(user.getName(), user.getEmail())
-                ).collect(Collectors.toList())).orElseThrow(
-        );
+                        group -> group.getListOfMembers().stream().map(
+                                user -> new UserDtoResponse(user.getName(), user.getEmail())
+                        ).collect(Collectors.toList()))
+                .orElseThrow(() -> new BudgetGroupNotFoundException(budgetGroup.getId()));
     }
 }
