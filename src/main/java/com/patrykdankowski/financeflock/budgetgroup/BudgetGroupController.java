@@ -1,6 +1,5 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.user.UserDto;
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
 import jakarta.validation.Valid;
@@ -20,8 +19,8 @@ class BudgetGroupController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
-    ResponseEntity<String> createBudgetGroup(@Valid @RequestBody BudgetGroupDto budgetGroupDto) {
-        budgetGroupFacade.createBudgetGroup(budgetGroupDto);
+    ResponseEntity<String> createBudgetGroup(@Valid @RequestBody BudgetGroupRequest budgetGroupRequest) {
+        budgetGroupFacade.createBudgetGroup(budgetGroupRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Budget group created");
     }

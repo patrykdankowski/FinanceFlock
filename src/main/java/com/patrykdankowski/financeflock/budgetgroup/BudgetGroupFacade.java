@@ -3,7 +3,6 @@ package com.patrykdankowski.financeflock.budgetgroup;
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.constants.Role;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserDto;
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserService;
@@ -19,11 +18,13 @@ import static com.patrykdankowski.financeflock.constants.Role.USER;
 
 @Service
 class BudgetGroupFacade {
+    private final BudgetGroupMembershipDomain budgetGroupMembershipDomain;
     private final UserService userService;
     private final BudgetGroupService budgetGroupService;
     private final AuthenticationService authenticationService;
 
-    BudgetGroupFacade(final UserService userService, final BudgetGroupService budgetGroupService, final AuthenticationService authenticationService) {
+    BudgetGroupFacade(final BudgetGroupMembershipDomain budgetGroupMembershipDomain, final UserService userService, final BudgetGroupService budgetGroupService, final AuthenticationService authenticationService) {
+        this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.budgetGroupService = budgetGroupService;
@@ -31,11 +32,11 @@ class BudgetGroupFacade {
 
     @Transactional
 //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
-    void createBudgetGroup(BudgetGroupDto budgetGroupDto) {
+    void createBudgetGroup(BudgetGroupRequest budgetGroupRequest) {
         var userFromContext = authenticationService.getUserFromContext();
 
         userFromContext.setRole(Role.GROUP_ADMIN);
-        BudgetGroup budgetGroup = BudgetGroup.create(userFromContext, budgetGroupDto);
+        BudgetGroup budgetGroup = BudgetGroup.create(userFromContext, budgetGroupRequest);
         userFromContext.setBudgetGroup(budgetGroup);
         budgetGroupService.saveBudgetGroup(budgetGroup);
 
@@ -67,65 +68,50 @@ class BudgetGroupFacade {
 
     @Transactional
     void addUserToGroup(String email) {
-        var userFromContext = authenticationService.getUserFromContext();
 
+        final BudgetGroup budgetGroup = budgetGroupMembershipDomain.addUserToGroup(email);
 
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException(userFromContext.getName() + " does not have a group");
-        }
-        var userToAdd = userService.findUserByEmail(email);
-
-        if (budgetGroup.getListOfMembers().contains(userToAdd)) {
-            throw new IllegalStateException("User is already a member of the group");
-        }
-        if (budgetGroup.getListOfMembers().size() >= MAX_BUDGET_GROUP_SIZE) {
-            throw new IllegalStateException("Budget group size is full, remove someone first");
-        }
-        budgetGroup.getListOfMembers().add(userToAdd);
-        userToAdd.setRole(Role.GROUP_MEMBER);
-        userToAdd.setBudgetGroup(budgetGroup);
         budgetGroupService.saveBudgetGroup(budgetGroup);
 
 
     }
 
-    @Transactional
-    void removeUserFromGroup(String email) {
-        var userFromContext = authenticationService.getUserFromContext();
+//    @Transactional
+//    void removeUserFromGroup(String email) {
+//        var userFromContext = authenticationService.getUserFromContext();
+//
+//
+//        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
+//        if (budgetGroup == null) {
+//            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
+//        }
+//        var userToRemove = userService.findUserByEmail(email);
+//        if (!(budgetGroup.getListOfMembers().contains(userToRemove))) {
+//            throw new IllegalStateException("User is not a member of the group");
+//        }
+//        budgetGroup.getListOfMembers().remove(userToRemove);
+//        userToRemove.setRole(USER);
+//        userToRemove.setBudgetGroup(null);
+//        budgetGroupService.saveBudgetGroup(budgetGroup);
 
-
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
-        }
-        var userToRemove = userService.findUserByEmail(email);
-        if (!(budgetGroup.getListOfMembers().contains(userToRemove))) {
-            throw new IllegalStateException("User is not a member of the group");
-        }
-        budgetGroup.getListOfMembers().remove(userToRemove);
-        userToRemove.setRole(USER);
-        userToRemove.setBudgetGroup(null);
-        budgetGroupService.saveBudgetGroup(budgetGroup);
-
-    }
+//    }
 
     //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
 //    @Cacheable(cacheNames = "userEmailCache")
-    public List<UserDtoResponse> listOfUsersInGroup() {
-        var userFromContext = authenticationService.getUserFromContext();
-
-
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
-        }
-        return budgetGroupService.findBudgetGroupById(budgetGroup.getId()).map(
-                group -> group.getListOfMembers().stream().map(
-                        user -> new UserDtoResponse(user.getName(), user.getEmail())
-                ).collect(Collectors.toList())).orElseThrow(
-        );
-    }
+//    public List<UserDtoResponse> listOfUsersInGroup() {
+//        var userFromContext = authenticationService.getUserFromContext();
+//
+//
+//        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
+//        if (budgetGroup == null) {
+//            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
+//        }
+//        return budgetGroupService.findBudgetGroupById(budgetGroup.getId()).map(
+//                group -> group.getListOfMembers().stream().map(
+//                        user -> new UserDtoResponse(user.getName(), user.getEmail())
+//                ).collect(Collectors.toList())).orElseThrow(
+//        );
+//    }
 
     List<UserDtoProjections> getBudgetGroupExpenses() {
         var userFromContext = authenticationService.getUserFromContext();

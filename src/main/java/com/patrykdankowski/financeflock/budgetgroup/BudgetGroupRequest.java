@@ -3,7 +3,7 @@ package com.patrykdankowski.financeflock.budgetgroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
- class BudgetGroupDto {
+ class BudgetGroupRequest {
     @Size(min = 5)
     @NotBlank
     private String description;
