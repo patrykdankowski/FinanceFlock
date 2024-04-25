@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.patrykdankowski.financeflock.constants.AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE;
-import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
+import static com.patrykdankowski.financeflock.common.AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE;
+import static com.patrykdankowski.financeflock.common.AppConstants.MAX_BUDGET_GROUP_SIZE;
 
 @RestControllerAdvice
 class GlobalExceptionHandler {

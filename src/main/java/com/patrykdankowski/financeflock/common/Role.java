@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.constants;
+package com.patrykdankowski.financeflock.common;
 
 public enum Role {
     USER,

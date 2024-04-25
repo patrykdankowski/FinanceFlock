@@ -1,27 +1,24 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.patrykdankowski.financeflock.constants.Role.USER;
+import static com.patrykdankowski.financeflock.common.Role.USER;
 
 @Service
 public class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDomain {
 
     private final AuthenticationService authenticationService;
-    private final UserService userService;
-    private final BudgetGroupService budgetGroupService;
     private final BudgetGroupFactory budgetGroupFactory;
 
-    BudgetGroupManagementDomainImpl(final AuthenticationService authenticationService, final UserService userService, final BudgetGroupService budgetGroupService, final BudgetGroupFactory budgetGroupFactory) {
+    BudgetGroupManagementDomainImpl(final AuthenticationService authenticationService,
+                                    final BudgetGroupFactory budgetGroupFactory) {
         this.authenticationService = authenticationService;
-        this.userService = userService;
-        this.budgetGroupService = budgetGroupService;
         this.budgetGroupFactory = budgetGroupFactory;
     }
 
@@ -49,17 +46,15 @@ public class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDom
     }
 
     @Override
-    public GroupUpdateResult closeBudgetGroup() {
+    public UserAndGroupUpdateResult closeBudgetGroup() {
+        //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
+
         var userFromContext = authenticationService.getUserFromContext();
         BudgetGroup budgetGroup = validateAndGetBudgetGroup(userFromContext);
         validateOwnership(budgetGroup, userFromContext);
-        //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
         List<User> listOfUsers = resetUsersRolesAndDetachFromGroup(budgetGroup);
-        userService.saveAllUsers(listOfUsers);
-        budgetGroupService.deleteBudgetGroup(budgetGroup);
 
-
-        return new GroupUpdateResult(budgetGroup,listOfUsers);
+        return new UserAndGroupUpdateResult(budgetGroup, listOfUsers);
     }
 
     private List<User> resetUsersRolesAndDetachFromGroup(final BudgetGroup budgetGroup) {

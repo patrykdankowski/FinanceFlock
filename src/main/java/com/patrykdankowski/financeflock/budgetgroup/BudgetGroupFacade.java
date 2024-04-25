@@ -1,8 +1,10 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
+import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
+import com.patrykdankowski.financeflock.user.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -10,15 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.patrykdankowski.financeflock.constants.Role.USER;
-
 @Service
 class BudgetGroupFacade {
     private final BudgetGroupMembershipDomain budgetGroupMembershipDomain;
+    private final BudgetGroupManagementDomain budgetGroupManagementDomain;
     private final UserService userService;
     private final BudgetGroupService budgetGroupService;
     private final AuthenticationService authenticationService;
-    private final BudgetGroupManagementDomain budgetGroupManagementDomain;
 
     BudgetGroupFacade(final BudgetGroupMembershipDomain budgetGroupMembershipDomain,
                       final UserService userService,
@@ -45,10 +45,10 @@ class BudgetGroupFacade {
 //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     void closeBudgetGroup() {
 
-        final GroupUpdateResult<List<User>> groupUpdateResult = budgetGroupManagementDomain.closeBudgetGroup();
+        final UserAndGroupUpdateResult<List<User>> userAndGroupUpdateResult = budgetGroupManagementDomain.closeBudgetGroup();
 
-        userService.saveAllUsers(groupUpdateResult.getSource());
-        budgetGroupService.deleteBudgetGroup(groupUpdateResult.getBudgetGroup());
+        userService.saveAllUsers(userAndGroupUpdateResult.getSource());
+        budgetGroupService.deleteBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
     }
 
     @Transactional
@@ -64,29 +64,20 @@ class BudgetGroupFacade {
     @Transactional
     void removeUserFromGroup(String email) {
 
-        final GroupUpdateResult<User> groupUpdateResult = budgetGroupMembershipDomain.removeUserFromGroup(email);
+        final UserAndGroupUpdateResult<User> userAndGroupUpdateResult = budgetGroupMembershipDomain.removeUserFromGroup(email);
 
-        budgetGroupService.saveBudgetGroup(groupUpdateResult.getBudgetGroup());
-        userService.saveUser(groupUpdateResult.getSource());
+        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
+        userService.saveUser(userAndGroupUpdateResult.getSource());
 
     }
 
-    //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
-//    @Cacheable(cacheNames = "userEmailCache")
-//    public List<UserDtoResponse> listOfUsersInGroup() {
-//        var userFromContext = authenticationService.getUserFromContext();
-//
-//
-//        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-//        if (budgetGroup == null) {
-//            throw new IllegalStateException(userFromContext.getName() + " is not a member of a group");
-//        }
-//        return budgetGroupService.findBudgetGroupById(budgetGroup.getId()).map(
-//                group -> group.getListOfMembers().stream().map(
-//                        user -> new UserDtoResponse(user.getName(), user.getEmail())
-//                ).collect(Collectors.toList())).orElseThrow(
-//        );
-//    }
+
+     List<UserDtoResponse> listOfUsersInGroup() {
+
+        return budgetGroupMembershipDomain.listOfUsersInGroup();
+
+
+    }
 
     List<UserDtoProjections> getBudgetGroupExpenses() {
         var userFromContext = authenticationService.getUserFromContext();

@@ -1,10 +1,8 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.common.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class UserFactory {

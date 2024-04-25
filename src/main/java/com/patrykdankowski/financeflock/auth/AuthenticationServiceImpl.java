@@ -18,6 +18,8 @@ class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public User getUserFromContext() {
+
+
         Authentication authentication = userContextService.getAuthenticationFromContext();
         String userEmail = authentication.getName();
         return userCacheService.getUserFromEmail(userEmail);

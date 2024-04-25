@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.exception;
 
-import com.patrykdankowski.financeflock.constants.AppConstants;
+import com.patrykdankowski.financeflock.common.AppConstants;
 import lombok.Getter;
 
 @Getter

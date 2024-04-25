@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.exception.ResourceNotBelongToUserException;
 import com.patrykdankowski.financeflock.exception.UserNotFoundException;

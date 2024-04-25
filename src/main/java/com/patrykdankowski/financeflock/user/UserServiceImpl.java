@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
-import static com.patrykdankowski.financeflock.constants.AppConstants.VALID_EMAIL_MESSAGE;
+import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
 class UserServiceImpl implements UserService {

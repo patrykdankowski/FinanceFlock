@@ -1,10 +1,7 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.auth.AuthenticationService;
-import com.patrykdankowski.financeflock.auth.UserContextService;
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
-import com.patrykdankowski.financeflock.cache.UserCacheService;
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupService;
+import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,32 +10,34 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserFacade {
 
-    UserFacade(final UserService userService, final UserContextService userContextService, final UserCacheService userCacheService, final AuthenticationService authenticationService) {
+    private final BudgetGroupService budgetGroupService;
+    private final UserMembershipDomain userMembershipDomain;
+    private final UserService userService;
+
+    public UserFacade(final BudgetGroupService budgetGroupService,
+                      final UserMembershipDomain userMembershipDomain,
+                      final UserService userService) {
+        this.budgetGroupService = budgetGroupService;
+        this.userMembershipDomain = userMembershipDomain;
         this.userService = userService;
-        this.authenticationService = authenticationService;
     }
 
-    private final UserService userService;
-    private final AuthenticationService authenticationService;
 
     @Transactional
     void leaveBudgetGroup() {
-        final User userFromContext = authenticationService.getUserFromContext();
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException(userFromContext.getName() + " does not have a group");
-        }
-        userFromContext.setBudgetGroup(null);
-        userFromContext.setRole(Role.USER);
-        userService.saveUser(userFromContext);
+
+        final UserAndGroupUpdateResult<User> userAndGroupUpdateResult = userMembershipDomain.leaveBudgetGroup();
+
+        userService.saveUser(userAndGroupUpdateResult.getSource());
+        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
         //TODO -> informowanie założyciela przez wysłanie mail'a, że user opuścił grupę
     }
 
+    @Transactional
     boolean toggleShareData() {
-        final User userFromContext = authenticationService.getUserFromContext();
-        userFromContext.setShareData(!userFromContext.isShareData());
-        userService.saveUser(userFromContext);
-        return userFromContext.isShareData();
+        final User user = userMembershipDomain.toggleShareData();
+        userService.saveUser(user);
+        return user.isShareData();
     }
 
 

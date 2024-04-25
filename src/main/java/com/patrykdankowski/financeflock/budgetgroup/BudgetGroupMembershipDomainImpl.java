@@ -1,7 +1,8 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.exception.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.patrykdankowski.financeflock.constants.AppConstants.MAX_BUDGET_GROUP_SIZE;
-import static com.patrykdankowski.financeflock.constants.Role.USER;
+import static com.patrykdankowski.financeflock.common.AppConstants.MAX_BUDGET_GROUP_SIZE;
+import static com.patrykdankowski.financeflock.common.Role.USER;
 
 @Service
 public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
@@ -73,7 +74,7 @@ public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDom
 
 
     @Override
-    public GroupUpdateResult removeUserFromGroup(final String email) {
+    public UserAndGroupUpdateResult removeUserFromGroup(final String email) {
         var userFromContext = authenticationService.getUserFromContext();
 
 
@@ -81,7 +82,7 @@ public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDom
         var userToRemove = validateAndGetUserToRemoveFromBudgetGroup(email, budgetGroup);
 
         removeUserFromBudgetGroup(budgetGroup, userToRemove);
-        return new GroupUpdateResult(budgetGroup, userToRemove);
+        return new UserAndGroupUpdateResult(budgetGroup, userToRemove);
 
     }
 

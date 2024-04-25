@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
-import com.patrykdankowski.financeflock.constants.Role;
+import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.expense.Expense;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
