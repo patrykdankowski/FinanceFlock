@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 class ExpenseController {
 
     private final ExpenseFacade expenseFacade;
-    private final ExpenseGeolocationService geolocationService;
+    private final ExpenseGeolocationServiceImpl geolocationService;
     private final CacheService cacheService;
 
     @PostMapping("/add")

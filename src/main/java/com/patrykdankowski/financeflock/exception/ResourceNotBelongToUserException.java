@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class ResourceNotBelongToUserException extends RuntimeException {
-    private String userEmail;
+    private String name;
     private Long resourceId;
 
-    public ResourceNotBelongToUserException(String userEmail, Long resourceId) {
-        this.userEmail = userEmail;
+    public ResourceNotBelongToUserException(String name, Long resourceId) {
+        this.name = name;
         this.resourceId = resourceId;
     }
 }

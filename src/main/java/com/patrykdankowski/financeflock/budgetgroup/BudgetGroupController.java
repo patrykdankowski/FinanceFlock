@@ -25,7 +25,7 @@ class BudgetGroupController {
                 .body("Budget group created");
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     ResponseEntity<Void> deleteBudgetGroup() {
         budgetGroupFacade.closeBudgetGroup();

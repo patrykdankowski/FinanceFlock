@@ -47,4 +47,7 @@ import java.time.LocalDateTime;
         return expenseDate;
     }
 
-}
+     void setExpenseDate(final LocalDateTime expenseDate) {
+         this.expenseDate = expenseDate;
+     }
+ }

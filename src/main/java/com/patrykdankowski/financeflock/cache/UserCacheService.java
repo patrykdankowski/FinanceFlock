@@ -20,7 +20,7 @@ public class UserCacheService {
     }
 
 
-    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
+//    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
     public User getUserFromEmail(String userEmail) {
         var user = userService.findUserByEmail(userEmail);
         log.info("Cache " + user.getName());

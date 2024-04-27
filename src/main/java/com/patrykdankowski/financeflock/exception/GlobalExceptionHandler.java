@@ -33,10 +33,21 @@ class GlobalExceptionHandler {
                 HttpStatus.CONFLICT);
 
     }
+
     @ExceptionHandler(BudgetGroupNotFoundException.class)
     ResponseEntity<ErrorDetails> handleBudgetGroupNotFoundException(BudgetGroupNotFoundException budgetGroupNotFoundException) {
         return setErrorDetails("Cannot find budget group",
                 budgetGroupNotFoundException.getDetails(),
+                HttpStatus.CONFLICT);
+
+    }
+
+    @ExceptionHandler(ExpenseNotFoundException.class)
+    ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseNotFoundException expenseNotFoundException) {
+        String message = String.format("Expense with id %d, doesnt exist in our db", expenseNotFoundException.getId());
+
+        return setErrorDetails("Cannot find expense",
+                message,
                 HttpStatus.CONFLICT);
 
     }
@@ -145,9 +156,12 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotBelongToUserException.class)
-    ResponseEntity<ErrorDetails> handleIllegalStateException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
-        return setErrorDetails("Exception occurred",
-                "That resource does not belong to you",
+    ResponseEntity<ErrorDetails> handleResourceNotBelongToUserException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
+
+        String message = String.format("Expense with id %d does not belong to you", resourceNotBelongToUserException.getResourceId());
+        String details = String.format("That expense belong to %s", resourceNotBelongToUserException.getName());
+        return setErrorDetails(message,
+                details,
                 HttpStatus.BAD_REQUEST);
     }
 
