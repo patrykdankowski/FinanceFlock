@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class UserAndGroupUpdateResult<T> {
-    private BudgetGroup budgetGroup;
+    private BudgetGroup budgetGroupEntity;
     private T source;
 
-    public UserAndGroupUpdateResult(final BudgetGroup budgetGroup, final T source) {
-        this.budgetGroup = budgetGroup;
+    public UserAndGroupUpdateResult(final BudgetGroup budgetGroupEntity, final T source) {
+        this.budgetGroupEntity = budgetGroupEntity;
         this.source = source;
     }
 }

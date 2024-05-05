@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.expense;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-public interface ExpenseGeolocationService {
+ interface ExpenseGeolocationService {
 
     String getUserIpAddress(HttpServletRequest request);
 

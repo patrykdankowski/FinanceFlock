@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.user;
+package com.patrykdankowski.financeflock.user.dto;
 
 import com.patrykdankowski.financeflock.security.validation.EqualsPassword;
 import com.patrykdankowski.financeflock.security.validation.ValidPassword;

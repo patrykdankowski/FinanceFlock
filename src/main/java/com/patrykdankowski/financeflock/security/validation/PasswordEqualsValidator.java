@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.security.validation;
 
-import com.patrykdankowski.financeflock.user.RegisterDtoRequest;
+import com.patrykdankowski.financeflock.user.dto.RegisterDtoRequest;
 import com.patrykdankowski.financeflock.exception.PasswordValidationException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

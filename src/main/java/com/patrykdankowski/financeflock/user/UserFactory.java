@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.user;
 
 import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.user.dto.RegisterDtoRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,8 @@ public class UserFactory {
                 .shareData(true)
                 .build();
     }
+
+
 
 
 }

@@ -3,8 +3,8 @@ package com.patrykdankowski.financeflock.budgetgroup;
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserDtoProjections;
-import com.patrykdankowski.financeflock.user.UserDtoResponse;
+import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
+import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-class BudgetGroupFacade {
+public class BudgetGroupFacade {
     private final BudgetGroupMembershipDomain budgetGroupMembershipDomain;
     private final BudgetGroupManagementDomain budgetGroupManagementDomain;
     private final UserService userService;
@@ -48,7 +48,7 @@ class BudgetGroupFacade {
         final UserAndGroupUpdateResult<List<User>> userAndGroupUpdateResult = budgetGroupManagementDomain.closeBudgetGroup();
 
         userService.saveAllUsers(userAndGroupUpdateResult.getSource());
-        budgetGroupService.deleteBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
+        budgetGroupService.deleteBudgetGroup(userAndGroupUpdateResult.getBudgetGroupEntity());
     }
 
     @Transactional
@@ -66,7 +66,7 @@ class BudgetGroupFacade {
 
         final UserAndGroupUpdateResult<User> userAndGroupUpdateResult = budgetGroupMembershipDomain.removeUserFromGroup(email);
 
-        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
+        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroupEntity());
         userService.saveUser(userAndGroupUpdateResult.getSource());
 
     }

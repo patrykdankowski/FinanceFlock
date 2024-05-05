@@ -5,7 +5,7 @@ import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.exception.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserDtoResponse;
+import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserService;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import static com.patrykdankowski.financeflock.common.AppConstants.MAX_BUDGET_GR
 import static com.patrykdankowski.financeflock.common.Role.USER;
 
 @Service
-public class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
+ class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
 
     private final BudgetGroupService budgetGroupService;
     private final UserService userService;

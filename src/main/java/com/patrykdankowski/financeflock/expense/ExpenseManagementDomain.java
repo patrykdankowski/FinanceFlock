@@ -1,7 +1,13 @@
 package com.patrykdankowski.financeflock.expense;
 
-public interface ExpenseManagementDomain {
-    Expense addExpense(ExpenseDto expenseDto, String userIp);
+import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
+import com.patrykdankowski.financeflock.user.dto.UserDto;
 
-    Expense updateExpense(Long id, ExpenseDto expenseDto);
+interface ExpenseManagementDomain {
+    Expense addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp);
+
+    ExpenseDto updateExpense(ExpenseDtoWriteModel id,
+                             ExpenseDto expenseDtoWriteModel,
+                             UserDto userFromContextDto);
 }

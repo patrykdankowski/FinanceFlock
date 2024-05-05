@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.expense;
+package com.patrykdankowski.financeflock.expense.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

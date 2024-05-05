@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.RegisterDtoRequest;
+import com.patrykdankowski.financeflock.user.dto.RegisterDtoRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.user;
 
 import com.patrykdankowski.financeflock.exception.ResourceAlreadyExists;
+import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +12,23 @@ import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_M
 
 @Service
 class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
+    private final UserCommandRepository userCommandRepository;
 
-    UserServiceImpl(final UserRepository userRepository) {
-        this.userRepository = userRepository;
+    UserServiceImpl(final UserQueryRepository userQueryRepository, final UserCommandRepository userCommandRepository) {
+        this.userQueryRepository = userQueryRepository;
+        this.userCommandRepository = userCommandRepository;
     }
 
     @Override
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(
+        return userCommandRepository.findByEmail(email).orElseThrow(
                 () -> new UsernameNotFoundException(email));
     }
 
     @Override
     public void checkIfUserExists(String userEmail) {
-        if (userRepository.existsUserByEmail(userEmail)) {
+        if (userQueryRepository.existsUserByEmail(userEmail)) {
             throw new ResourceAlreadyExists(userEmail, VALID_EMAIL_MESSAGE);
 
         }
@@ -34,17 +37,17 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
-        userRepository.save(user);
+        userCommandRepository.save(user);
     }
 
     @Override
     public void saveAllUsers(List<User> users) {
-        userRepository.saveAll(users);
+        userCommandRepository.saveAll(users);
     }
 
     @Override
     public Set<UserDtoProjections> findAllUsersByShareDataTrueInSameBudgetGroup(Long budgetGroupId) {
-        return userRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(budgetGroupId);
+        return userQueryRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(budgetGroupId);
     }
 
 }

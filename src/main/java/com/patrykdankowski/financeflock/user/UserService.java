@@ -1,5 +1,7 @@
 package com.patrykdankowski.financeflock.user;
 
+import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
+
 import java.util.List;
 import java.util.Set;
 

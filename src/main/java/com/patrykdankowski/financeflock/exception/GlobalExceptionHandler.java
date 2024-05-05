@@ -159,7 +159,7 @@ class GlobalExceptionHandler {
     ResponseEntity<ErrorDetails> handleResourceNotBelongToUserException(ResourceNotBelongToUserException resourceNotBelongToUserException) {
 
         String message = String.format("Expense with id %d does not belong to you", resourceNotBelongToUserException.getResourceId());
-        String details = String.format("That expense belong to %s", resourceNotBelongToUserException.getName());
+        String details = String.format("That expense belong to user with id %s ", resourceNotBelongToUserException.getUserId());
         return setErrorDetails(message,
                 details,
                 HttpStatus.BAD_REQUEST);

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class UserMembershipDomainImpl implements UserMembershipDomain {
+ class UserMembershipDomainImpl implements UserMembershipDomain {
 
     private final AuthenticationService authenticationService;
 
@@ -23,12 +23,12 @@ public class UserMembershipDomainImpl implements UserMembershipDomain {
 
         log.info("Starting process of leave budget group for user with id {} ", userFromContext.getId());
 
-        final BudgetGroup budgetGroup = validateAndGetBudgetGroup(userFromContext);
+        final BudgetGroup budgetGroupEntity = validateAndGetBudgetGroup(userFromContext);
         assignRoleAndBudgetGroupForUser(userFromContext, null, Role.USER);
 
         log.info("User with id {} left budget group", userFromContext.getId());
 
-        return new UserAndGroupUpdateResult<>(budgetGroup, userFromContext);
+        return new UserAndGroupUpdateResult<>(budgetGroupEntity, userFromContext);
     }
 
     @Override
@@ -49,18 +49,19 @@ public class UserMembershipDomainImpl implements UserMembershipDomain {
     }
 
     private BudgetGroup validateAndGetBudgetGroup(final User userFromContext) {
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
+        BudgetGroup budgetGroupEntity = userFromContext.getBudgetGroup();
+        if (budgetGroupEntity == null) {
 
             log.warn("Budget group does not exist for user with id {} ", userFromContext.getId());
 
             throw new IllegalStateException(userFromContext.getName() + " does not have a group");
         }
-        return budgetGroup;
+        return budgetGroupEntity;
     }
 
-    private void assignRoleAndBudgetGroupForUser(final User userFromContext, final BudgetGroup budgetGroup, final Role role) {
+    private void assignRoleAndBudgetGroupForUser(final User userFromContext, final BudgetGroup budgetGroupEntity, final Role role) {
         userFromContext.setRole(role);
-        userFromContext.setBudgetGroup(budgetGroup);
+        userFromContext.setBudgetGroup(budgetGroupEntity);
     }
+
 }

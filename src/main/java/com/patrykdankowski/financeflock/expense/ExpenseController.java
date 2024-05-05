@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.expense;
 
 import com.patrykdankowski.financeflock.cache.CacheService;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +26,11 @@ class ExpenseController {
     private final CacheService cacheService;
 
     @PostMapping("/add")
-    ResponseEntity<String> addExpense(@Validated(ExpenseDto.onCreate.class) @RequestBody ExpenseDto expenseDto,
+    ResponseEntity<String> addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
                                              HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);
-        expenseFacade.addExpense(expenseDto, userIp);
+        expenseFacade.addExpense(expenseDtoWriteModel, userIp);
         log.info(cacheService.cachedObjects("userEmailCache").toString());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -37,9 +38,9 @@ class ExpenseController {
     }
     @PatchMapping("/update/{id}")
     ResponseEntity<String> updateExpense(@PathVariable Long id,
-                                                @RequestBody ExpenseDto expenseDto){
+                                                @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel){
 
-        expenseFacade.updateExpense(id,expenseDto);
+        expenseFacade.updateExpense(id, expenseDtoWriteModel);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("Resource updated");
     }

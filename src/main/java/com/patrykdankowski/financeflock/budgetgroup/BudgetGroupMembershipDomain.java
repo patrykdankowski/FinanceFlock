@@ -1,11 +1,11 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
-import com.patrykdankowski.financeflock.user.UserDtoResponse;
+import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 
 import java.util.List;
 
-public interface BudgetGroupMembershipDomain {
+ interface BudgetGroupMembershipDomain {
 
     BudgetGroup addUserToGroup(String email);
 

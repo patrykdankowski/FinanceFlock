@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.expense;
+package com.patrykdankowski.financeflock.expense.dto;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 
 
- class ExpenseDto {
+ public class ExpenseDtoWriteModel {
     @Length(min = 2)
     @NotBlank(groups = onCreate.class)
     private String description;
@@ -47,7 +47,7 @@ import java.time.LocalDateTime;
         return expenseDate;
     }
 
-     void setExpenseDate(final LocalDateTime expenseDate) {
+     public void setExpenseDate(final LocalDateTime expenseDate) {
          this.expenseDate = expenseDate;
      }
  }

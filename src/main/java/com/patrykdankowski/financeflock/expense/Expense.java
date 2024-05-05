@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
+import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
 import com.patrykdankowski.financeflock.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,6 +14,33 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Expense {
+
+    public ExpenseDto toDto() {
+        return ExpenseDto.builder()
+                .amount(this.amount)
+                .expenseDate(this.expenseDate)
+                .description(this.description)
+                .id(this.id)
+                .location(this.location)
+                .ownerId(this.user.getId())
+                .ownerGroupId(this.user.getBudgetGroup().getId())
+                .build();
+
+    }
+
+    public static Expense fromDto(ExpenseDto dto) {
+        return Expense.builder()
+                .amount(dto.getAmount())
+                .id(dto.getId())
+                .expenseDate(dto.getExpenseDate())
+                .user(User.fromDto(dto.getOwner()))
+                .location(dto.getLocation())
+                .description(dto.getDescription())
+                .build();
+
+    }
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +57,7 @@ public class Expense {
 
     private String location;
 
-     Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -37,7 +65,7 @@ public class Expense {
         this.id = id;
     }
 
-     User getUser() {
+    User getUser() {
         return user;
     }
 
@@ -45,35 +73,35 @@ public class Expense {
         this.user = user;
     }
 
-     BigDecimal getAmount() {
+    BigDecimal getAmount() {
         return amount;
     }
 
-     void setAmount(final BigDecimal amount) {
+    void setAmount(final BigDecimal amount) {
         this.amount = amount;
     }
 
-     LocalDateTime getExpenseDate() {
+    LocalDateTime getExpenseDate() {
         return expenseDate;
     }
 
-     void setExpenseDate(final LocalDateTime expenseDate) {
+    void setExpenseDate(final LocalDateTime expenseDate) {
         this.expenseDate = expenseDate;
     }
 
-     String getDescription() {
+    String getDescription() {
         return description;
     }
 
-     void setDescription(final String description) {
+    void setDescription(final String description) {
         this.description = description;
     }
 
-     String getLocation() {
+    String getLocation() {
         return location;
     }
 
-     void setLocation(final String location) {
+    void setLocation(final String location) {
         this.location = location;
     }
 }

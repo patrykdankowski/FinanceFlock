@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.expense.Expense;
+import com.patrykdankowski.financeflock.user.dto.UserDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -21,12 +22,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -34,8 +38,53 @@ import java.util.Set;
 @EqualsAndHashCode
 @Getter
 @Setter
+@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class User {
+
+    public UserDto toDto() {
+
+        Set<Long> expenseDtoId = expenseList.stream()
+                .map(expense -> expense.getId())
+                .collect(Collectors.toSet());
+
+        return UserDto.builder()
+                .id(this.id)
+                .name(this.name)
+                .role(this.role)
+                .expenseListId(expenseDtoId)
+                .shareData(this.shareData)
+                .budgetGroupId(Optional.ofNullable(this.budgetGroup.getId()).orElse(null))
+                .build();
+    }
+//    public UserDto toLightDto() {
+//
+//        return UserDto.builder()
+//                .id(this.id)
+//                .name(this.name)
+//                .role(this.role)
+//                .expenseList(null)
+//                .shareData(this.shareData)
+//                .budgetGroup(Optional.ofNullable(this.budgetGroup).map(group -> group.toDto()).orElse(null))
+//                .build();
+//    }
+
+//
+    public static User fromDto(UserDto userDto) {
+
+
+
+
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .role(userDto.getRole())
+                .shareData(userDto.isShareData())
+                .build();
+    }
+
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -176,8 +225,8 @@ public class User {
 
         }
 
-        public Builder budgetGroup(final BudgetGroup budgetGroup) {
-            this.budgetGroup = budgetGroup;
+        public Builder budgetGroup(final BudgetGroup budgetGroupEntity) {
+            this.budgetGroup = budgetGroupEntity;
             return this;
 
         }

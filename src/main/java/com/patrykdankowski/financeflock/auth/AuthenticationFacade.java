@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.RegisterDtoRequest;
+import com.patrykdankowski.financeflock.user.dto.RegisterDtoRequest;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.UserFactory;
 import com.patrykdankowski.financeflock.user.UserService;

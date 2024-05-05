@@ -1,7 +1,8 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.user.UserDtoProjections;
-import com.patrykdankowski.financeflock.user.UserDtoResponse;
+import com.patrykdankowski.financeflock.budgetgroup.dto.EmailDtoReadModel;
+import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
+import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -14,7 +14,7 @@ public class UserFacade {
     private final UserMembershipDomain userMembershipDomain;
     private final UserService userService;
 
-    public UserFacade(final BudgetGroupService budgetGroupService,
+     UserFacade(final BudgetGroupService budgetGroupService,
                       final UserMembershipDomain userMembershipDomain,
                       final UserService userService) {
         this.budgetGroupService = budgetGroupService;
@@ -29,7 +29,7 @@ public class UserFacade {
         final UserAndGroupUpdateResult<User> userAndGroupUpdateResult = userMembershipDomain.leaveBudgetGroup();
 
         userService.saveUser(userAndGroupUpdateResult.getSource());
-        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroup());
+        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroupEntity());
         //TODO -> informowanie założyciela przez wysłanie mail'a, że user opuścił grupę
     }
 

@@ -1,6 +1,6 @@
-package com.patrykdankowski.financeflock.user;
+package com.patrykdankowski.financeflock.user.dto;
 
-import com.patrykdankowski.financeflock.expense.ExpenseProjections;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseProjections;
 
 import java.util.Set;
 

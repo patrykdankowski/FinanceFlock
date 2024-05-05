@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.user;
 
 import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 
-public interface UserMembershipDomain {
+ interface UserMembershipDomain {
 
 
     UserAndGroupUpdateResult leaveBudgetGroup();

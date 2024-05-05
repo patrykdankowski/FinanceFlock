@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
+import com.patrykdankowski.financeflock.expense.dto.ExpenseGeolocationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

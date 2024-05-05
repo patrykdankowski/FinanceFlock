@@ -10,18 +10,20 @@ import java.util.List;
 @Component
  class UserWarmup implements CommandLineRunner {
 
-    UserWarmup(final PasswordEncoder passwordEncoder, final UserRepository userRepository) {
+    UserWarmup(final PasswordEncoder passwordEncoder, final UserCommandRepository userCommandRepository, final UserQueryRepository userQueryRepository) {
         this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
+        this.userCommandRepository = userCommandRepository;
+        this.userQueryRepository = userQueryRepository;
     }
 
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserCommandRepository userCommandRepository;
+    private final UserQueryRepository userQueryRepository;
 
     @Override
     public void run(final String... args) throws Exception {
 
-        if (userRepository.count() == 0) {
+        if (userQueryRepository.count() == 0) {
             User user1 = new User();
             user1.setName("Patryk");
             user1.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
@@ -36,7 +38,7 @@ import java.util.List;
             user2.setRole(Role.USER);
             user2.setShareData(true);
 
-            userRepository.saveAll(List.of(user1, user2));
+            userCommandRepository.saveAll(List.of(user1, user2));
         }
     }
 }

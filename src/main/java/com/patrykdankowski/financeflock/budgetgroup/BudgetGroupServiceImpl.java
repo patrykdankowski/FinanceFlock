@@ -7,24 +7,24 @@ import java.util.Optional;
 @Service
 class BudgetGroupServiceImpl implements BudgetGroupService {
 
-    private final BudgetGroupRepository budgetGroupRepository;
+    private final BudgetGroupCommandRepository budgetGroupCommandRepository;
 
-    BudgetGroupServiceImpl(final BudgetGroupRepository budgetGroupRepository) {
-        this.budgetGroupRepository = budgetGroupRepository;
+    BudgetGroupServiceImpl(final BudgetGroupCommandRepository budgetGroupCommandRepository) {
+        this.budgetGroupCommandRepository = budgetGroupCommandRepository;
     }
 
     @Override
     public BudgetGroup saveBudgetGroup(final BudgetGroup budgetGroup) {
-        return budgetGroupRepository.save(budgetGroup);
+        return budgetGroupCommandRepository.save(budgetGroup);
     }
 
     @Override
     public void deleteBudgetGroup(final BudgetGroup budgetGroup) {
-        budgetGroupRepository.delete(budgetGroup);
+        budgetGroupCommandRepository.delete(budgetGroup);
     }
 
     @Override
     public Optional<BudgetGroup> findBudgetGroupById(final long id) {
-        return budgetGroupRepository.findById(id);
+        return budgetGroupCommandRepository.findById(id);
     }
 }
