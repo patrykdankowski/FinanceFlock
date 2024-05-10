@@ -15,17 +15,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Expense {
 
-    public ExpenseDto toDto() {
+    public ExpenseDto toDtoLight() {
         return ExpenseDto.builder()
+                .id(this.id)
                 .amount(this.amount)
                 .expenseDate(this.expenseDate)
                 .description(this.description)
-                .id(this.id)
                 .location(this.location)
                 .ownerId(this.user.getId())
                 .ownerGroupId(this.user.getBudgetGroup().getId())
                 .build();
-
     }
 
     public static Expense fromDto(ExpenseDto dto) {

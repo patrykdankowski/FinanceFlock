@@ -4,10 +4,9 @@ import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.exception.ExpenseNotFoundException;
 import com.patrykdankowski.financeflock.exception.ResourceNotBelongToUserException;
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
+import com.patrykdankowski.financeflock.geolocationAPI.ExpenseGeolocationService;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.dto.UserDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,31 +14,24 @@ import java.time.LocalDateTime;
 
 @Service
 class ExpenseManagementDomainImpl implements ExpenseManagementDomain {
-    private final AuthenticationService authenticationService;
     private final ExpenseGeolocationService geolocationService;
-    private final ExpenseQueryRepository expenseQueryRepository;
 
-    public ExpenseManagementDomainImpl(final AuthenticationService authenticationService,
-                                       final ExpenseGeolocationServiceImpl geolocationService,
-                                       final ExpenseQueryRepository expenseQueryRepository) {
-        this.authenticationService = authenticationService;
+    public ExpenseManagementDomainImpl(final ExpenseGeolocationService geolocationService) {
         this.geolocationService = geolocationService;
-        this.expenseQueryRepository = expenseQueryRepository;
     }
 
     @Override
-    public Expense addExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final String userIp) {
-        var userFromContext = authenticationService.getUserFromContext();
+    public Expense addExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final String userIp, final User userFromContext) {
 
         validateAndPrepareExpense(expenseDtoWriteModel, userIp);
 
-        final Expense expense = createExpense(expenseDtoWriteModel, userFromContext);
+        final Expense expense = createExpense(expenseDtoWriteModel);
         userFromContext.addExpense(expense);
 
         return expense;
     }
 
-    private Expense createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final User userFromContext) {
+    private Expense createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel) {
         return Expense.builder()
                 .expenseDate(expenseDtoWriteModel.getExpenseDate())
                 .amount(expenseDtoWriteModel.getAmount())
@@ -52,7 +44,7 @@ class ExpenseManagementDomainImpl implements ExpenseManagementDomain {
     private void validateAndPrepareExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
                                            final String userIp) {
         if (expenseDtoWriteModel.getLocation() == null || expenseDtoWriteModel.getLocation().isEmpty()) {
-            setLocationForExpenseFromUserIp(expenseDtoWriteModel, userIp);
+            geolocationService.setLocationForExpenseFromUserIp(expenseDtoWriteModel, userIp);
 
         }
         if (expenseDtoWriteModel.getExpenseDate() == null) {
@@ -62,62 +54,51 @@ class ExpenseManagementDomainImpl implements ExpenseManagementDomain {
 
     }
 
-    private void setLocationForExpenseFromUserIp(final ExpenseDtoWriteModel expenseDtoWriteModel,
-                                                 final String userIp) {
-        try {
-            String city = geolocationService.getLocationFromUserIp(userIp);
-            expenseDtoWriteModel.setLocation(city);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
     @Override
-    public ExpenseDto updateExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
-                                    final ExpenseDto expenseDto,
-                                    final UserDto userFromContextDto) {
+    public void updateExpense(final ExpenseDtoWriteModel expenseSourceDto,
+                              final Expense expense,
+                              final User userFromContext) {
 
 
-        validateUserAccessToExpense(userFromContextDto, expenseDto);
+        validateUserAccessToExpense(userFromContext, expense);
 
-        ExpenseDto result = validateAndSetFieldsForExpense(expenseDtoWriteModel, expenseDto);
-        result.setOwner(userFromContextDto);
-        return result;
+        validateAndSetFieldsForExpense(expenseSourceDto, expense);
     }
 
-    private void validateUserAccessToExpense(final UserDto userDtoFromContext, final ExpenseDto expenseDtoToUpdate) {
+    private void validateUserAccessToExpense(final User userFromContext,
+                                             final Expense expense) {
 
         //for group admin only
-        boolean isExpenseInSameUserGroup = userDtoFromContext.getRole().equals(Role.GROUP_ADMIN) &&
-                userDtoFromContext.getBudgetGroupId().equals(expenseDtoToUpdate.getOwnerGroupId());
+        boolean isExpenseInSameUserGroup = userFromContext.getRole().equals(Role.GROUP_ADMIN) &&
+                userFromContext.getBudgetGroup().getId().equals(expense.getUser().getBudgetGroup().getId());
 
-        boolean isExpenseOfUser = userDtoFromContext.getExpenseListId().contains(expenseDtoToUpdate.getId()) &&
-                expenseDtoToUpdate.getOwnerId().equals(userDtoFromContext.getId());
+        boolean isExpenseOfUser = userFromContext.getExpenseList().contains(expense) &&
+                expense.getUser().getId().equals(userFromContext.getId());
 
 
         if (isExpenseInSameUserGroup && !isExpenseOfUser) {
-            throw new ResourceNotBelongToUserException(expenseDtoToUpdate.getOwnerId(), expenseDtoToUpdate.getId());
+            throw new ResourceNotBelongToUserException(userFromContext.getId(), expense.getId());
         } else if (!isExpenseOfUser) {
-            throw new ExpenseNotFoundException(expenseDtoToUpdate.getId());
+            throw new ExpenseNotFoundException(expense.getId());
 
         }
     }
 
-    private ExpenseDto validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
-                                                      final ExpenseDto expenseDto) {
+    private void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
+                                                final Expense expense) {
         if (expenseDtoWriteModel.getExpenseDate() != null) {
-            expenseDto.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
+            expense.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
         }
         if (expenseDtoWriteModel.getDescription() != null && !expenseDtoWriteModel.getDescription().isBlank()) {
-            expenseDto.setDescription(expenseDtoWriteModel.getDescription());
+            expense.setDescription(expenseDtoWriteModel.getDescription());
         }
         if (expenseDtoWriteModel.getAmount() != null) {
-            expenseDto.setAmount(expenseDtoWriteModel.getAmount());
+            expense.setAmount(expenseDtoWriteModel.getAmount());
         }
         if (expenseDtoWriteModel.getLocation() != null && !expenseDtoWriteModel.getLocation().isBlank()) {
-            expenseDto.setLocation(expenseDtoWriteModel.getLocation());
+            expense.setLocation(expenseDtoWriteModel.getLocation());
         }
-        return expenseDto;
     }
 }
 

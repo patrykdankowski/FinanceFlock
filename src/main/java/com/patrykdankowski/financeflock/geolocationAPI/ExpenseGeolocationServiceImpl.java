@@ -1,5 +1,6 @@
-package com.patrykdankowski.financeflock.expense;
+package com.patrykdankowski.financeflock.geolocationAPI;
 
+import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseGeolocationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,16 @@ class ExpenseGeolocationServiceImpl implements ExpenseGeolocationService {
             return geolocationDto.getCity();
         } else {
             return "Unknown";
+        }
+    }
+    @Override
+    public void setLocationForExpenseFromUserIp(final ExpenseDtoWriteModel expenseDtoWriteModel,
+                                                 final String userIp) {
+        try {
+            String city = getLocationFromUserIp(userIp);
+            expenseDtoWriteModel.setLocation(city);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.cache.CacheService;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
+import com.patrykdankowski.financeflock.geolocationAPI.ExpenseGeolocationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/expenses")
@@ -22,19 +25,23 @@ import org.springframework.web.bind.annotation.RestController;
 class ExpenseController {
 
     private final ExpenseFacade expenseFacade;
-    private final ExpenseGeolocationServiceImpl geolocationService;
-    private final CacheService cacheService;
+    private final ExpenseGeolocationService geolocationService;
 
     @PostMapping("/add")
-    ResponseEntity<String> addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
+    ResponseEntity<URI> addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
                                              HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);
-        expenseFacade.addExpense(expenseDtoWriteModel, userIp);
-        log.info(cacheService.cachedObjects("userEmailCache").toString());
+        final long expenseId = expenseFacade.addExpense(expenseDtoWriteModel, userIp);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Expense added successfully");
+        URI location = ServletUriComponentsBuilder
+                //TODO zmodyfikować url z post na get w ścieżce
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(expenseId)
+                .toUri();
+
+        return ResponseEntity.created(location).body(location);
     }
     @PatchMapping("/update/{id}")
     ResponseEntity<String> updateExpense(@PathVariable Long id,

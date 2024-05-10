@@ -31,23 +31,26 @@ public class ExpenseFacade {
 
 
     @Transactional
-    void addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp) {
+    long addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp) {
 
-        final Expense expense = expenseManagementDomain.addExpense(expenseDtoWriteModel, userIp);
-        expenseCommandRepository.save(expense);
+        final User userFromContext = authenticationService.getUserFromContext();
+        final Expense expense = expenseManagementDomain.addExpense(expenseDtoWriteModel, userIp, userFromContext);
+        return expenseCommandRepository.save(expense).getId();
+
 
     }
 
     @Transactional
-    void updateExpense(Long id, ExpenseDtoWriteModel expenseDtoWriteModel) {
+    void updateExpense(Long id, ExpenseDtoWriteModel expenseSourceDto) {
 
-        ExpenseDto expenseDto = retrieveExpenseById(id).toDto();
-        User userFromContext = authenticationService.getUserFromContext();
-        UserDto userFromContextDto = userFromContext.toDto();
+        final Expense expense = retrieveExpenseById(id);
+        final User userFromContext = authenticationService.getUserFromContext();
 
-         ExpenseDto expenseToUpdate = expenseManagementDomain.updateExpense(expenseDtoWriteModel, expenseDto, userFromContextDto);
+        expenseManagementDomain.updateExpense(expenseSourceDto,
+                expense,
+                userFromContext);
 
-        expenseCommandRepository.save(Expense.fromDto(expenseToUpdate));
+        expenseCommandRepository.save(expense);
     }
 
     private Expense retrieveExpenseById(final Long id) {
