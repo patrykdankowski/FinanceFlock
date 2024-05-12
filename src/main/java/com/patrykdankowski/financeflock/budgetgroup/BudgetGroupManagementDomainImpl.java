@@ -12,7 +12,7 @@ import java.util.List;
 import static com.patrykdankowski.financeflock.common.Role.USER;
 
 @Service
-public class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDomain {
+class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDomain {
 
     private final org.slf4j.Logger logger = Logger.getLogger(this.getClass());
 

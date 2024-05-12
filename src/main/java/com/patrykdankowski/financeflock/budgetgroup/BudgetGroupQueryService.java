@@ -5,7 +5,7 @@ import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 
 import java.util.List;
 
-public interface BudgetGroupQueryService {
+interface BudgetGroupQueryService {
 
     List<UserDtoResponse> listOfUsersInGroup();
 

@@ -1,104 +1,14 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
-import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserCommandService;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+public interface BudgetGroupFacade {
 
-@Service
-@Slf4j
-public class BudgetGroupFacade {
-    private final BudgetGroupMembershipDomain budgetGroupMembershipDomain;
-    private final BudgetGroupManagementDomain budgetGroupManagementDomain;
-    private final UserCommandService userCommandService;
-    private final BudgetGroupCommandService budgetGroupCommandService;
-    private final AuthenticationService authenticationService;
+    void createBudgetGroup(BudgetGroupRequest budgetGroupRequest);
 
-    BudgetGroupFacade(final BudgetGroupMembershipDomain budgetGroupMembershipDomain,
-                      final UserCommandService userCommandService,
-                      final BudgetGroupCommandService budgetGroupCommandService,
-                      final AuthenticationService authenticationService,
-                      final BudgetGroupManagementDomain budgetGroupManagementDomain) {
-        this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
-        this.authenticationService = authenticationService;
-        this.userCommandService = userCommandService;
-        this.budgetGroupCommandService = budgetGroupCommandService;
-        this.budgetGroupManagementDomain = budgetGroupManagementDomain;
-    }
+    void closeBudgetGroup();
 
-    @Transactional
-//    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
-    void createBudgetGroup(BudgetGroupRequest budgetGroupRequest) {
+    void addUserToGroup(String email);
 
-        log.info("Starting process of create budget group");
-
-        final User userFromContext = authenticationService.getUserFromContext();
-
-
-        final BudgetGroup budgetGroup = budgetGroupManagementDomain.createBudgetGroup
-                (budgetGroupRequest, userFromContext);
-        budgetGroupCommandService.saveBudgetGroup(budgetGroup);
-
-        log.info("Successfully finished process of create budget group");
-
-    }
-
-    @Transactional
-//    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
-    void closeBudgetGroup() {
-
-        log.info("Starting process of close group");
-
-        User userFromContext = authenticationService.getUserFromContext();
-        BudgetGroup userGroup = userFromContext.getBudgetGroup();
-        final List<Long> listOfUserId =
-                budgetGroupManagementDomain.closeBudgetGroup(userFromContext);
-
-        userCommandService.saveAllUsers(userCommandService.listOfUsersFromIds(listOfUserId));
-        budgetGroupCommandService.deleteBudgetGroup(userGroup);
-
-        log.info("Finished process of close group");
-    }
-
-    @Transactional
-    void addUserToGroup(String email) {
-
-        log.info("Starting process to add user to group");
-
-        User userFromContext = authenticationService.getUserFromContext();
-        User userToAdd = userCommandService.findUserByEmail(email);
-
-        budgetGroupMembershipDomain.addUserToGroup(userFromContext, userToAdd);
-
-
-        budgetGroupCommandService.saveBudgetGroup(userFromContext.getBudgetGroup());
-
-        log.info("Successfully finished process to add user to group");
-
-    }
-
-    @Transactional
-    void removeUserFromGroup(String email) {
-
-        log.info("Starting process to remove user from group");
-
-        User userFromContext = authenticationService.getUserFromContext();
-        BudgetGroup userGroup = userFromContext.getBudgetGroup();
-        User userToRemove = userCommandService.findUserByEmail(email);
-
-        budgetGroupMembershipDomain.removeUserFromGroup(userFromContext, userToRemove);
-
-        budgetGroupCommandService.saveBudgetGroup(userGroup);
-        userCommandService.saveUser(userToRemove);
-
-        log.info("Successfully finished process to remove user from group");
-
-    }
-
-
+    void removeUserFromGroup(String email);
 }
