@@ -1,8 +1,9 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.auth.AuthenticationService;
+import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
+import com.patrykdankowski.financeflock.common.CommonDomainService;
+import com.patrykdankowski.financeflock.common.Logger;
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import com.patrykdankowski.financeflock.user.User;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,21 @@ import static com.patrykdankowski.financeflock.common.Role.USER;
 @Service
 public class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDomain {
 
-    private final AuthenticationService authenticationService;
-    private final BudgetGroupFactory budgetGroupFactory;
+    private final org.slf4j.Logger logger = Logger.getLogger(this.getClass());
 
-    BudgetGroupManagementDomainImpl(final AuthenticationService authenticationService,
-                                    final BudgetGroupFactory budgetGroupFactory) {
-        this.authenticationService = authenticationService;
+    private final BudgetGroupFactory budgetGroupFactory;
+    private final CommonDomainService commonDomainService;
+
+
+    BudgetGroupManagementDomainImpl(final BudgetGroupFactory budgetGroupFactory,
+                                    final CommonDomainService commonDomainService) {
         this.budgetGroupFactory = budgetGroupFactory;
+        this.commonDomainService = commonDomainService;
     }
 
     @Override
-    public BudgetGroup createBudgetGroup(final BudgetGroupRequest budgetGroupRequest) {
-        var userFromContext = authenticationService.getUserFromContext();
+    public BudgetGroup createBudgetGroup(final BudgetGroupRequest budgetGroupRequest,
+                                         final User userFromContext) {
 
         isUserAbleToCreateBudgetGroup(userFromContext);
 
@@ -33,51 +37,49 @@ public class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDom
         return budgetGroup;
     }
 
-    private static void isUserAbleToCreateBudgetGroup(final User userFromContext) {
+    private void isUserAbleToCreateBudgetGroup(final User userFromContext) {
         if (userFromContext.getRole() != USER || userFromContext.getBudgetGroup() != null) {
             //TODO CUSTOMOWY EXCEPTION
             throw new IllegalStateException("Cannot create budget group");
         }
     }
 
-    private void assignRoleAndBudgetGroupForUser(final User userFromContext, final BudgetGroup budgetGroup, final Role role) {
-        userFromContext.setRole(role);
-        userFromContext.setBudgetGroup(budgetGroup);
-    }
-
     @Override
-    public UserAndGroupUpdateResult closeBudgetGroup() {
+    public List<Long> closeBudgetGroup(final User userFromContext) {
         //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
 
-        var userFromContext = authenticationService.getUserFromContext();
-        BudgetGroup budgetGroup = validateAndGetBudgetGroup(userFromContext);
+        final BudgetGroup budgetGroup = commonDomainService.
+                validateIfGroupIsNotNullAndGetBudgetGroup(userFromContext);
+
         validateOwnership(budgetGroup, userFromContext);
-        List<User> listOfUsers = resetUsersRolesAndDetachFromGroup(budgetGroup);
 
-        return new UserAndGroupUpdateResult(budgetGroup, listOfUsers);
+        return resetUsersRolesAndDetachFromGroup(budgetGroup);
+
     }
 
-    private List<User> resetUsersRolesAndDetachFromGroup(final BudgetGroup budgetGroup) {
-        List<User> listOfUsers = budgetGroup.getListOfMembers().stream().map(
-                userToMap ->
-                {
-                    assignRoleAndBudgetGroupForUser(userToMap, null, USER);
-                    return userToMap;
-                }).toList();
-        return listOfUsers;
-    }
-
-    private void validateOwnership(final BudgetGroup budgetGroup, final User userFromContext) {
+    private void validateOwnership(final BudgetGroup budgetGroup,
+                                   final User userFromContext) {
         if (!budgetGroup.getOwner().equals(userFromContext)) {
+            logger.error("User {} is not a owner of a group", userFromContext.getName());
             throw new IllegalStateException("Only the group owner can close the group");
         }
     }
 
-    private BudgetGroup validateAndGetBudgetGroup(final User userFromContext) {
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
-            throw new IllegalStateException("There is no group to close");
-        }
-        return budgetGroup;
+    private List<Long> resetUsersRolesAndDetachFromGroup(final BudgetGroup budgetGroup) {
+        List<Long> listOfUsersId = budgetGroup.getListOfMembers().stream().map(
+                userToMap ->
+                {
+                    assignRoleAndBudgetGroupForUser(userToMap, null, USER);
+                    return userToMap.getId();
+                }).toList();
+        logger.info("Detached users from group");
+        return listOfUsersId;
+    }
+
+    private void assignRoleAndBudgetGroupForUser(final User userFromContext,
+                                                 final BudgetGroup budgetGroup,
+                                                 final Role role) {
+        userFromContext.setRole(role);
+        userFromContext.setBudgetGroup(budgetGroup);
     }
 }

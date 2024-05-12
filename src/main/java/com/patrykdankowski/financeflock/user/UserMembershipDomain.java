@@ -1,12 +1,12 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
+import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
 
- interface UserMembershipDomain {
+interface UserMembershipDomain {
 
 
-    UserAndGroupUpdateResult leaveBudgetGroup();
+    BudgetGroup leaveBudgetGroup(final User userFromContext);
 
-    User toggleShareData();
+    boolean toggleShareData(final User userFromContext);
 
 }

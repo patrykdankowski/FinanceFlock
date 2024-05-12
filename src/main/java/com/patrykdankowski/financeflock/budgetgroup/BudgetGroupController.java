@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
+import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
 import com.patrykdankowski.financeflock.budgetgroup.dto.EmailDtoReadModel;
 import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 class BudgetGroupController {
     private final BudgetGroupFacade budgetGroupFacade;
+    private final BudgetGroupQueryService budgetGroupQueryService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
@@ -34,7 +36,7 @@ class BudgetGroupController {
     }
 
     @PostMapping("/addUser")
-    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
     ResponseEntity<String> addUserToGroup(@RequestBody EmailDtoReadModel emailDto) {
         budgetGroupFacade.addUserToGroup(emailDto.getEmail());
         return ResponseEntity.status(HttpStatus.OK)
@@ -52,7 +54,7 @@ class BudgetGroupController {
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @GetMapping("/listOfMembers")
     ResponseEntity<List<UserDtoResponse>> getListOfMembersInBudgetGroup() {
-        List<UserDtoResponse> list = budgetGroupFacade.listOfUsersInGroup();
+        List<UserDtoResponse> list = budgetGroupQueryService.listOfUsersInGroup();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(list);
     }
@@ -61,7 +63,7 @@ class BudgetGroupController {
     @GetMapping("/list")
     ResponseEntity<List<UserDtoProjections>> getList() {
 
-        List<UserDtoProjections> budgetGroupExpenses = budgetGroupFacade.getBudgetGroupExpenses();
+        List<UserDtoProjections> budgetGroupExpenses = budgetGroupQueryService.getBudgetGroupExpenses();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(budgetGroupExpenses);
 

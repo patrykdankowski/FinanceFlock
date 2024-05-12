@@ -1,9 +1,9 @@
-package com.patrykdankowski.financeflock.budgetgroup;
+package com.patrykdankowski.financeflock.budgetgroup.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
- class BudgetGroupRequest {
+public class BudgetGroupRequest {
     @Size(min = 5)
     @NotBlank
     private String description;

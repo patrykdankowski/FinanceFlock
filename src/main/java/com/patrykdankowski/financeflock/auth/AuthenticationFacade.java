@@ -3,7 +3,7 @@ package com.patrykdankowski.financeflock.auth;
 import com.patrykdankowski.financeflock.user.dto.RegisterDtoRequest;
 import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.UserFactory;
-import com.patrykdankowski.financeflock.user.UserService;
+import com.patrykdankowski.financeflock.user.UserCommandService;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,16 +16,16 @@ import java.time.LocalDateTime;
 @Service
 class AuthenticationFacade {
 
-    AuthenticationFacade(final AuthenticationManager authenticationManager, final JwtTokenProvider jwtTokenProvider, final UserService userService, final UserFactory userFactory) {
+    AuthenticationFacade(final AuthenticationManager authenticationManager, final JwtTokenProvider jwtTokenProvider, final UserCommandService userCommandService, final UserFactory userFactory) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
+        this.userCommandService = userCommandService;
         this.userFactory = userFactory;
     }
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+    private final UserCommandService userCommandService;
     private final UserFactory userFactory;
 
 
@@ -39,9 +39,9 @@ class AuthenticationFacade {
     }
 
     String register(RegisterDtoRequest registerDtoRequest) {
-        userService.checkIfUserExists(registerDtoRequest.getEmail());
+        userCommandService.checkIfUserExists(registerDtoRequest.getEmail());
         var user = userFactory.createUserFromRegisterRequest(registerDtoRequest);
-        userService.saveUser(user);
+        userCommandService.saveUser(user);
         return "Registered";
     }
 
@@ -53,11 +53,11 @@ class AuthenticationFacade {
             throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
         }
         String userMail = authentication.getName();
-        var user = userService.findUserByEmail(userMail);
+        var user = userCommandService.findUserByEmail(userMail);
         User userToSave = user.toBuilder()
                 .lastLoggedInAt(LocalDateTime.now())
                 .build();
-        userService.saveUser(userToSave);
+        userCommandService.saveUser(userToSave);
     }
 
 }

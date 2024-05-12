@@ -11,7 +11,6 @@ public interface UserQueryRepository extends Repository<User, Long> {
 //@Query("SELECT u.name FROM users u LEFT JOIN  u.expenseList e WHERE u.shareData = true")
     Set<UserDtoProjections> findAllByShareDataIsTrueAndBudgetGroup_Id(Long budgetGroupID);
 
-    Boolean existsUserByEmail(String email);
 
     int count();
 

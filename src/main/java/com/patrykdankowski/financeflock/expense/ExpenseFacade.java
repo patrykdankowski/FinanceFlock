@@ -2,10 +2,8 @@ package com.patrykdankowski.financeflock.expense;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.exception.ExpenseNotFoundException;
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseDtoWriteModel;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.dto.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

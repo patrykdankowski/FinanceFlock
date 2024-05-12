@@ -1,13 +1,17 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
+import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
+import com.patrykdankowski.financeflock.user.User;
 
- interface BudgetGroupManagementDomain {
+import java.util.List;
+
+interface BudgetGroupManagementDomain {
 
 
-    BudgetGroup createBudgetGroup(BudgetGroupRequest budgetGroupRequest);
+    BudgetGroup createBudgetGroup(BudgetGroupRequest budgetGroupRequest,
+                                  final User userFromContext);
 
-    UserAndGroupUpdateResult closeBudgetGroup();
+    List<Long> closeBudgetGroup(final User userFromContext);
 
 
 

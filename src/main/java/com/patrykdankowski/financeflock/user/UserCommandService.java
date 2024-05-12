@@ -5,7 +5,7 @@ import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
 import java.util.List;
 import java.util.Set;
 
-public interface UserService {
+public interface UserCommandService {
     User findUserByEmail(String email);
 
     void checkIfUserExists(String userEmail);
@@ -14,5 +14,5 @@ public interface UserService {
 
     void saveAllUsers(List<User> users);
 
-    Set<UserDtoProjections> findAllUsersByShareDataTrueInSameBudgetGroup(Long budgetGroupId);
+    List<User> listOfUsersFromIds(List<Long> userIds);
 }

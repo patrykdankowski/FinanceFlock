@@ -1,8 +1,6 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupDto;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.dto.UserDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,51 +12,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "budget_groups")
 @NoArgsConstructor
 public class BudgetGroup {
-
-//    public static BudgetGroup fromDto(final BudgetGroupDto budgetGroupDto) {
-//
-//        Set<User> users = budgetGroupDto.getListOfMembers()
-//                .stream().map(
-//                        userDto -> User.fromDto(userDto)).collect(Collectors.toSet());
-//
-//        User owner = User.fromDto(budgetGroupDto.getOwner());
-//
-//        return BudgetGroup.builder()
-//                .id(budgetGroupDto.getId())
-//                .description(budgetGroupDto.getDescription())
-//                .members(users)
-//                .owner(owner)
-//                .build();
-//
-//
-//    }
-
-    public BudgetGroupDto toDto() {
-
-
-        UserDto ownerDto = this.owner.toDto();
-        Set<UserDto> members = this.listOfMembers.stream().map(
-                user -> user.toDto()
-        ).collect(Collectors.toSet());
-
-
-        return BudgetGroupDto.builder()
-                .id(this.id)
-                .description(this.description)
-                .owner(ownerDto)
-                .listOfMembers(members)
-                .build();
-    }
 
 
     @Id

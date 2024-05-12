@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
+import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
 import com.patrykdankowski.financeflock.user.User;
 import org.springframework.stereotype.Component;
 

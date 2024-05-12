@@ -1,10 +1,9 @@
 package com.patrykdankowski.financeflock.cache;
 
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.UserService;
+import com.patrykdankowski.financeflock.user.UserCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,16 +12,16 @@ import org.springframework.stereotype.Service;
 public class UserCacheService {
 
 
-    private final UserService userService;
+    private final UserCommandService userCommandService;
 
-    public UserCacheService(final UserService userService) {
-        this.userService = userService;
+    public UserCacheService(final UserCommandService userCommandService) {
+        this.userCommandService = userCommandService;
     }
 
 
 //    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
     public User getUserFromEmail(String userEmail) {
-        var user = userService.findUserByEmail(userEmail);
+        var user = userCommandService.findUserByEmail(userEmail);
         log.info("Cache " + user.getName());
         return user;
     }

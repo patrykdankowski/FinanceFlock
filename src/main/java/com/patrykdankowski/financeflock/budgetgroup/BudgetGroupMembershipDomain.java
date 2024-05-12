@@ -1,16 +1,14 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
+import com.patrykdankowski.financeflock.user.User;
 import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
 
 import java.util.List;
 
- interface BudgetGroupMembershipDomain {
+interface BudgetGroupMembershipDomain {
 
-    BudgetGroup addUserToGroup(String email);
+    void addUserToGroup(final User userFromContext, final User userToAdd);
 
-    UserAndGroupUpdateResult removeUserFromGroup(String email);
-
-    List<UserDtoResponse> listOfUsersInGroup();
+    void removeUserFromGroup(final User userFromContext, User userToRemove);
 
 }

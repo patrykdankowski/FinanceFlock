@@ -1,8 +1,6 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.UserFacade;
-import com.patrykdankowski.financeflock.user.UserService;
-import lombok.RequiredArgsConstructor;
+import com.patrykdankowski.financeflock.user.UserCommandService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -17,15 +15,15 @@ import java.util.List;
 @Service
 class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserCommandService userCommandService;
 
-    CustomUserDetailsService(final UserService userService) {
-        this.userService = userService;
+    CustomUserDetailsService(final UserCommandService userCommandService) {
+        this.userCommandService = userCommandService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = userService.findUserByEmail(email);
+        var user = userCommandService.findUserByEmail(email);
 
         List<GrantedAuthority> authority = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
 

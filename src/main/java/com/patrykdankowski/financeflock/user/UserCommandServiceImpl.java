@@ -11,11 +11,11 @@ import java.util.Set;
 import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
-class UserServiceImpl implements UserService {
+class UserCommandServiceImpl implements UserCommandService {
     private final UserQueryRepository userQueryRepository;
     private final UserCommandRepository userCommandRepository;
 
-    UserServiceImpl(final UserQueryRepository userQueryRepository, final UserCommandRepository userCommandRepository) {
+    UserCommandServiceImpl(final UserQueryRepository userQueryRepository, final UserCommandRepository userCommandRepository) {
         this.userQueryRepository = userQueryRepository;
         this.userCommandRepository = userCommandRepository;
     }
@@ -28,7 +28,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     public void checkIfUserExists(String userEmail) {
-        if (userQueryRepository.existsUserByEmail(userEmail)) {
+        if (userCommandRepository.existsUserByEmail(userEmail)) {
             throw new ResourceAlreadyExists(userEmail, VALID_EMAIL_MESSAGE);
 
         }
@@ -45,9 +45,10 @@ class UserServiceImpl implements UserService {
         userCommandRepository.saveAll(users);
     }
 
+
     @Override
-    public Set<UserDtoProjections> findAllUsersByShareDataTrueInSameBudgetGroup(Long budgetGroupId) {
-        return userQueryRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(budgetGroupId);
+    public List<User> listOfUsersFromIds(final List<Long> userIds) {
+        return userCommandRepository.findAllById(userIds);
     }
 
 }

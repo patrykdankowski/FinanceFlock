@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-class BudgetGroupServiceImpl implements BudgetGroupService {
+class BudgetGroupCommandServiceImpl implements BudgetGroupCommandService {
 
     private final BudgetGroupCommandRepository budgetGroupCommandRepository;
 
-    BudgetGroupServiceImpl(final BudgetGroupCommandRepository budgetGroupCommandRepository) {
+    BudgetGroupCommandServiceImpl(final BudgetGroupCommandRepository budgetGroupCommandRepository) {
         this.budgetGroupCommandRepository = budgetGroupCommandRepository;
     }
 
@@ -23,8 +23,5 @@ class BudgetGroupServiceImpl implements BudgetGroupService {
         budgetGroupCommandRepository.delete(budgetGroup);
     }
 
-    @Override
-    public Optional<BudgetGroup> findBudgetGroupById(final long id) {
-        return budgetGroupCommandRepository.findById(id);
-    }
+
 }

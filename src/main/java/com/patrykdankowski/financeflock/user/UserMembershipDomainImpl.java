@@ -1,25 +1,16 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
- class UserMembershipDomainImpl implements UserMembershipDomain {
-
-    private final AuthenticationService authenticationService;
-
-    public UserMembershipDomainImpl(final AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+class UserMembershipDomainImpl implements UserMembershipDomain {
 
     @Override
-    public UserAndGroupUpdateResult leaveBudgetGroup() {
-        final User userFromContext = authenticationService.getUserFromContext();
+    public BudgetGroup leaveBudgetGroup(final User userFromContext) {
 
         log.info("Starting process of leave budget group for user with id {} ", userFromContext.getId());
 
@@ -28,24 +19,7 @@ import org.springframework.stereotype.Service;
 
         log.info("User with id {} left budget group", userFromContext.getId());
 
-        return new UserAndGroupUpdateResult<>(budgetGroupEntity, userFromContext);
-    }
-
-    @Override
-    public User toggleShareData() {
-
-        log.info("Starting process of toggle share data");
-
-        final User userFromContext = authenticationService.getUserFromContext();
-        toggleShareDataForUser(userFromContext);
-
-        log.info("Toggled share data for user with id {} ", userFromContext.getId());
-
-        return userFromContext;
-    }
-
-    private static void toggleShareDataForUser(final User userFromContext) {
-        userFromContext.setShareData(!userFromContext.isShareData());
+        return budgetGroupEntity;
     }
 
     private BudgetGroup validateAndGetBudgetGroup(final User userFromContext) {
@@ -59,9 +33,27 @@ import org.springframework.stereotype.Service;
         return budgetGroupEntity;
     }
 
-    private void assignRoleAndBudgetGroupForUser(final User userFromContext, final BudgetGroup budgetGroupEntity, final Role role) {
+    private void assignRoleAndBudgetGroupForUser(final User userFromContext,
+                                                 final BudgetGroup budgetGroupEntity,
+                                                 final Role role) {
         userFromContext.setRole(role);
         userFromContext.setBudgetGroup(budgetGroupEntity);
+    }
+
+    @Override
+    public boolean toggleShareData(final User userFromContext) {
+
+        log.info("Starting process of toggle share data");
+
+        toggleShareDataForUser(userFromContext);
+
+        log.info("Toggled share data for user with id {} ", userFromContext.getId());
+
+        return userFromContext.isShareData();
+    }
+
+    private void toggleShareDataForUser(final User userFromContext) {
+        userFromContext.setShareData(!userFromContext.isShareData());
     }
 
 }

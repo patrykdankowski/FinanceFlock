@@ -1,34 +1,33 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationService;
-import com.patrykdankowski.financeflock.common.UserAndGroupUpdateResult;
+import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupRequest;
 import com.patrykdankowski.financeflock.user.User;
-import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
-import com.patrykdankowski.financeflock.user.dto.UserDtoResponse;
-import com.patrykdankowski.financeflock.user.UserService;
+import com.patrykdankowski.financeflock.user.UserCommandService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class BudgetGroupFacade {
     private final BudgetGroupMembershipDomain budgetGroupMembershipDomain;
     private final BudgetGroupManagementDomain budgetGroupManagementDomain;
-    private final UserService userService;
-    private final BudgetGroupService budgetGroupService;
+    private final UserCommandService userCommandService;
+    private final BudgetGroupCommandService budgetGroupCommandService;
     private final AuthenticationService authenticationService;
 
     BudgetGroupFacade(final BudgetGroupMembershipDomain budgetGroupMembershipDomain,
-                      final UserService userService,
-                      final BudgetGroupService budgetGroupService,
+                      final UserCommandService userCommandService,
+                      final BudgetGroupCommandService budgetGroupCommandService,
                       final AuthenticationService authenticationService,
                       final BudgetGroupManagementDomain budgetGroupManagementDomain) {
         this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
         this.authenticationService = authenticationService;
-        this.userService = userService;
-        this.budgetGroupService = budgetGroupService;
+        this.userCommandService = userCommandService;
+        this.budgetGroupCommandService = budgetGroupCommandService;
         this.budgetGroupManagementDomain = budgetGroupManagementDomain;
     }
 
@@ -36,8 +35,16 @@ public class BudgetGroupFacade {
 //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     void createBudgetGroup(BudgetGroupRequest budgetGroupRequest) {
 
-        final BudgetGroup budgetGroup = budgetGroupManagementDomain.createBudgetGroup(budgetGroupRequest);
-        budgetGroupService.saveBudgetGroup(budgetGroup);
+        log.info("Starting process of create budget group");
+
+        final User userFromContext = authenticationService.getUserFromContext();
+
+
+        final BudgetGroup budgetGroup = budgetGroupManagementDomain.createBudgetGroup
+                (budgetGroupRequest, userFromContext);
+        budgetGroupCommandService.saveBudgetGroup(budgetGroup);
+
+        log.info("Successfully finished process of create budget group");
 
     }
 
@@ -45,44 +52,52 @@ public class BudgetGroupFacade {
 //    @CacheEvict(cacheNames = "userEmailCache", allEntries = true)
     void closeBudgetGroup() {
 
-        final UserAndGroupUpdateResult<List<User>> userAndGroupUpdateResult = budgetGroupManagementDomain.closeBudgetGroup();
+        log.info("Starting process of close group");
 
-        userService.saveAllUsers(userAndGroupUpdateResult.getSource());
-        budgetGroupService.deleteBudgetGroup(userAndGroupUpdateResult.getBudgetGroupEntity());
+        User userFromContext = authenticationService.getUserFromContext();
+        BudgetGroup userGroup = userFromContext.getBudgetGroup();
+        final List<Long> listOfUserId =
+                budgetGroupManagementDomain.closeBudgetGroup(userFromContext);
+
+        userCommandService.saveAllUsers(userCommandService.listOfUsersFromIds(listOfUserId));
+        budgetGroupCommandService.deleteBudgetGroup(userGroup);
+
+        log.info("Finished process of close group");
     }
 
     @Transactional
     void addUserToGroup(String email) {
 
-        final BudgetGroup budgetGroup = budgetGroupMembershipDomain.addUserToGroup(email);
+        log.info("Starting process to add user to group");
 
-        budgetGroupService.saveBudgetGroup(budgetGroup);
+        User userFromContext = authenticationService.getUserFromContext();
+        User userToAdd = userCommandService.findUserByEmail(email);
 
+        budgetGroupMembershipDomain.addUserToGroup(userFromContext, userToAdd);
+
+
+        budgetGroupCommandService.saveBudgetGroup(userFromContext.getBudgetGroup());
+
+        log.info("Successfully finished process to add user to group");
 
     }
 
     @Transactional
     void removeUserFromGroup(String email) {
 
-        final UserAndGroupUpdateResult<User> userAndGroupUpdateResult = budgetGroupMembershipDomain.removeUserFromGroup(email);
+        log.info("Starting process to remove user from group");
 
-        budgetGroupService.saveBudgetGroup(userAndGroupUpdateResult.getBudgetGroupEntity());
-        userService.saveUser(userAndGroupUpdateResult.getSource());
+        User userFromContext = authenticationService.getUserFromContext();
+        BudgetGroup userGroup = userFromContext.getBudgetGroup();
+        User userToRemove = userCommandService.findUserByEmail(email);
 
-    }
+        budgetGroupMembershipDomain.removeUserFromGroup(userFromContext, userToRemove);
 
+        budgetGroupCommandService.saveBudgetGroup(userGroup);
+        userCommandService.saveUser(userToRemove);
 
-     List<UserDtoResponse> listOfUsersInGroup() {
+        log.info("Successfully finished process to remove user from group");
 
-        return budgetGroupMembershipDomain.listOfUsersInGroup();
-
-
-    }
-
-    List<UserDtoProjections> getBudgetGroupExpenses() {
-        var userFromContext = authenticationService.getUserFromContext();
-
-        return new ArrayList<>(userService.findAllUsersByShareDataTrueInSameBudgetGroup(userFromContext.getBudgetGroup().getId()));
     }
 
 
