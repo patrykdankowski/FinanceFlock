@@ -45,11 +45,11 @@ class BudgetGroupManagementDomainImpl implements BudgetGroupManagementDomain {
     }
 
     @Override
-    public List<Long> closeBudgetGroup(final User userFromContext) {
+    public List<Long> closeBudgetGroup(final User userFromContext,final Long id) {
         //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
 
         final BudgetGroup budgetGroup = commonDomainService.
-                validateIfGroupIsNotNullAndGetBudgetGroup(userFromContext);
+                validateAndGetGroup(userFromContext,id);
 
         validateOwnership(budgetGroup, userFromContext);
 

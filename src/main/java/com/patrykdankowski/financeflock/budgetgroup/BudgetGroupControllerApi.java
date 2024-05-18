@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,17 +21,17 @@ public interface BudgetGroupControllerApi {
     @PreAuthorize("hasAuthority('USER')")
     ResponseEntity<String> createBudgetGroup(@Valid @RequestBody BudgetGroupRequest budgetGroupRequest);
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
-    ResponseEntity<Void> deleteBudgetGroup();
+    ResponseEntity<Void> deleteBudgetGroup(@PathVariable Long id);
 
-    @PostMapping("/addUser")
+    @PostMapping("/addUser/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
-    ResponseEntity<String> addUserToGroup(@RequestBody EmailDtoReadModel emailDto);
+    ResponseEntity<String> addUserToGroup(@PathVariable Long id, @RequestBody EmailDtoReadModel emailDto);
 
-    @PostMapping("/removeUser")
+    @PostMapping("/removeUser/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
-    ResponseEntity<String> removeUserFromGroup(@RequestBody EmailDtoReadModel emailDto);
+    ResponseEntity<String> removeUserFromGroup(@PathVariable Long id,@RequestBody EmailDtoReadModel emailDto);
 
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @GetMapping("/listOfMembers")

@@ -11,7 +11,7 @@ interface BudgetGroupManagementDomain {
     BudgetGroup createBudgetGroup(BudgetGroupRequest budgetGroupRequest,
                                   final User userFromContext);
 
-    List<Long> closeBudgetGroup(final User userFromContext);
+    List<Long> closeBudgetGroup(final User userFromContext, final Long id);
 
 
 

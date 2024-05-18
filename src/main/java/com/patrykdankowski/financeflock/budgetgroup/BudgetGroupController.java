@@ -29,21 +29,21 @@ class BudgetGroupController implements BudgetGroupControllerApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteBudgetGroup() {
-        budgetGroupFacade.closeBudgetGroup();
+    public ResponseEntity<Void> deleteBudgetGroup(Long id) {
+        budgetGroupFacade.closeBudgetGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<String> addUserToGroup(EmailDtoReadModel emailDto) {
-        budgetGroupFacade.addUserToGroup(emailDto.getEmail());
+    public ResponseEntity<String> addUserToGroup(Long id, EmailDtoReadModel emailDto) {
+        budgetGroupFacade.addUserToGroup(emailDto.getEmail(), id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("User successfully added to group");
     }
 
     @Override
-    public ResponseEntity<String> removeUserFromGroup(EmailDtoReadModel emailDto) {
-        budgetGroupFacade.removeUserFromGroup(emailDto.getEmail());
+    public ResponseEntity<String> removeUserFromGroup(Long id, EmailDtoReadModel emailDto) {
+        budgetGroupFacade.removeUserFromGroup(emailDto.getEmail(), id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("User successfully removed from group");
     }

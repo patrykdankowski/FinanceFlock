@@ -11,11 +11,15 @@ public class CommonDomainServiceImpl implements CommonDomainService {
 
 
     @Override
-    public BudgetGroup validateIfGroupIsNotNullAndGetBudgetGroup(final User userFromContext) {
+    public BudgetGroup validateAndGetGroup(final User userFromContext, final Long id) {
         var groupToValidate = userFromContext.getBudgetGroup();
-        if (groupToValidate == null) {
+        if (userFromContext.getBudgetGroup()== null) {
             logger.warn("User {} is not a member of any group", userFromContext.getName());
             throw new IllegalStateException("User does not belong to any budget group");
+        }
+        if (!groupToValidate.getId().equals(id)) {
+            logger.warn("Given id group {} is not the same as your group", id);
+            throw new IllegalStateException("U are not a member of given id group");
         }
         return groupToValidate;
     }

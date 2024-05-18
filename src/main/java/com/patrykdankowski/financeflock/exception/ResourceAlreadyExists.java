@@ -1,5 +1,8 @@
 package com.patrykdankowski.financeflock.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ResourceAlreadyExists extends RuntimeException {
     private String message;
     private String details;

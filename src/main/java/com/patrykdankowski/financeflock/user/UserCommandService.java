@@ -3,10 +3,11 @@ package com.patrykdankowski.financeflock.user;
 import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface UserCommandService {
-    User findUserByEmail(String email);
+   User findUserByEmail(String email);
 
     void checkIfUserExists(String userEmail);
 

@@ -12,11 +12,9 @@ import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_M
 
 @Service
 class UserCommandServiceImpl implements UserCommandService {
-    private final UserQueryRepository userQueryRepository;
     private final UserCommandRepository userCommandRepository;
 
-    UserCommandServiceImpl(final UserQueryRepository userQueryRepository, final UserCommandRepository userCommandRepository) {
-        this.userQueryRepository = userQueryRepository;
+    UserCommandServiceImpl(final UserCommandRepository userCommandRepository) {
         this.userCommandRepository = userCommandRepository;
     }
 

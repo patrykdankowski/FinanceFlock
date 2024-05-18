@@ -171,6 +171,12 @@ class GlobalExceptionHandler {
                 "Please enter a different email address.",
                 HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(BudgetGroupValidateException.class)
+    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(BudgetGroupValidateException budgetGroupValidateException) {
+        return setErrorDetails("Exception occurred during budget group validation",
+                budgetGroupValidateException.getMessage(),
+                HttpStatus.CONFLICT);
+    }
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);

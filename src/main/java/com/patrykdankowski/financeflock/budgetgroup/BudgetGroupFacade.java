@@ -6,9 +6,9 @@ public interface BudgetGroupFacade {
 
     void createBudgetGroup(BudgetGroupRequest budgetGroupRequest);
 
-    void closeBudgetGroup();
+    void closeBudgetGroup(Long id);
 
-    void addUserToGroup(String email);
+    void addUserToGroup(final String email, final Long id);
 
-    void removeUserFromGroup(String email);
+    void removeUserFromGroup(final String email, final Long id);
 }

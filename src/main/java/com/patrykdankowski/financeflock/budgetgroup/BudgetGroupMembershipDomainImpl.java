@@ -1,9 +1,9 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.auth.AuthenticationService;
 import com.patrykdankowski.financeflock.common.CommonDomainService;
 import com.patrykdankowski.financeflock.common.Logger;
 import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.exception.BudgetGroupValidateException;
 import com.patrykdankowski.financeflock.user.User;
 import org.springframework.stereotype.Service;
 
@@ -24,19 +24,46 @@ class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
     }
 
     @Override
-    public void addUserToGroup(final User userFromContext, final User userToAdd) {
+    public void addUserToGroup(final User userFromContext,
+                               final User userToAdd,
+                               final Long id) {
 
+
+
+        logger.info("log4");
+        BudgetGroup budgetGroup = commonDomainService.validateAndGetGroup(userFromContext, id);
+        logger.info("log5");
 
         validateIfUserIsAdmin(userFromContext);
+        logger.info("log6");
 
-        BudgetGroup budgetGroup = commonDomainService.validateIfGroupIsNotNullAndGetBudgetGroup(userFromContext);
-
+        // ta metoda wywoluje N+1 selectow
         validateUserIfPossibleToAddToBudgetGroup(budgetGroup, userToAdd);
-
+        logger.warn("log7");
         addUserToBudgetGroup(budgetGroup, userToAdd);
+        logger.info("log8");
 
         assignRoleAndBudgetGroupForUser(userToAdd, budgetGroup, Role.GROUP_MEMBER);
 
+
+    }
+
+    private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroup budgetGroup,
+                                                          final User userToAdd) {
+        if (userToAdd.getBudgetGroup() != null || userToAdd.getRole() != USER) {
+            logger.warn("User {} is already a member of different group", userToAdd.getName());
+            throw new BudgetGroupValidateException("User is already a member of a different group group");
+        }
+        if (budgetGroup.getListOfMembers().contains(userToAdd)) {
+            logger.warn("User {} is already a member of this group", userToAdd.getName());
+            throw new BudgetGroupValidateException("User is already a member of this group");
+
+        }
+
+        if (budgetGroup.getListOfMembers().size() >= MAX_BUDGET_GROUP_SIZE) {
+            logger.warn("Budget group reached full size '{}'", MAX_BUDGET_GROUP_SIZE);
+            throw new BudgetGroupValidateException("Budget group size is full, remove someone first");
+        }
 
     }
 
@@ -50,29 +77,14 @@ class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
 
     }
 
-    private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
-        if (budgetGroup.getListOfMembers().contains(userToAdd)) {
-            logger.warn("User {} is already a member of this group", userToAdd.getName());
-            throw new IllegalStateException("User is already a member of this group");
-
-        }
-
-        if (userToAdd.getBudgetGroup() != null || userToAdd.getRole() != USER) {
-            logger.warn("User {} is already a member of different group", userToAdd.getName());
-            throw new IllegalStateException("User is already a member of a different group group");
-        }
-        if (budgetGroup.getListOfMembers().size() >= MAX_BUDGET_GROUP_SIZE) {
-            logger.warn("Budget group reached full size '{}'", MAX_BUDGET_GROUP_SIZE);
-            throw new IllegalStateException("Budget group size is full, remove someone first");
-        }
-
-    }
-
-    private void addUserToBudgetGroup(final BudgetGroup budgetGroup, final User userToAdd) {
+    private void addUserToBudgetGroup(final BudgetGroup budgetGroup,
+                                      final User userToAdd) {
         budgetGroup.getListOfMembers().add(userToAdd);
     }
 
-    private void assignRoleAndBudgetGroupForUser(final User user, final BudgetGroup budgetGroup, final Role role) {
+    private void assignRoleAndBudgetGroupForUser(final User user,
+                                                 final BudgetGroup budgetGroup,
+                                                 final Role role) {
         user.setRole(role);
         user.setBudgetGroup(budgetGroup);
 
@@ -80,10 +92,12 @@ class BudgetGroupMembershipDomainImpl implements BudgetGroupMembershipDomain {
 
 
     @Override
-    public void removeUserFromGroup(final User userFromContext, final User userToRemove) {
+    public void removeUserFromGroup(final User userFromContext,
+                                    final User userToRemove,
+                                    final Long id) {
 
 
-        BudgetGroup budgetGroup = commonDomainService.validateAndGetUserGroup(userFromContext);
+        BudgetGroup budgetGroup = commonDomainService.validateAndGetGroup(userFromContext,id);
 
         validateIsUserAdminOfBudgetGroup(userToRemove, budgetGroup);
 
