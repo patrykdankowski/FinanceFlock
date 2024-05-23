@@ -3,13 +3,13 @@ package com.patrykdankowski.financeflock.user;
 import java.util.List;
 
 public interface UserCommandServicePort {
-   User findUserByEmail(String email);
+   UserDomainEntity findUserByEmail(String email);
 
     void checkIfUserExists(String userEmail);
 
-    void saveUser(User user);
+    void saveUser(UserDomainEntity user);
 
-    void saveAllUsers(List<User> users);
+    void saveAllUsers(List<UserDomainEntity> users);
 
-    List<User> listOfUsersFromIds(List<Long> userIds);
+    List<UserDomainEntity> listOfUsersFromIds(List<Long> userIds);
 }

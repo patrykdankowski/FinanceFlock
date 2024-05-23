@@ -14,10 +14,10 @@ public class UserFactory {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest) {
+    public UserDomainEntity createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest) {
 
 
-        return User.builder()
+        return UserDomainEntity.builder()
                 .name(registerDtoRequest.getName())
                 .email(registerDtoRequest.getEmail())
                 .password(passwordEncoder.encode(registerDtoRequest.getPassword()))

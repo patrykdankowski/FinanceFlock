@@ -1,14 +1,12 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.user.User;
-import org.springframework.stereotype.Component;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
-@Component
- class BudgetGroupFactory {
+class BudgetGroupFactory {
 
-    public BudgetGroup createBudgetGroupFromRequest(User userFromContext, BudgetGroupRequest budgetGroupRequest) {
+    public BudgetGroupDomainEntity createBudgetGroupFromRequest(UserDomainEntity userFromContext, BudgetGroupRequest budgetGroupRequest) {
 
-        return BudgetGroup.builder()
+        return BudgetGroupDomainEntity.builder()
                 .owner(userFromContext)
                 .description(budgetGroupRequest.getDescription())
                 .member(userFromContext)

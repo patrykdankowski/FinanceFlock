@@ -1,15 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.user.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,23 +8,15 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "expanses")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Expense {
+public class ExpenseDomainEntity {
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserDomainEntity user;
 
-    // kategoria wydatku
-    @Column(precision = 9, scale = 2)
     private BigDecimal amount;
     private LocalDateTime expenseDate;
 
@@ -49,11 +32,11 @@ public class Expense {
         this.id = id;
     }
 
-    User getUser() {
+    UserDomainEntity getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(final UserDomainEntity user) {
         this.user = user;
     }
 

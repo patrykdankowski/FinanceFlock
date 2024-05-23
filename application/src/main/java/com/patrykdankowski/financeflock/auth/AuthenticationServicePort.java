@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 public interface AuthenticationServicePort {
-    User getUserFromContext();
+    UserDomainEntity getUserFromContext();
 }

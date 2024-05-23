@@ -1,16 +1,16 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 import java.util.List;
 
-interface BudgetGroupManagementDomainPort {
+public interface BudgetGroupManagementDomainPort {
 
 
-    BudgetGroup createBudgetGroup(BudgetGroupRequest budgetGroupRequest,
-                                  final User userFromContext);
+    BudgetGroupDomainEntity createBudgetGroup(BudgetGroupRequest budgetGroupRequest,
+                                              final UserDomainEntity userFromContext);
 
-    List<Long> closeBudgetGroup(final User userFromContext, final Long id);
+    List<Long> closeBudgetGroup(final UserDomainEntity userFromContext, final Long id);
 
 
 

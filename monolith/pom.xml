@@ -9,10 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.patrykdankowski</groupId>
-    <artifactId>FinanceFlock</artifactId>
+    <artifactId>monolith</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>FinanceFlock</name>
-    <description>FinanceFlock</description>
     <properties>
         <java.version>21</java.version>
     </properties>

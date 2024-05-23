@@ -9,14 +9,14 @@ import static com.patrykdankowski.financeflock.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
 public class UserCommandServiceAdapter implements UserCommandServicePort {
-    private final UserCommandRepository userCommandRepository;
+    private final UserCommandRepositoryPort userCommandRepository;
 
-    UserCommandServiceAdapter(final UserCommandRepository userCommandRepository) {
+    UserCommandServiceAdapter(final UserCommandRepositoryPort userCommandRepository) {
         this.userCommandRepository = userCommandRepository;
     }
 
     @Override
-    public User findUserByEmail(String email) {
+    public UserDomainEntity findUserByEmail(String email) {
         return userCommandRepository.findByEmail(email).orElseThrow(
                 () -> new UsernameNotFoundException(email));
     }
@@ -31,18 +31,18 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     }
 
     @Override
-    public void saveUser(User user) {
+    public void saveUser(UserDomainEntity user) {
         userCommandRepository.save(user);
     }
 
     @Override
-    public void saveAllUsers(List<User> users) {
+    public void saveAllUsers(List<UserDomainEntity> users) {
         userCommandRepository.saveAll(users);
     }
 
 
     @Override
-    public List<User> listOfUsersFromIds(final List<Long> userIds) {
+    public List<UserDomainEntity> listOfUsersFromIds(final List<Long> userIds) {
         return userCommandRepository.findAllById(userIds);
     }
 

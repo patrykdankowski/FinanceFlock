@@ -2,8 +2,8 @@ package com.patrykdankowski.financeflock.budgetgroup;
 
 
 public interface BudgetGroupCommandServicePort {
-    BudgetGroup saveBudgetGroup(BudgetGroup budgetGroup);
+    BudgetGroupDomainEntity saveBudgetGroup(BudgetGroupDomainEntity budgetGroupDomainEntity);
 
-    void deleteBudgetGroup(BudgetGroup budgetGroup);
+    void deleteBudgetGroup(BudgetGroupDomainEntity budgetGroupDomainEntity);
 
 }

@@ -1,13 +1,13 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 interface ExpenseManagementDomainPort {
-    Expense addExpense(ExpenseDtoWriteModel expenseDtoWriteModel,
-                       final User userFromContext);
+    ExpenseDomainEntity addExpense(ExpenseDtoWriteModel expenseDtoWriteModel,
+                                   final UserDomainEntity userFromContext);
 
 
     void updateExpense(ExpenseDtoWriteModel expenseSourceDto,
-                       Expense expense,
-                       User userFromContext);
+                       ExpenseDomainEntity expenseDomainEntity,
+                       UserDomainEntity userFromContext);
 }

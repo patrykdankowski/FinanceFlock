@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ class AuthenticationServiceAdapter implements AuthenticationServicePort {
 
 
     @Override
-    public User getUserFromContext() {
+    public UserDomainEntity getUserFromContext() {
 
 
         Authentication authentication = userContextService.getAuthenticationFromContext();

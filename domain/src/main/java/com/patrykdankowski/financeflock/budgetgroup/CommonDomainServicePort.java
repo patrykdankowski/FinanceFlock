@@ -1,11 +1,11 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 public interface CommonDomainServicePort {
 
-     BudgetGroup validateAndGetGroup(final User userFromContext, final Long id);
+     BudgetGroupDomainEntity validateAndGetGroup(final UserDomainEntity userFromContext, final Long id);
 
-     BudgetGroup validateAndGetUserGroup(final User userFromContext);
+     BudgetGroupDomainEntity validateAndGetUserGroup(final UserDomainEntity userFromContext);
 
 }

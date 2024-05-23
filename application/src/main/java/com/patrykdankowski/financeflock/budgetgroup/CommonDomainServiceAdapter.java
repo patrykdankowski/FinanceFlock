@@ -1,19 +1,15 @@
-package com.patrykdankowski.financeflock.common;
+package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.Logger;
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroup;
-import com.patrykdankowski.financeflock.budgetgroup.CommonDomainServicePort;
-import com.patrykdankowski.financeflock.user.User;
-import org.springframework.stereotype.Service;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
-@Service
 public class CommonDomainServiceAdapter implements CommonDomainServicePort {
 
     private final org.slf4j.Logger logger = Logger.getLogger(this.getClass());
 
 
     @Override
-    public BudgetGroup validateAndGetGroup(final User userFromContext, final Long id) {
+    public BudgetGroupDomainEntity validateAndGetGroup(final UserDomainEntity userFromContext, final Long id) {
         var groupToValidate = userFromContext.getBudgetGroup();
         if (userFromContext.getBudgetGroup()== null) {
             logger.warn("User {} is not a member of any group", userFromContext.getName());
@@ -27,12 +23,12 @@ public class CommonDomainServiceAdapter implements CommonDomainServicePort {
     }
 
     @Override
-    public BudgetGroup validateAndGetUserGroup(final User userFromContext) {
-        BudgetGroup budgetGroup = userFromContext.getBudgetGroup();
-        if (budgetGroup == null) {
+    public BudgetGroupDomainEntity validateAndGetUserGroup(final UserDomainEntity userFromContext) {
+        BudgetGroupDomainEntity budgetGroupDomainEntity = userFromContext.getBudgetGroup();
+        if (budgetGroupDomainEntity == null) {
             logger.warn("Budget group is null");
             throw new IllegalStateException("Budget group does not exist");
         }
-        return budgetGroup;
+        return budgetGroupDomainEntity;
     }
 }

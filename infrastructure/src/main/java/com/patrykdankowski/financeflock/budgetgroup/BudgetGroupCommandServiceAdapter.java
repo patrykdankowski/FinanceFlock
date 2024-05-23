@@ -5,20 +5,20 @@ import org.springframework.stereotype.Service;
 @Service
 class BudgetGroupCommandServiceAdapter implements BudgetGroupCommandServicePort {
 
-    private final BudgetGroupCommandRepository budgetGroupCommandRepository;
+    private final BudgetGroupCommandRepositoryPort budgetGroupCommandRepository;
 
-    BudgetGroupCommandServiceAdapter(final BudgetGroupCommandRepository budgetGroupCommandRepository) {
+    BudgetGroupCommandServiceAdapter(final BudgetGroupCommandRepositoryPort budgetGroupCommandRepository) {
         this.budgetGroupCommandRepository = budgetGroupCommandRepository;
     }
 
     @Override
-    public BudgetGroup saveBudgetGroup(final BudgetGroup budgetGroup) {
-        return budgetGroupCommandRepository.save(budgetGroup);
+    public BudgetGroupDomainEntity saveBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
+        return budgetGroupCommandRepository.save(budgetGroupDomainEntity);
     }
 
     @Override
-    public void deleteBudgetGroup(final BudgetGroup budgetGroup) {
-        budgetGroupCommandRepository.delete(budgetGroup);
+    public void deleteBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
+        budgetGroupCommandRepository.delete(budgetGroupDomainEntity);
     }
 
 

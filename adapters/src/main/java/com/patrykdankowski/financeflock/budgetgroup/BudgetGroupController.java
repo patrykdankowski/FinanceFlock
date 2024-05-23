@@ -2,9 +2,10 @@ package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,47 +17,58 @@ class BudgetGroupController implements BudgetGroupControllerApi {
     private final BudgetGroupFacade budgetGroupFacade;
     private final BudgetGroupQueryService budgetGroupQueryService;
 
-
     @Override
-    public ResponseEntity<String> createBudgetGroup(BudgetGroupRequest budgetGroupRequest) {
-        budgetGroupFacade.createBudgetGroup(budgetGroupRequest);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Budget group created");
+    @PostMapping("/create")
+    @PreAuthorize("hasAuthority('USER')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String createBudgetGroup(@Valid @RequestBody BudgetGroupRequest budgetGroupRequest) {
+        Long budgetGroupId = budgetGroupFacade.createBudgetGroup(budgetGroupRequest);
+        return String.format("Budget group created with id {}", budgetGroupId);
     }
 
     @Override
-    public ResponseEntity<Void> deleteBudgetGroup(Long id) {
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBudgetGroup(@PathVariable Long id) {
         budgetGroupFacade.closeBudgetGroup(id);
-        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<String> addUserToGroup(Long id, EmailDtoReadModel emailDto) {
+    @PostMapping("/addUser/{id}")
+    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public String addUserToGroup(@PathVariable Long id, @RequestBody EmailDtoReadModel emailDto) {
         budgetGroupFacade.addUserToGroup(emailDto.getEmail(), id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("User successfully added to group");
+        return "User successfully added to group";
     }
 
     @Override
-    public ResponseEntity<String> removeUserFromGroup(Long id, EmailDtoReadModel emailDto) {
+    @PostMapping("/removeUser/{id}")
+    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public String removeUserFromGroup(@PathVariable Long id, @RequestBody EmailDtoReadModel emailDto) {
         budgetGroupFacade.removeUserFromGroup(emailDto.getEmail(), id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("User successfully removed from group");
+        return "User successfully removed from group";
     }
 
     @Override
-    public ResponseEntity<List<UserDtoResponse>> getListOfMembersInBudgetGroup() {
+    @GetMapping("/listOfMembers")
+    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDtoResponse> getListOfMembersInBudgetGroup() {
         List<UserDtoResponse> list = budgetGroupQueryService.listOfUsersInGroup();
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(list);
+        return list;
     }
 
     @Override
-    public ResponseEntity<List<UserDtoProjections>> getList() {
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDtoProjections> getList() {
 
         List<UserDtoProjections> budgetGroupExpenses = budgetGroupQueryService.getBudgetGroupExpenses();
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(budgetGroupExpenses);
+        return budgetGroupExpenses;
 
     }
 

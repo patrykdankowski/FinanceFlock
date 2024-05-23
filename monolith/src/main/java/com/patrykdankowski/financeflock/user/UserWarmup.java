@@ -10,28 +10,28 @@ import java.util.List;
 @Component
  class UserWarmup implements CommandLineRunner {
 
-    UserWarmup(final PasswordEncoder passwordEncoder, final UserCommandRepository userCommandRepository, final UserQueryRepository userQueryRepository) {
+    UserWarmup(final PasswordEncoder passwordEncoder, final UserCommandRepositoryPort userCommandRepository, final UserQueryRepositoryPort userQueryRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userCommandRepository = userCommandRepository;
         this.userQueryRepository = userQueryRepository;
     }
 
     private final PasswordEncoder passwordEncoder;
-    private final UserCommandRepository userCommandRepository;
-    private final UserQueryRepository userQueryRepository;
+    private final UserCommandRepositoryPort userCommandRepository;
+    private final UserQueryRepositoryPort userQueryRepository;
 
     @Override
     public void run(final String... args) throws Exception {
 
         if (userQueryRepository.count() == 0) {
-            User user1 = new User();
+            UserDomainEntity user1 = new UserDomainEntity();
             user1.setName("Patryk");
             user1.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
             user1.setEmail("patryk@gmail.com");
             user1.setRole(Role.USER);
             user1.setShareData(true);
 
-            User user2 = new User();
+            UserDomainEntity user2 = new UserDomainEntity();
             user2.setName("Kuba");
             user2.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
             user2.setEmail("kuba@gmail.com");

@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.budgetgroup;
 
  interface BudgetGroupFacade {
 
-    void createBudgetGroup(BudgetGroupRequest budgetGroupRequest);
+    Long createBudgetGroup(BudgetGroupRequest budgetGroupRequest);
 
     void closeBudgetGroup(Long id);
 

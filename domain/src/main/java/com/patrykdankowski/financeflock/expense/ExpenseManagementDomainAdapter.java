@@ -1,32 +1,30 @@
 package com.patrykdankowski.financeflock.expense;
 
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.user.User;
-import org.springframework.stereotype.Service;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 import java.time.LocalDateTime;
 
 
-@Service
 class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
 
     @Override
-    public Expense addExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final User userFromContext) {
+    public ExpenseDomainEntity addExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final UserDomainEntity userFromContext) {
 
         validateExpenseDate(expenseDtoWriteModel);
 
-        final Expense expense = createExpense(expenseDtoWriteModel);
-        userFromContext.addExpense(expense);
+        final ExpenseDomainEntity expenseDomainEntity = createExpense(expenseDtoWriteModel);
+        userFromContext.addExpense(expenseDomainEntity);
 
-        return expense;
+        return expenseDomainEntity;
     }
 
-    private Expense createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel) {
+    private ExpenseDomainEntity createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel) {
 
 
 
-        return Expense.builder()
+        return ExpenseDomainEntity.builder()
                 .expenseDate(expenseDtoWriteModel.getExpenseDate())
                 .amount(expenseDtoWriteModel.getAmount())
                 .description(expenseDtoWriteModel.getDescription())
@@ -45,47 +43,47 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
     @Override
     public void updateExpense(final ExpenseDtoWriteModel expenseSourceDto,
-                              final Expense expense,
-                              final User userFromContext) {
+                              final ExpenseDomainEntity expenseDomainEntity,
+                              final UserDomainEntity userFromContext) {
 
 
-        validateUserAccessToExpense(userFromContext, expense);
+        validateUserAccessToExpense(userFromContext, expenseDomainEntity);
 
-        validateAndSetFieldsForExpense(expenseSourceDto, expense);
+        validateAndSetFieldsForExpense(expenseSourceDto, expenseDomainEntity);
     }
 
-    private void validateUserAccessToExpense(final User userFromContext,
-                                             final Expense expense) {
+    private void validateUserAccessToExpense(final UserDomainEntity userFromContext,
+                                             final ExpenseDomainEntity expenseDomainEntity) {
 
         //for group admin only
         boolean isExpenseInSameUserGroup = userFromContext.getRole().equals(Role.GROUP_ADMIN) &&
-                userFromContext.getBudgetGroup().getId().equals(expense.getUser().getBudgetGroup().getId());
+                userFromContext.getBudgetGroup().getId().equals(expenseDomainEntity.getUser().getBudgetGroup().getId());
 
-        boolean isExpenseOfUser = userFromContext.getExpenseList().contains(expense) &&
-                expense.getUser().getId().equals(userFromContext.getId());
+        boolean isExpenseOfUser = userFromContext.getExpenseList().contains(expenseDomainEntity) &&
+                expenseDomainEntity.getUser().getId().equals(userFromContext.getId());
 
 
         if (isExpenseInSameUserGroup && !isExpenseOfUser) {
-            throw new ExpenseNotBelongToUserException(userFromContext.getId(), expense.getId());
+            throw new ExpenseNotBelongToUserException(userFromContext.getId(), expenseDomainEntity.getId());
         } else if (!isExpenseOfUser) {
-            throw new ExpenseNotFoundException(expense.getId());
+            throw new ExpenseNotFoundException(expenseDomainEntity.getId());
 
         }
     }
 
     private void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
-                                                final Expense expense) {
+                                                final ExpenseDomainEntity expenseDomainEntity) {
         if (expenseDtoWriteModel.getExpenseDate() != null) {
-            expense.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
+            expenseDomainEntity.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
         }
         if (expenseDtoWriteModel.getDescription() != null && !expenseDtoWriteModel.getDescription().isBlank()) {
-            expense.setDescription(expenseDtoWriteModel.getDescription());
+            expenseDomainEntity.setDescription(expenseDtoWriteModel.getDescription());
         }
         if (expenseDtoWriteModel.getAmount() != null) {
-            expense.setAmount(expenseDtoWriteModel.getAmount());
+            expenseDomainEntity.setAmount(expenseDtoWriteModel.getAmount());
         }
         if (expenseDtoWriteModel.getLocation() != null && !expenseDtoWriteModel.getLocation().isBlank()) {
-            expense.setLocation(expenseDtoWriteModel.getLocation());
+            expenseDomainEntity.setLocation(expenseDtoWriteModel.getLocation());
         }
     }
 }

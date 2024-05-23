@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.expense;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationServicePort;
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
 
     ExpenseFacadeImpl(
             final ExpenseManagementDomainPort expenseManagementDomain,
-            final ExpenseCommandRepository expenseCommandRepository,
+            final ExpenseCommandRepositoryPort expenseCommandRepository,
             final AuthenticationServicePort authenticationService,
             final ExpenseCommandServicePort expenseCommandService, final ExpenseGeolocationServicePort expenseGeolocationService) {
 
@@ -24,7 +24,7 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
 
 
     private final ExpenseManagementDomainPort expenseManagementDomain;
-    private final ExpenseCommandRepository expenseCommandRepository;
+    private final ExpenseCommandRepositoryPort expenseCommandRepository;
     private final AuthenticationServicePort authenticationService;
     private final ExpenseCommandServicePort expenseCommandService;
     private final ExpenseGeolocationServicePort expenseGeolocationService;
@@ -32,10 +32,10 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
     @Override
     public long addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp) {
 
-        final User userFromContext = authenticationService.getUserFromContext();
+        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
         final ExpenseDtoWriteModel expenseDtoValidated = expenseGeolocationService.validateAndPrepareExpense(expenseDtoWriteModel, userIp);
-        final Expense expense = expenseManagementDomain.addExpense(expenseDtoValidated, userFromContext);
-        return expenseCommandRepository.save(expense).getId();
+        final ExpenseDomainEntity expenseDomainEntity = expenseManagementDomain.addExpense(expenseDtoValidated, userFromContext);
+        return expenseCommandRepository.save(expenseDomainEntity).getId();
 
 
     }
@@ -43,14 +43,14 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
     @Override
     public void updateExpense(Long id, ExpenseDtoWriteModel expenseSourceDto) {
 
-        final Expense expense = expenseCommandService.retrieveExpenseById(id);
-        final User userFromContext = authenticationService.getUserFromContext();
+        final ExpenseDomainEntity expenseDomainEntity = expenseCommandService.retrieveExpenseById(id);
+        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
 
         expenseManagementDomain.updateExpense(expenseSourceDto,
-                expense,
+                expenseDomainEntity,
                 userFromContext);
 
-        expenseCommandRepository.save(expense);
+        expenseCommandRepository.save(expenseDomainEntity);
     }
 
 

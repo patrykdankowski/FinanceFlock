@@ -2,14 +2,12 @@ package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.AppConstants;
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 
-@Service
 @Slf4j
-class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainPort {
+public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainPort {
 
 
     private final CommonDomainServicePort commonDomainService;
@@ -19,44 +17,44 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
     }
 
     @Override
-    public void addUserToGroup(final User userFromContext,
-                               final User userToAdd,
+    public void addUserToGroup(final UserDomainEntity userFromContext,
+                               final UserDomainEntity userToAdd,
                                final Long id) {
 
 
-        BudgetGroup budgetGroup = commonDomainService.validateAndGetGroup(userFromContext, id);
+        BudgetGroupDomainEntity budgetGroupDomainEntity = commonDomainService.validateAndGetGroup(userFromContext, id);
 
         validateIfUserIsAdmin(userFromContext);
 
         // ta metoda wywoluje N+1 selectow
-        validateUserIfPossibleToAddToBudgetGroup(budgetGroup, userToAdd);
-        addUserToBudgetGroup(budgetGroup, userToAdd);
+        validateUserIfPossibleToAddToBudgetGroup(budgetGroupDomainEntity, userToAdd);
+        addUserToBudgetGroup(budgetGroupDomainEntity, userToAdd);
 
-        assignRoleAndBudgetGroupForUser(userToAdd, budgetGroup, Role.GROUP_MEMBER);
+        assignRoleAndBudgetGroupForUser(userToAdd, budgetGroupDomainEntity, Role.GROUP_MEMBER);
 
 
     }
 
-    private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroup budgetGroup,
-                                                          final User userToAdd) {
+    private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                                                          final UserDomainEntity userToAdd) {
         if (userToAdd.getBudgetGroup() != null || userToAdd.getRole() != Role.USER) {
             log.warn("User {} is already a member of different group", userToAdd.getName());
             throw new BudgetGroupValidationException("User is already a member of a different group group");
         }
-        if (budgetGroup.getListOfMembers().contains(userToAdd)) {
+        if (budgetGroupDomainEntity.getListOfMembers().contains(userToAdd)) {
             log.warn("User {} is already a member of this group", userToAdd.getName());
             throw new BudgetGroupValidationException("User is already a member of this group");
 
         }
 
-        if (budgetGroup.getListOfMembers().size() >= AppConstants.MAX_BUDGET_GROUP_SIZE) {
+        if (budgetGroupDomainEntity.getListOfMembers().size() >= AppConstants.MAX_BUDGET_GROUP_SIZE) {
             log.warn("Budget group reached full size '{}'", AppConstants.MAX_BUDGET_GROUP_SIZE);
             throw new MaxUserCountInBudgetGroupException();
         }
 
     }
 
-    private void validateIfUserIsAdmin(final User userFromContext) {
+    private void validateIfUserIsAdmin(final UserDomainEntity userFromContext) {
 
         if (userFromContext.getRole() != Role.GROUP_ADMIN || userFromContext.getBudgetGroup() == null) {
             log.error("Security issue: User with ID {} with role {} attempted to add a user to the budget group but is not an admin",
@@ -66,52 +64,52 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
 
     }
 
-    private void addUserToBudgetGroup(final BudgetGroup budgetGroup,
-                                      final User userToAdd) {
-        budgetGroup.getListOfMembers().add(userToAdd);
+    private void addUserToBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                                      final UserDomainEntity userToAdd) {
+        budgetGroupDomainEntity.getListOfMembers().add(userToAdd);
     }
 
-    private void assignRoleAndBudgetGroupForUser(final User user,
-                                                 final BudgetGroup budgetGroup,
+    private void assignRoleAndBudgetGroupForUser(final UserDomainEntity user,
+                                                 final BudgetGroupDomainEntity budgetGroupDomainEntity,
                                                  final Role role) {
         user.setRole(role);
-        user.setBudgetGroup(budgetGroup);
+        user.setBudgetGroup(budgetGroupDomainEntity);
 
     }
 
 
     @Override
-    public void removeUserFromGroup(final User userFromContext,
-                                    final User userToRemove,
+    public void removeUserFromGroup(final UserDomainEntity userFromContext,
+                                    final UserDomainEntity userToRemove,
                                     final Long id) {
 
 
-        BudgetGroup budgetGroup = commonDomainService.validateAndGetGroup(userFromContext, id);
+        BudgetGroupDomainEntity budgetGroupDomainEntity = commonDomainService.validateAndGetGroup(userFromContext, id);
 
-        validateIsUserAdminOfBudgetGroup(userToRemove, budgetGroup);
+        validateIsUserAdminOfBudgetGroup(userToRemove, budgetGroupDomainEntity);
 
-        validateUserToRemoveFromBudgetGroup(userToRemove, budgetGroup);
+        validateUserToRemoveFromBudgetGroup(userToRemove, budgetGroupDomainEntity);
 
-        removeUserFromBudgetGroup(budgetGroup, userToRemove);
+        removeUserFromBudgetGroup(budgetGroupDomainEntity, userToRemove);
 
     }
 
-    private void validateIsUserAdminOfBudgetGroup(final User userFromContext, final BudgetGroup budgetGroup) {
-        if (userFromContext.getRole() != Role.GROUP_ADMIN || !(budgetGroup.getOwner().equals(userFromContext))) {
+    private void validateIsUserAdminOfBudgetGroup(final UserDomainEntity userFromContext, final BudgetGroupDomainEntity budgetGroupDomainEntity) {
+        if (userFromContext.getRole() != Role.GROUP_ADMIN || !(budgetGroupDomainEntity.getOwner().equals(userFromContext))) {
             log.warn("User {} is not an admin of this group", userFromContext.getName());
             throw new SecurityException("You dont have permission to remove user from the budget group");
         }
     }
 
-    private void validateUserToRemoveFromBudgetGroup(final User userToRemove, final BudgetGroup budgetGroup) {
-        if (!(budgetGroup.getListOfMembers().contains(userToRemove)) || userToRemove.getRole() != Role.GROUP_MEMBER) {
+    private void validateUserToRemoveFromBudgetGroup(final UserDomainEntity userToRemove, final BudgetGroupDomainEntity budgetGroupDomainEntity) {
+        if (!(budgetGroupDomainEntity.getListOfMembers().contains(userToRemove)) || userToRemove.getRole() != Role.GROUP_MEMBER) {
             log.warn("User {} is not a member of this group", userToRemove.getName());
             throw new IllegalStateException("User is not a member of the group");
         }
     }
 
-    private void removeUserFromBudgetGroup(final BudgetGroup budgetGroup, final User userToRemove) {
-        budgetGroup.getListOfMembers().remove(userToRemove);
+    private void removeUserFromBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity, final UserDomainEntity userToRemove) {
+        budgetGroupDomainEntity.getListOfMembers().remove(userToRemove);
         assignRoleAndBudgetGroupForUser(userToRemove, null, Role.USER);
     }
 

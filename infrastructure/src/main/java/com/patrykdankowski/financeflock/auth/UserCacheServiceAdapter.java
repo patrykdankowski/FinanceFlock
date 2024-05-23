@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserCommandServicePort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -21,7 +21,7 @@ public class UserCacheServiceAdapter implements UserCacheServicePort {
 
     //    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
     @Override
-    public User getUserFromEmail(String userEmail) {
+    public UserDomainEntity getUserFromEmail(String userEmail) {
         var user = userCommandService.findUserByEmail(userEmail);
         return user;
     }

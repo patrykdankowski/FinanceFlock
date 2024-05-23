@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -21,28 +21,25 @@ class ExpenseController implements ExpenseControllerApi {
     private final ExpenseGeolocationServicePort geolocationService;
 
     @Override
-    public ResponseEntity<URI> addExpense(ExpenseDtoWriteModel expenseDtoWriteModel,
-                                          HttpServletRequest request) {
+    @PostMapping("/add")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
+                             HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);
         final long expenseId = expenseFacade.addExpense(expenseDtoWriteModel, userIp);
 
-        URI location = ServletUriComponentsBuilder
-                //TODO zmodyfikować url z post na get w ścieżce
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(expenseId)
-                .toUri();
+        return String.format("Expense created with id {}", expenseId);
 
-        return ResponseEntity.created(location).body(location);
     }
 
     @Override
-    public ResponseEntity<String> updateExpense(Long id,
-                                                ExpenseDtoWriteModel expenseDtoWriteModel) {
+    @PatchMapping("/update/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String updateExpense(@PathVariable Long id,
+                                @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel) {
 
         expenseFacade.updateExpense(id, expenseDtoWriteModel);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Resource updated");
+        return "Resource updated";
     }
 }

@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.auth;
 
 import com.patrykdankowski.financeflock.auth.dto.LoginDto;
 import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
-import com.patrykdankowski.financeflock.user.User;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserFactory;
 import com.patrykdankowski.financeflock.user.UserCommandServicePort;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -60,7 +60,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
         }
         String userMail = authentication.getName();
         var user = userCommandService.findUserByEmail(userMail);
-        User userToSave = user.toBuilder()
+        UserDomainEntity userToSave = user.toBuilder()
                 .lastLoggedInAt(LocalDateTime.now())
                 .build();
         userCommandService.saveUser(userToSave);
