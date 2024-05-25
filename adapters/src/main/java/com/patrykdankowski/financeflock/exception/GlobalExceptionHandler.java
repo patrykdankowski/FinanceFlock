@@ -185,6 +185,12 @@ class GlobalExceptionHandler {
                 budgetGroupValidationException.getMessage(),
                 HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(StackOverflowError.class)
+    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(StackOverflowError budgetGroupValidationException) {
+        return setErrorDetails("Stack overflowexception",
+                budgetGroupValidationException.getMessage(),
+                HttpStatus.CONFLICT);
+    }
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);

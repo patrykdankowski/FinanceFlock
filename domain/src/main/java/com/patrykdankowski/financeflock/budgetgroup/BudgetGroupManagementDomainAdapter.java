@@ -23,11 +23,12 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
     @Override
     public BudgetGroupDomainEntity createBudgetGroup(final BudgetGroupRequest budgetGroupRequest,
                                                      final UserDomainEntity userFromContext) {
-
+        log.info("asdasd");
         isUserAbleToCreateBudgetGroup(userFromContext);
 
         BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupFactory.createBudgetGroupFromRequest(userFromContext, budgetGroupRequest);
         assignRoleAndBudgetGroupForUser(userFromContext, budgetGroupDomainEntity, Role.GROUP_ADMIN);
+        log.info("test");
         return budgetGroupDomainEntity;
     }
 

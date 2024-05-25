@@ -28,11 +28,11 @@ public class ExpenseDomainEntity {
         return id;
     }
 
-    void setId(final Long id) {
+   public void setId(final Long id) {
         this.id = id;
     }
 
-    UserDomainEntity getUser() {
+    public UserDomainEntity getUser() {
         return user;
     }
 
@@ -52,7 +52,7 @@ public class ExpenseDomainEntity {
         return expenseDate;
     }
 
-    void setExpenseDate(final LocalDateTime expenseDate) {
+    public void setExpenseDate(final LocalDateTime expenseDate) {
         this.expenseDate = expenseDate;
     }
 
@@ -60,7 +60,7 @@ public class ExpenseDomainEntity {
         return description;
     }
 
-    void setDescription(final String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 

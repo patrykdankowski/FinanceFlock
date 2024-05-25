@@ -3,6 +3,7 @@ package com.patrykdankowski.financeflock.user;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.expense.ExpenseDomainEntity;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
-//@Getter
+@Getter
 @Setter
 @ToString
 public class UserDomainEntity {
@@ -31,9 +32,9 @@ public class UserDomainEntity {
 
     private Role role;
 
-    private BudgetGroupDomainEntity budgetGroupDomainEntity;
+    private BudgetGroupDomainEntity budgetGroup;
 
-    private Set<ExpenseDomainEntity> expenseDomainEntityList = new HashSet<>();
+    private Set<ExpenseDomainEntity> expenseList = new HashSet<>();
 
     private boolean shareData;
 
@@ -66,11 +67,11 @@ public class UserDomainEntity {
     }
 
     public BudgetGroupDomainEntity getBudgetGroup() {
-        return budgetGroupDomainEntity;
+        return budgetGroup;
     }
 
     public Set<ExpenseDomainEntity> getExpenseList() {
-        return expenseDomainEntityList;
+        return expenseList;
     }
 
     public boolean isShareData() {
@@ -106,11 +107,11 @@ public class UserDomainEntity {
     }
 
     public void setBudgetGroup(BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        this.budgetGroupDomainEntity = budgetGroupDomainEntity;
+        this.budgetGroup = budgetGroupDomainEntity;
     }
 
-    public void setExpenseList(Set<ExpenseDomainEntity> expenseDomainEntityList) {
-        this.expenseDomainEntityList = expenseDomainEntityList;
+    public void setExpenseList(Set<ExpenseDomainEntity> expenseList) {
+        this.expenseList = expenseList;
     }
 
     public void setShareData(boolean shareData) {
@@ -125,8 +126,8 @@ public class UserDomainEntity {
         this.lastLoggedInAt = builder.lastLoggedInAt;
         this.createdAt = builder.createdAt;
         this.role = builder.role;
-        this.budgetGroupDomainEntity = builder.budgetGroupDomainEntity;
-        this.expenseDomainEntityList = builder.expenseDomainEntityList;
+        this.budgetGroup = builder.budgetGroup;
+        this.expenseList = builder.expenseList;
         this.shareData = builder.shareData;
     }
 
@@ -139,8 +140,8 @@ public class UserDomainEntity {
                 .lastLoggedInAt(this.lastLoggedInAt)
                 .createdAt(this.createdAt)
                 .role(this.role)
-                .budgetGroup(this.budgetGroupDomainEntity)
-                .expenseList(this.expenseDomainEntityList)
+                .budgetGroup(this.budgetGroup)
+                .expenseList(this.expenseList)
                 .shareData(this.shareData);
     }
 
@@ -149,10 +150,10 @@ public class UserDomainEntity {
     }
 
     public void addExpense(ExpenseDomainEntity expenseDomainEntity) {
-        if (expenseDomainEntityList.contains(expenseDomainEntity)) {
+        if (expenseList.contains(expenseDomainEntity)) {
             return;
         }
-        this.expenseDomainEntityList.add(expenseDomainEntity);
+        this.expenseList.add(expenseDomainEntity);
         expenseDomainEntity.setUser(this);
     }
 
@@ -176,9 +177,9 @@ public class UserDomainEntity {
 
         private Role role;
 
-        private BudgetGroupDomainEntity budgetGroupDomainEntity;
+        private BudgetGroupDomainEntity budgetGroup;
 
-        private Set<ExpenseDomainEntity> expenseDomainEntityList = new HashSet<>();
+        private Set<ExpenseDomainEntity> expenseList = new HashSet<>();
 
         private boolean shareData;
 
@@ -229,14 +230,14 @@ public class UserDomainEntity {
 
         }
 
-        public Builder budgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntityEntity) {
-            this.budgetGroupDomainEntity = budgetGroupDomainEntityEntity;
+        public Builder budgetGroup(final BudgetGroupDomainEntity budgetGroup) {
+            this.budgetGroup = budgetGroup;
             return this;
 
         }
 
-        public Builder expenseList(final Set<ExpenseDomainEntity> expenseDomainEntityList) {
-            this.expenseDomainEntityList = expenseDomainEntityList;
+        public Builder expenseList(final Set<ExpenseDomainEntity> expenseList) {
+            this.expenseList = expenseList;
             return this;
 
         }

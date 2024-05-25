@@ -1,7 +1,15 @@
 package com.patrykdankowski.financeflock.expense;
 
 import com.patrykdankowski.financeflock.user.UserSqlEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,8 +17,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static com.patrykdankowski.financeflock.user.UserSqlEntity.fromDomainUser;
-import static com.patrykdankowski.financeflock.user.UserSqlEntity.toDomainUser;
 
 @Entity
 @Table(name = "expanses")
@@ -19,25 +25,25 @@ import static com.patrykdankowski.financeflock.user.UserSqlEntity.toDomainUser;
 @NoArgsConstructor
 public class ExpenseSqlEntity {
 
-    public static ExpenseSqlEntity fromDomainExpense(ExpenseDomainEntity expenseDomainEntity) {
-        var result = new ExpenseSqlEntity();
-        result.amount = expenseDomainEntity.getAmount();
-        result.description = expenseDomainEntity.getDescription();
-        result.id = expenseDomainEntity.getId();
-        result.location = expenseDomainEntity.getLocation();
-        result.user = fromDomainUser(expenseDomainEntity.getUser());
-        return result;
-    }
-
-    public static ExpenseDomainEntity toDomainExpense(ExpenseSqlEntity expenseSqlEntity){
-        var result = new ExpenseDomainEntity();
-        result.setAmount(expenseSqlEntity.getAmount());
-        result.setId(expenseSqlEntity.getId());
-        result.setLocation(expenseSqlEntity.getLocation());
-        result.setExpenseDate(expenseSqlEntity.getExpenseDate());
-        result.setUser(toDomainUser((expenseSqlEntity.getUser())));
-        return result;
-    }
+//    public static ExpenseSqlEntity fromDomainExpense(ExpenseDomainEntity expenseDomainEntity) {
+//        var result = new ExpenseSqlEntity();
+//        result.amount = expenseDomainEntity.getAmount();
+//        result.description = expenseDomainEntity.getDescription();
+//        result.id = expenseDomainEntity.getId();
+//        result.location = expenseDomainEntity.getLocation();
+//        result.user = fromDomainUser(expenseDomainEntity.getUser());
+//        return result;
+//    }
+//
+//    public static ExpenseDomainEntity toDomainExpense(ExpenseSqlEntity expenseSqlEntity){
+//        var result = new ExpenseDomainEntity();
+//        result.setAmount(expenseSqlEntity.getAmount());
+//        result.setId(expenseSqlEntity.getId());
+//        result.setLocation(expenseSqlEntity.getLocation());
+//        result.setExpenseDate(expenseSqlEntity.getExpenseDate());
+//        result.setUser(toDomainUser((expenseSqlEntity.getUser())));
+//        return result;
+//    }
 
 
     @Id
@@ -64,7 +70,7 @@ public class ExpenseSqlEntity {
         this.id = id;
     }
 
-    UserSqlEntity getUser() {
+    public UserSqlEntity getUser() {
         return user;
     }
 

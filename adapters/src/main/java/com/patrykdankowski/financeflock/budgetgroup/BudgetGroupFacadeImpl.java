@@ -42,7 +42,9 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         final BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupManagementDomain.createBudgetGroup
                 (budgetGroupRequest, userFromContext);
+        log.info("before");
         Long id = budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity).getId();
+        log.info("after");
 
         log.info("Successfully finished process of create budget group");
 

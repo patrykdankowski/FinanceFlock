@@ -1,11 +1,14 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
-
+@Getter
+@Setter
 public class BudgetGroupDomainEntity {
 
 
@@ -15,13 +18,24 @@ public class BudgetGroupDomainEntity {
 
     private UserDomainEntity owner;
 
-    private final Set<UserDomainEntity> listOfMembers = new HashSet<>();
+    private Set<UserDomainEntity> listOfMembers = new HashSet<>();
 
+//            BudgetGroupDomainEntity(final Builder builder) {
+//        this.id = builder.id;
+//        this.description = builder.description;
+//        this.owner = builder.owner;
+//        this.listOfMembers.add(builder.owner);
+//    }
     BudgetGroupDomainEntity(final Builder builder) {
         this.id = builder.id;
         this.description = builder.description;
         this.owner = builder.owner;
-        this.listOfMembers.add(builder.owner);
+        this.listOfMembers = builder.listOfMembers;
+    }
+
+
+    public UserDomainEntity getOwner() {
+        return owner;
     }
 
     public static Builder builder() {
@@ -30,18 +44,6 @@ public class BudgetGroupDomainEntity {
 
     public Long getId() {
         return id;
-    }
-
-    String getDescription() {
-        return description;
-    }
-
-    UserDomainEntity getOwner() {
-        return owner;
-    }
-
-    Set<UserDomainEntity> getListOfMembers() {
-        return listOfMembers;
     }
 
     public static class Builder {
@@ -63,7 +65,10 @@ public class BudgetGroupDomainEntity {
             return this;
 
         }
-
+        public Builder listOfMembers(final UserDomainEntity owner) {
+            this.owner = owner;
+            return this;
+        }
         public Builder owner(final UserDomainEntity owner) {
             this.owner = owner;
             return this;

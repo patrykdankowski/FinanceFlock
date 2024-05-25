@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.user;
 
+import com.patrykdankowski.financeflock.mapper.UserMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
