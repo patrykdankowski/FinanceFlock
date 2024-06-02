@@ -27,14 +27,15 @@ public class UserFacadeImpl implements UserFacade {
 
 
     @Override
-    public void leaveBudgetGroup() {
+    public void leaveBudgetGroup(final Long id) {
 
-        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-        final BudgetGroupDomainEntity budgetGroupDomainEntity = userMembershipDomain.leaveBudgetGroup(userFromContext);
+        final UserDomainEntity user = authenticationService.getUserFromContext();
+        final BudgetGroupDomainEntity budgetGroup = budgetGroupCommandService.findBudgetGroupById(user.getBudgetGroupId());
+        userMembershipDomain.leaveBudgetGroup(user, budgetGroup, id);
 
 
-        userCommandService.saveUser(userFromContext);
-        budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity);
+        userCommandService.saveUser(user);
+        budgetGroupCommandService.saveBudgetGroup(budgetGroup);
         //TODO -> informowanie założyciela przez wysłanie mail'a, że user opuścił grupę
     }
 

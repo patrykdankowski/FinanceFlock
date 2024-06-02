@@ -30,7 +30,6 @@ class ExpenseCommandRepositoryImpl implements ExpenseCommandRepositoryPort {
     @Override
     public ExpenseDomainEntity save(final ExpenseDomainEntity expenseDomainEntity) {
 
-//        return mapper.toDomainEntity(expenseCommandRepositoryAdapter.save(mapper.toSqlEntity(expenseDomainEntity,context)));
         return mapper.toDomainEntity(expenseCommandRepositoryAdapter.save(mapper.toSqlEntity(expenseDomainEntity)));
     }
 

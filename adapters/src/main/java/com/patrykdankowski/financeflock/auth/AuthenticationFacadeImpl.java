@@ -60,10 +60,11 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
         }
         String userMail = authentication.getName();
         var user = userCommandService.findUserByEmail(userMail);
-        UserDomainEntity userToSave = user.toBuilder()
-                .lastLoggedInAt(LocalDateTime.now())
-                .build();
-        userCommandService.saveUser(userToSave);
+//        UserDomainEntity userToSave = user.toBuilder()
+//                .lastLoggedInAt(LocalDateTime.now())
+//                .build();
+        user.setLastLoggedInAt(LocalDateTime.now());
+        userCommandService.saveUser(user);
     }
 
 }

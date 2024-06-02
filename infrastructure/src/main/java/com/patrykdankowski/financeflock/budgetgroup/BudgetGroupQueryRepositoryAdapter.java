@@ -19,7 +19,8 @@ class BudgetGroupQueryRepositoryImpl implements BudgetGroupQueryRepositoryPort {
     private final BudgetGroupQueryRepositoryAdapter budgetGroupQueryRepositoryAdapter;
     private final BudgetGroupMapper mapper;
 
-    BudgetGroupQueryRepositoryImpl(final BudgetGroupQueryRepositoryAdapter budgetGroupQueryRepositoryAdapter, final BudgetGroupMapper mapper) {
+    BudgetGroupQueryRepositoryImpl(final BudgetGroupQueryRepositoryAdapter budgetGroupQueryRepositoryAdapter,
+                                   final BudgetGroupMapper mapper) {
         this.budgetGroupQueryRepositoryAdapter = budgetGroupQueryRepositoryAdapter;
         this.mapper = mapper;
     }
@@ -32,6 +33,7 @@ class BudgetGroupQueryRepositoryImpl implements BudgetGroupQueryRepositoryPort {
     public Optional<BudgetGroupDomainEntity> findBudgetGroupById(final long id) {
 
         return budgetGroupQueryRepositoryAdapter.findBudgetGroupById(id)
+//                .map(group -> mapper.toDomainEntity(group));
                 .map(group -> mapper.toDomainEntity(group));
     }
 }

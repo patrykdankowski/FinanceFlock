@@ -40,49 +40,6 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class UserSqlEntity {
 
-//
-//    public static UserSqlEntity fromDomainUser(UserDomainEntity source) {
-//        Set<ExpenseSqlEntity> expenseSqlEntities = source.getExpenseList().stream().map(
-//                expense -> fromDomainExpense(expense)
-//        ).collect(Collectors.toSet());
-//
-//
-//        var result = new UserSqlEntity();
-//        result.id = source.getId();
-//        result.password = source.getPassword();
-//        result.email = source.getEmail();
-//        result.name = source.getName();
-//        result.lastLoggedInAt = source.getLastLoggedInAt();
-//        result.createdAt = source.getCreatedAt();
-//        result.role = source.getRole();
-//        result.budgetGroup = source.getBudgetGroup() == null ? null : fromDomainGroup(source.getBudgetGroup());
-//        result.expenseList = source.getExpenseList() == null ? null : expenseSqlEntities;
-//        result.shareData = source.isShareData();
-//        return result;
-//
-//    }
-//
-//    public static UserDomainEntity toDomainUser(UserSqlEntity source) {
-//
-//        Set<ExpenseDomainEntity> expenseDomainEntities = source.expenseList.stream().map(
-//                expense -> toDomainExpense(expense)
-//        ).collect(Collectors.toSet());
-//
-//
-//        return UserDomainEntity.builder()
-//                .id(source.id)
-//                .budgetGroup(source.budgetGroup == null ? null : toDomainGroup(source.budgetGroup))
-//                .password(source.password)
-//                .email(source.email)
-//                .lastLoggedInAt(source.lastLoggedInAt)
-//                .createdAt(source.createdAt)
-//                .name(source.name)
-//                .role(source.role)
-//                .expenseList(source.expenseList == null ? null : expenseDomainEntities)
-//                .shareData(source.shareData)
-//                .build();
-//    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -106,17 +63,73 @@ public class UserSqlEntity {
     @JoinColumn(name = "group_id")
     private BudgetGroupSqlEntity budgetGroup;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<ExpenseSqlEntity> expenseList = new HashSet<>();
 
     private boolean shareData;
 
-    public Set<ExpenseSqlEntity> getExpenseList() {
-        return expenseList;
+    public boolean isShareData() {
+        return shareData;
     }
 
-    public void setExpenseList(final Set<ExpenseSqlEntity> expenseList) {
-        this.expenseList = expenseList;
+    public void setShareData(final boolean shareData) {
+        this.shareData = shareData;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(final String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getLastLoggedInAt() {
+        return lastLoggedInAt;
+    }
+
+    public void setLastLoggedInAt(final LocalDateTime lastLoggedInAt) {
+        this.lastLoggedInAt = lastLoggedInAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(final LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(final Role role) {
+        this.role = role;
     }
 
     public BudgetGroupSqlEntity getBudgetGroup() {
@@ -126,4 +139,13 @@ public class UserSqlEntity {
     public void setBudgetGroup(final BudgetGroupSqlEntity budgetGroup) {
         this.budgetGroup = budgetGroup;
     }
+
+    public Set<ExpenseSqlEntity> getExpenseList() {
+        return expenseList;
+    }
+
+    public void setExpenseList(final Set<ExpenseSqlEntity> expenseList) {
+        this.expenseList = expenseList;
+    }
+
 }

@@ -24,12 +24,13 @@ class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPo
 
     private final BudgetGroupCommandRepositoryAdapter budgetGroupQueryRepositoryAdapter;
     private final BudgetGroupMapper mapper;
+//    private final BudgetGroupMapperClass mapper;
 
-    BudgetGroupCommandRepositoryImpl(final BudgetGroupCommandRepositoryAdapter budgetGroupQueryRepositoryAdapter, final BudgetGroupMapper mapper) {
+    BudgetGroupCommandRepositoryImpl(final BudgetGroupCommandRepositoryAdapter budgetGroupQueryRepositoryAdapter,
+                                     final BudgetGroupMapper mapper) {
         this.budgetGroupQueryRepositoryAdapter = budgetGroupQueryRepositoryAdapter;
         this.mapper = mapper;
     }
-
 
 
     @Override
@@ -41,8 +42,8 @@ class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPo
 
     @Override
     public BudgetGroupDomainEntity save(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-
-        return mapper.toDomainEntity((budgetGroupQueryRepositoryAdapter.save(mapper.toSqlEntity(budgetGroupDomainEntity))));
+        BudgetGroupSqlEntity entityToSaved = budgetGroupQueryRepositoryAdapter.save(mapper.toSqlEntity(budgetGroupDomainEntity));
+        return mapper.toDomainEntity(entityToSaved);
     }
 
     @Override

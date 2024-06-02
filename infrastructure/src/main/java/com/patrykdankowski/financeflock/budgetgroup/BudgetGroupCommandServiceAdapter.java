@@ -2,6 +2,8 @@ package com.patrykdankowski.financeflock.budgetgroup;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 class BudgetGroupCommandServiceAdapter implements BudgetGroupCommandServicePort {
 
@@ -19,6 +21,12 @@ class BudgetGroupCommandServiceAdapter implements BudgetGroupCommandServicePort 
     @Override
     public void deleteBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
         budgetGroupCommandRepository.delete(budgetGroupDomainEntity);
+    }
+
+    @Override
+    public BudgetGroupDomainEntity findBudgetGroupById(final Long id) {
+        return budgetGroupCommandRepository.findById(id)
+                .orElseThrow(() -> new BudgetGroupNotFoundException(id));
     }
 
 

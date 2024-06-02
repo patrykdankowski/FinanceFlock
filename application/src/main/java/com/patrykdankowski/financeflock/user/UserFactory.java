@@ -17,16 +17,22 @@ public class UserFactory {
     public UserDomainEntity createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest) {
 
 
-        return UserDomainEntity.builder()
-                .name(registerDtoRequest.getName())
-                .email(registerDtoRequest.getEmail())
-                .password(passwordEncoder.encode(registerDtoRequest.getPassword()))
-                .role(Role.USER)
-                .shareData(true)
-                .build();
+//        return UserDomainEntity.builder()
+//                .name(registerDtoRequest.getName())
+//                .email(registerDtoRequest.getEmail())
+//                .password(passwordEncoder.encode(registerDtoRequest.getPassword()))
+//                .role(Role.USER)
+//                .shareData(true)
+//                .build();
+
+        UserDomainEntity userDomainEntity = new UserDomainEntity();
+        userDomainEntity.setName(registerDtoRequest.getName());
+        userDomainEntity.setEmail(registerDtoRequest.getEmail());
+        userDomainEntity.setPassword(passwordEncoder.encode(registerDtoRequest.getPassword()));
+        userDomainEntity.setRole(Role.USER);
+        userDomainEntity.setShareData(true);
+        return userDomainEntity;
     }
-
-
 
 
 }

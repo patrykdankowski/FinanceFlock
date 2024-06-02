@@ -25,27 +25,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ExpenseSqlEntity {
 
-//    public static ExpenseSqlEntity fromDomainExpense(ExpenseDomainEntity expenseDomainEntity) {
-//        var result = new ExpenseSqlEntity();
-//        result.amount = expenseDomainEntity.getAmount();
-//        result.description = expenseDomainEntity.getDescription();
-//        result.id = expenseDomainEntity.getId();
-//        result.location = expenseDomainEntity.getLocation();
-//        result.user = fromDomainUser(expenseDomainEntity.getUser());
-//        return result;
-//    }
-//
-//    public static ExpenseDomainEntity toDomainExpense(ExpenseSqlEntity expenseSqlEntity){
-//        var result = new ExpenseDomainEntity();
-//        result.setAmount(expenseSqlEntity.getAmount());
-//        result.setId(expenseSqlEntity.getId());
-//        result.setLocation(expenseSqlEntity.getLocation());
-//        result.setExpenseDate(expenseSqlEntity.getExpenseDate());
-//        result.setUser(toDomainUser((expenseSqlEntity.getUser())));
-//        return result;
-//    }
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

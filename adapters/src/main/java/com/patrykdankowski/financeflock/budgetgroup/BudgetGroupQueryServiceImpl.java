@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationServicePort;
+import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
 import com.patrykdankowski.financeflock.user.UserQueryRepositoryPort;
@@ -8,10 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
- class BudgetGroupQueryServiceImpl implements BudgetGroupQueryService {
+class BudgetGroupQueryServiceImpl implements BudgetGroupQueryService {
 
     private final AuthenticationServicePort authenticationService;
     private final CommonDomainServicePort commonDomainService;
@@ -31,19 +33,30 @@ import java.util.stream.Collectors;
     @Override
     public List<UserDtoResponse> listOfUsersInGroup() {
 
-        var userFromContext = authenticationService.getUserFromContext();
+        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
 
-        BudgetGroupDomainEntity budgetGroupDomainEntity = commonDomainService.validateAndGetUserGroup(userFromContext);
+        Long budgetGroupDomainEntityId = commonDomainService.checkIfGroupExistsOld(userFromContext);
 
-        return getListOfMembers(budgetGroupDomainEntity);
+        return getListOfMembers(budgetGroupDomainEntityId);
     }
 
-    private List<UserDtoResponse> getListOfMembers(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        return budgetGroupQueryRepository.findBudgetGroupById(budgetGroupDomainEntity.getId()).map(
-                        group -> group.getListOfMembers().stream().map(
-                                user -> new UserDtoResponse(user.getName(), user.getEmail())
-                        ).collect(Collectors.toList()))
-                .orElseThrow(() -> new BudgetGroupNotFoundException(budgetGroupDomainEntity.getId()));
+    private List<UserDtoResponse> getListOfMembers(final Long budgetGroupDomainEntityId) {
+        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupQueryRepository.findBudgetGroupById(budgetGroupDomainEntityId)
+                .orElseThrow(() -> new BudgetGroupNotFoundException(budgetGroupDomainEntityId));
+
+        Set<Long> listOfMembersId = budgetGroupDomainEntity.getListOfMembersId();
+        List<Long> mappedId = listOfMembersId.stream().toList();
+        List<UserDomainEntity> listOfUsers = userQueryRepository.findAllByIdIn(mappedId);
+
+        return listOfUsers.stream().map(
+                user -> {
+                    return new UserDtoResponse(
+                            user.getName(),
+                            user.getEmail());
+                }
+                    )
+
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -51,8 +64,8 @@ import java.util.stream.Collectors;
 
         // TODO logika zwiazana z podziałem na kategorie
 
-        var userFromContext = authenticationService.getUserFromContext();
+        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
 
-        return new ArrayList<>(userQueryRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(userFromContext.getBudgetGroup().getId()));
+        return new ArrayList<>(userQueryRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(userFromContext.getBudgetGroupId()));
     }
 }

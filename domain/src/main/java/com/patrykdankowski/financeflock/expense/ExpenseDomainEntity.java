@@ -15,7 +15,7 @@ public class ExpenseDomainEntity {
 
 
     private Long id;
-    private UserDomainEntity user;
+    private Long userId;
 
     private BigDecimal amount;
     private LocalDateTime expenseDate;
@@ -32,12 +32,12 @@ public class ExpenseDomainEntity {
         this.id = id;
     }
 
-    public UserDomainEntity getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(final UserDomainEntity user) {
-        this.user = user;
+    public void setUserId(final Long userId) {
+        this.userId = userId;
     }
 
     BigDecimal getAmount() {

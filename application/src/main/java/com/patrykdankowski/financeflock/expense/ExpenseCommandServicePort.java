@@ -1,7 +1,9 @@
 package com.patrykdankowski.financeflock.expense;
 
- interface ExpenseCommandServicePort {
+ public interface ExpenseCommandServicePort {
 
-    ExpenseDomainEntity retrieveExpenseById(final Long id);
+    ExpenseDomainEntity findExpenseById(final Long id);
+
+    ExpenseDomainEntity saveExpense(ExpenseDomainEntity expenseDomainEntity);
 
 }

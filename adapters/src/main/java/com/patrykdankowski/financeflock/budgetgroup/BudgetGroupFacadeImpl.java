@@ -39,13 +39,15 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
 
+        log.info("Before creating");
 
-        final BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupManagementDomain.createBudgetGroup
-                (budgetGroupRequest, userFromContext);
-        log.info("before");
+        final BudgetGroupDomainEntity budgetGroupDomainEntity =
+                budgetGroupManagementDomain.createBudgetGroup(budgetGroupRequest, userFromContext);
+        log.info("Before saving {}", budgetGroupDomainEntity);
+
         Long id = budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity).getId();
-        log.info("after");
-
+        log.info("after saving group");
+        userCommandService.saveUser(userFromContext);
         log.info("Successfully finished process of create budget group");
 
         return id;
@@ -60,12 +62,14 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         log.info("Starting process of close group");
 
         UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-        BudgetGroupDomainEntity userGroup = userFromContext.getBudgetGroup();
-        final List<Long> listOfUserId =
-                budgetGroupManagementDomain.closeBudgetGroup(userFromContext, id);
+        Long userGroup = userFromContext.getBudgetGroupId();
+        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupCommandService.findBudgetGroupById(userGroup);
+        //TODO getListOfMembersId().stream().toList()) - czy warto do osobnej metody
+        List<UserDomainEntity> listOfUsers = userCommandService.listOfUsersFromIds(budgetGroupDomainEntity.getListOfMembersId().stream().toList());
+        budgetGroupManagementDomain.closeBudgetGroup(userFromContext, id, listOfUsers);
 
-        userCommandService.saveAllUsers(userCommandService.listOfUsersFromIds(listOfUserId));
-        budgetGroupCommandService.deleteBudgetGroup(userGroup);
+        userCommandService.saveAllUsers(listOfUsers);
+        budgetGroupCommandService.deleteBudgetGroup(budgetGroupDomainEntity);
 
         log.info("Finished process of close group");
     }
@@ -77,11 +81,13 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         log.info("Starting process to add user to group");
         UserDomainEntity userFromContext = authenticationService.getUserFromContext();
         UserDomainEntity userToAdd = userCommandService.findUserByEmail(email);
+        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupCommandService.findBudgetGroupById(userFromContext.getBudgetGroupId());
 //        User userToAdd = commandRepository.findByEmail(email).get();
-        budgetGroupMembershipDomain.addUserToGroup(userFromContext, userToAdd, id);
+        budgetGroupMembershipDomain.addUserToGroup(userFromContext, userToAdd, id, budgetGroupDomainEntity);
 
 
-        budgetGroupCommandService.saveBudgetGroup(userFromContext.getBudgetGroup());
+        budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity);
+        userCommandService.saveUser(userToAdd);
 
         log.info("Successfully finished process to add user to group");
 
@@ -94,12 +100,18 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         log.info("Starting process to remove user from group");
 
         UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-        BudgetGroupDomainEntity userGroup = userFromContext.getBudgetGroup();
+        Long budgetGroupDomainEntityId = userFromContext.getBudgetGroupId();
+        BudgetGroupDomainEntity budgetGroupDomainEntity =
+
+                budgetGroupCommandService.findBudgetGroupById(budgetGroupDomainEntityId);
         UserDomainEntity userToRemove = userCommandService.findUserByEmail(email);
 
-        budgetGroupMembershipDomain.removeUserFromGroup(userFromContext, userToRemove, id);
+        budgetGroupMembershipDomain.removeUserFromGroup(userFromContext,
+                userToRemove,
+                budgetGroupDomainEntity,
+                id);
 
-        budgetGroupCommandService.saveBudgetGroup(userGroup);
+        budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity);
         userCommandService.saveUser(userToRemove);
 
         log.info("Successfully finished process to remove user from group");

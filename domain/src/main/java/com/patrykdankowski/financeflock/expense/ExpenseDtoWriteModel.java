@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
     public interface onCreate {
     }
 
+    //TODO pozbyć sie adnotacji hibernate.
 //    public interface onUpdate {
 //    }
 

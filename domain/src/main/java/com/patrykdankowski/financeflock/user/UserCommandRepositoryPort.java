@@ -3,16 +3,20 @@ package com.patrykdankowski.financeflock.user;
 import java.util.List;
 import java.util.Optional;
 
- public interface UserCommandRepositoryPort {
+  interface UserCommandRepositoryPort {
     //TODO uzywane w query i w command
     Optional<UserDomainEntity> findByEmail(String email);
+
+    Optional<UserDomainEntity> findById(Long id);
 
     UserDomainEntity save(UserDomainEntity user);
 
     List<UserDomainEntity> saveAll(Iterable<UserDomainEntity> entities);
 
-    List<UserDomainEntity> findAllById(Iterable<Long> ids);
+    List<UserDomainEntity> findAllByIdIn(List<Long> ids);
 
     boolean existsUserByEmail(String email);
+
+
 
 }

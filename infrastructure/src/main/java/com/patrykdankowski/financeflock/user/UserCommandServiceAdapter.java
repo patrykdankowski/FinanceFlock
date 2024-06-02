@@ -1,7 +1,5 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.mapper.UserMapper;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +17,13 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     @Override
     public UserDomainEntity findUserByEmail(String email) {
         return userCommandRepository.findByEmail(email).orElseThrow(
-                () -> new UsernameNotFoundException(email));
+                () -> new UserNotFoundException(email));
+    }
+
+    @Override
+    public UserDomainEntity findUserById(final Long id) {
+        return userCommandRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
@@ -44,7 +48,7 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
 
     @Override
     public List<UserDomainEntity> listOfUsersFromIds(final List<Long> userIds) {
-        return userCommandRepository.findAllById(userIds);
+        return userCommandRepository.findAllByIdIn(userIds);
     }
 
 }

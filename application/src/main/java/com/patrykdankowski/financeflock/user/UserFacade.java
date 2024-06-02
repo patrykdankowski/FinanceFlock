@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 
  interface UserFacade {
     @Transactional
-    void leaveBudgetGroup();
+    void leaveBudgetGroup(final Long id);
 
     @Transactional
     boolean toggleShareData();

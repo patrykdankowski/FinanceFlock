@@ -191,7 +191,12 @@ class GlobalExceptionHandler {
                 budgetGroupValidationException.getMessage(),
                 HttpStatus.CONFLICT);
     }
-
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(Exception budgetGroupValidationException) {
+        return setErrorDetails("Exception occurred during budget group validation",
+                budgetGroupValidationException.getMessage(),
+                HttpStatus.CONFLICT);
+    }
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);
         return new ResponseEntity<>(errorDetails, httpStatus);

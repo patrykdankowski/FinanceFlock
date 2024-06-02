@@ -10,18 +10,17 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
 
     @Override
-    public ExpenseDomainEntity addExpense(final ExpenseDtoWriteModel expenseDtoWriteModel, final UserDomainEntity userFromContext) {
+    public ExpenseDomainEntity createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
+                                             final UserDomainEntity userFromContext) {
 
         validateExpenseDate(expenseDtoWriteModel);
 
-        final ExpenseDomainEntity expenseDomainEntity = createExpense(expenseDtoWriteModel);
-        userFromContext.addExpense(expenseDomainEntity);
+        return buildExpenseObject(expenseDtoWriteModel, userFromContext);
 
-        return expenseDomainEntity;
     }
 
-    private ExpenseDomainEntity createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel) {
-
+    private ExpenseDomainEntity buildExpenseObject(final ExpenseDtoWriteModel expenseDtoWriteModel,
+                                                   final UserDomainEntity userFromContext) {
 
 
         return ExpenseDomainEntity.builder()
@@ -29,7 +28,7 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
                 .amount(expenseDtoWriteModel.getAmount())
                 .description(expenseDtoWriteModel.getDescription())
                 .location(expenseDtoWriteModel.getLocation())
-                // owner jest ustawiany przy wywołaniu metody .addExpense()
+                .userId(userFromContext.getId())
                 .build();
     }
 
@@ -40,27 +39,17 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
         }
     }
 
-
     @Override
-    public void updateExpense(final ExpenseDtoWriteModel expenseSourceDto,
-                              final ExpenseDomainEntity expenseDomainEntity,
-                              final UserDomainEntity userFromContext) {
+    public void validateUserAccessToExpense(final UserDomainEntity userFromContext,
+                                            final ExpenseDomainEntity expenseDomainEntity,
+                                            final Long userGroupIdFromGivenExpenseId) {
 
-
-        validateUserAccessToExpense(userFromContext, expenseDomainEntity);
-
-        validateAndSetFieldsForExpense(expenseSourceDto, expenseDomainEntity);
-    }
-
-    private void validateUserAccessToExpense(final UserDomainEntity userFromContext,
-                                             final ExpenseDomainEntity expenseDomainEntity) {
-
-        //for group admin only
+        //for group admin only - different exception
         boolean isExpenseInSameUserGroup = userFromContext.getRole().equals(Role.GROUP_ADMIN) &&
-                userFromContext.getBudgetGroup().getId().equals(expenseDomainEntity.getUser().getBudgetGroup().getId());
+                userFromContext.getBudgetGroupId().equals(userGroupIdFromGivenExpenseId);
 
-        boolean isExpenseOfUser = userFromContext.getExpenseList().contains(expenseDomainEntity) &&
-                expenseDomainEntity.getUser().getId().equals(userFromContext.getId());
+        boolean isExpenseOfUser = userFromContext.getExpenseListId().contains(expenseDomainEntity.getId()) &&
+                expenseDomainEntity.getUserId().equals(userFromContext.getId());
 
 
         if (isExpenseInSameUserGroup && !isExpenseOfUser) {
@@ -71,7 +60,8 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
         }
     }
 
-    private void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
+    @Override
+    public void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
                                                 final ExpenseDomainEntity expenseDomainEntity) {
         if (expenseDtoWriteModel.getExpenseDate() != null) {
             expenseDomainEntity.setExpenseDate(expenseDtoWriteModel.getExpenseDate());

@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.user;
 
 import com.patrykdankowski.financeflock.mapper.UserMapper;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
@@ -13,11 +14,14 @@ interface UserCommandRepositoryAdapter extends Repository<UserSqlEntity, Long> {
 
     Optional<UserSqlEntity> findByEmail(String email);
 
+    Optional<UserSqlEntity> findById(Long id);
+
     UserSqlEntity save(UserSqlEntity user);
 
     List<UserSqlEntity> saveAll(Iterable<UserSqlEntity> entities);
 
-    List<UserSqlEntity> findAllById(Iterable<Long> ids);
+    @Query("SELECT u FROM UserSqlEntity u WHERE u.id IN :ids")
+    List<UserSqlEntity> findAllByIdIn(List<Long> ids);
 
     boolean existsUserByEmail(String email);
 }
@@ -28,7 +32,8 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
     private final UserCommandRepositoryAdapter userCommandRepository;
     private final UserMapper mapper;
 
-    public UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository, final UserMapper mapper) {
+    public UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
+                                     final UserMapper mapper) {
         this.userCommandRepository = userCommandRepository;
         this.mapper = mapper;
     }
@@ -45,6 +50,12 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
                 .map(user -> mapper.toDomainEntity(user));
     }
 
+    @Override
+    public Optional<UserDomainEntity> findById(final Long id) {
+        return userCommandRepository.findById(id)
+                .map(user -> mapper.toDomainEntity(user));
+    }
+
 
     @Override
     public UserDomainEntity save(UserDomainEntity user) {
@@ -54,15 +65,14 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
     @Override
     public List<UserDomainEntity> saveAll(Iterable<UserDomainEntity> entities) {
-
         return userCommandRepository.saveAll(StreamSupport.stream(entities.spliterator(), false)
                         .map(user -> mapper.toSqlEntity(user)).collect(Collectors.toList())).stream()
                 .map(user -> mapper.toDomainEntity(user)).collect(Collectors.toList());
     }
 
     @Override
-    public List<UserDomainEntity> findAllById(Iterable<Long> ids) {
-        return userCommandRepository.findAllById(ids)
+    public List<UserDomainEntity> findAllByIdIn(List<Long> ids) {
+        return userCommandRepository.findAllByIdIn(ids)
                 .stream().map(user -> mapper.toDomainEntity(user))
                 .collect(Collectors.toList());
     }

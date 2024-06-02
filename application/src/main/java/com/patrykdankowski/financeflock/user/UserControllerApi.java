@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.user;
 
 interface UserControllerApi {
 
-    String leaveBudgetGroup();
+    String leaveBudgetGroup(Long id);
 
     String updateShareDataPreference();
 }

@@ -23,58 +23,57 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
     @Override
     public BudgetGroupDomainEntity createBudgetGroup(final BudgetGroupRequest budgetGroupRequest,
                                                      final UserDomainEntity userFromContext) {
-        log.info("asdasd");
         isUserAbleToCreateBudgetGroup(userFromContext);
 
-        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupFactory.createBudgetGroupFromRequest(userFromContext, budgetGroupRequest);
-        assignRoleAndBudgetGroupForUser(userFromContext, budgetGroupDomainEntity, Role.GROUP_ADMIN);
-        log.info("test");
+        BudgetGroupDomainEntity budgetGroupDomainEntity =
+                budgetGroupFactory.createBudgetGroupFromRequest(userFromContext, budgetGroupRequest);
+        assignRoleAndBudgetGroupForUser(userFromContext, budgetGroupDomainEntity.getId(), Role.GROUP_ADMIN);
         return budgetGroupDomainEntity;
     }
 
     private void isUserAbleToCreateBudgetGroup(final UserDomainEntity userFromContext) {
-        if (userFromContext.getRole() != Role.USER || userFromContext.getBudgetGroup() != null) {
+        if (userFromContext.getRole() != Role.USER || userFromContext.getBudgetGroupId() != null) {
             //TODO CUSTOMOWY EXCEPTION
             throw new IllegalStateException("Cannot create budget group");
         }
     }
 
     @Override
-    public List<Long> closeBudgetGroup(final UserDomainEntity userFromContext, final Long id) {
+    public void closeBudgetGroup(final UserDomainEntity userFromContext, final Long groupId, final List<UserDomainEntity> listOfUsers) {
         //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
 
-        final BudgetGroupDomainEntity budgetGroupDomainEntity = commonDomainService.
-                validateAndGetGroup(userFromContext,id);
+         commonDomainService.
+                 checkIfGroupExists(userFromContext, groupId);
 
-        validateOwnership(budgetGroupDomainEntity, userFromContext);
+        validateOwnership(groupId, userFromContext);
 
-        return resetUsersRolesAndDetachFromGroup(budgetGroupDomainEntity);
+        resetUsersRolesAndDetachFromGroup(listOfUsers);
 
     }
 
-    private void validateOwnership(final BudgetGroupDomainEntity budgetGroupDomainEntity,
+    private void validateOwnership(final Long budgetGroupIdToValidate,
                                    final UserDomainEntity userFromContext) {
-        if (!budgetGroupDomainEntity.getOwner().equals(userFromContext)) {
+        if (!budgetGroupIdToValidate.equals(userFromContext.getBudgetGroupId()) || !userFromContext.getRole().equals(Role.GROUP_ADMIN)) {
             log.error("User {} is not a owner of a group", userFromContext.getName());
             throw new IllegalStateException("Only the group owner can close the group");
         }
     }
 
-    private List<Long> resetUsersRolesAndDetachFromGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        List<Long> listOfUsersId = budgetGroupDomainEntity.getListOfMembers().stream().map(
+    private void resetUsersRolesAndDetachFromGroup(final List<UserDomainEntity> listOfUsers) {
+        listOfUsers.stream().map(
                 userToMap ->
                 {
                     assignRoleAndBudgetGroupForUser(userToMap, null, Role.USER);
                     return userToMap.getId();
-                }).toList();
+                });
         log.info("Detached users from group");
-        return listOfUsersId;
+
     }
 
     private void assignRoleAndBudgetGroupForUser(final UserDomainEntity userFromContext,
-                                                 final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                                                 final Long budgetGroupDomainEntity,
                                                  final Role role) {
         userFromContext.setRole(role);
-        userFromContext.setBudgetGroup(budgetGroupDomainEntity);
+        userFromContext.setBudgetGroupId(budgetGroupDomainEntity);
     }
 }
