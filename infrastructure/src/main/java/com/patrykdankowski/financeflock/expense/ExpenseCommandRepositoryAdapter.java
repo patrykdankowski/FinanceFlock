@@ -1,7 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
 
-import com.patrykdankowski.financeflock.mapper.ExpenseMapper;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
@@ -19,23 +18,24 @@ public interface ExpenseCommandRepositoryAdapter extends Repository<ExpenseSqlEn
 class ExpenseCommandRepositoryImpl implements ExpenseCommandRepositoryPort {
 
 
-    private final ExpenseCommandRepositoryAdapter expenseCommandRepositoryAdapter;
-    private final ExpenseMapper mapper;
+//    private final ExpenseCommandRepositoryAdapter expenseCommandRepositoryAdapter;
+//    private final ExpenseMapper mapper;
 
-    ExpenseCommandRepositoryImpl(final ExpenseCommandRepositoryAdapter expenseCommandRepositoryAdapter, final ExpenseMapper mapper) {
-        this.expenseCommandRepositoryAdapter = expenseCommandRepositoryAdapter;
-        this.mapper = mapper;
-    }
+//    ExpenseCommandRepositoryImpl(final ExpenseCommandRepositoryAdapter expenseCommandRepositoryAdapter, final ExpenseMapper mapper) {
+//        this.expenseCommandRepositoryAdapter = expenseCommandRepositoryAdapter;
+//        this.mapper = mapper;
+//    }
 
     @Override
     public ExpenseDomainEntity save(final ExpenseDomainEntity expenseDomainEntity) {
-
-        return mapper.toDomainEntity(expenseCommandRepositoryAdapter.save(mapper.toSqlEntity(expenseDomainEntity)));
+return null;
+//        return mapper.toDomainEntity(expenseCommandRepositoryAdapter.save(mapper.toSqlEntity(expenseDomainEntity)));
     }
 
     @Override
     public Optional<ExpenseDomainEntity> findById(final Long id) {
-        return expenseCommandRepositoryAdapter.findById(id)
-                .map(expense -> mapper.toDomainEntity(expense));
+//        return expenseCommandRepositoryAdapter.findById(id)
+//                .map(expense -> mapper.toDomainEntity(expense));
+    return null;
     }
 }

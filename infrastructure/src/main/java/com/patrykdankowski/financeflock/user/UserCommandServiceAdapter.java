@@ -36,13 +36,13 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     }
 
     @Override
-    public void saveUser(UserDomainEntity user) {
-        userCommandRepository.save(user);
+    public UserDomainEntity saveUser(UserDomainEntity user) {
+        return userCommandRepository.save(user);
     }
 
     @Override
-    public void saveAllUsers(List<UserDomainEntity> users) {
-        userCommandRepository.saveAll(users);
+    public List<UserDomainEntity> saveAllUsers(List<UserDomainEntity> users) {
+        return userCommandRepository.saveAll(users);
     }
 
 

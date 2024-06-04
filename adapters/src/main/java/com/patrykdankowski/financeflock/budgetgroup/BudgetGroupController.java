@@ -23,7 +23,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
     @ResponseStatus(HttpStatus.CREATED)
     public String createBudgetGroup(@Valid @RequestBody BudgetGroupRequest budgetGroupRequest) {
         Long budgetGroupId = budgetGroupFacade.createBudgetGroup(budgetGroupRequest);
-        return String.format("Budget group created with id {}", budgetGroupId);
+        return String.format("Budget group created with id %d", budgetGroupId);
     }
 
     @Override

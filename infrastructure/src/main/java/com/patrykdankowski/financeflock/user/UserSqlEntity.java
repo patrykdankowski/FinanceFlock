@@ -59,11 +59,11 @@ public class UserSqlEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
     private BudgetGroupSqlEntity budgetGroup;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<ExpenseSqlEntity> expenseList = new HashSet<>();
 
     private boolean shareData;

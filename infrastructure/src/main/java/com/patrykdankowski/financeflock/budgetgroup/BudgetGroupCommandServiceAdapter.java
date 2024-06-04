@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
+import com.patrykdankowski.financeflock.mapper.BudgetGroupMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

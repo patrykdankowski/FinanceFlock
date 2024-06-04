@@ -5,6 +5,7 @@ import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainPort {
@@ -27,7 +28,9 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
 
         BudgetGroupDomainEntity budgetGroupDomainEntity =
                 budgetGroupFactory.createBudgetGroupFromRequest(userFromContext, budgetGroupRequest);
+
         assignRoleAndBudgetGroupForUser(userFromContext, budgetGroupDomainEntity.getId(), Role.GROUP_ADMIN);
+
         return budgetGroupDomainEntity;
     }
 
@@ -39,34 +42,39 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
     }
 
     @Override
-    public void closeBudgetGroup(final UserDomainEntity userFromContext, final Long groupId, final List<UserDomainEntity> listOfUsers) {
+    public List<UserDomainEntity> closeBudgetGroup(final UserDomainEntity userFromContext,
+                                                   final Long groupId,
+                                                   final List<UserDomainEntity> listOfUsers, BudgetGroupDomainEntity budgetGroupDomainEntity) {
         //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
 
-         commonDomainService.
-                 checkIfGroupExists(userFromContext, groupId);
+        commonDomainService.validateGroupForPotentialOwner(userFromContext,groupId,budgetGroupDomainEntity);
+//        validateGroupForPotentialOwner(userFromContext, groupId, budgetGroupDomainEntity);
 
-        validateOwnership(groupId, userFromContext);
+        List<UserDomainEntity> mapppedEntities = resetUsersRolesAndDetachFromGroup(listOfUsers);
 
-        resetUsersRolesAndDetachFromGroup(listOfUsers);
+        return mapppedEntities;
 
     }
 
-    private void validateOwnership(final Long budgetGroupIdToValidate,
-                                   final UserDomainEntity userFromContext) {
-        if (!budgetGroupIdToValidate.equals(userFromContext.getBudgetGroupId()) || !userFromContext.getRole().equals(Role.GROUP_ADMIN)) {
-            log.error("User {} is not a owner of a group", userFromContext.getName());
-            throw new IllegalStateException("Only the group owner can close the group");
-        }
+    private void validateGroupForPotentialOwner(UserDomainEntity userFromContext, Long groupId, BudgetGroupDomainEntity budgetGroupDomainEntity) {
+        commonDomainService.checkIfGroupIsNotNull(userFromContext);
+        commonDomainService.checkRoleForUser(userFromContext, Role.GROUP_ADMIN);
+        commonDomainService.checkIfUserIsMemberOfGroup(userFromContext, budgetGroupDomainEntity);
+        commonDomainService.checkIdGroupWithGivenId(groupId, userFromContext.getBudgetGroupId());
     }
 
-    private void resetUsersRolesAndDetachFromGroup(final List<UserDomainEntity> listOfUsers) {
-        listOfUsers.stream().map(
+
+
+    private List<UserDomainEntity> resetUsersRolesAndDetachFromGroup(final List<UserDomainEntity> listOfUsers) {
+        return listOfUsers.stream().map(
                 userToMap ->
                 {
                     assignRoleAndBudgetGroupForUser(userToMap, null, Role.USER);
-                    return userToMap.getId();
-                });
-        log.info("Detached users from group");
+                    return userToMap;
+                }
+
+                ).collect(Collectors.toList());
+//        log.info("Detached users from group");
 
     }
 

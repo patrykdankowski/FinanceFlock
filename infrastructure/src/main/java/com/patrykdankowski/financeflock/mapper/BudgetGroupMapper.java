@@ -2,113 +2,65 @@ package com.patrykdankowski.financeflock.mapper;
 
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
-import com.patrykdankowski.financeflock.user.UserNotFoundException;
 import com.patrykdankowski.financeflock.user.UserSqlEntity;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
-public interface BudgetGroupMapper {
+@Slf4j
+@Component
+public class BudgetGroupMapper {
 
-    BudgetGroupMapper INSTANCE = Mappers.getMapper(BudgetGroupMapper.class);
+    private final EntityManager entityManager;
 
-    @Mapping(target = "ownerId", ignore = true)
-    @Mapping(target = "listOfMembersId", ignore = true)
-    BudgetGroupDomainEntity toDomainEntity(BudgetGroupSqlEntity budgetGroupSqlEntity);
-
-    @AfterMapping
-    default void handleAfterMapping(BudgetGroupSqlEntity source,
-                                    @MappingTarget BudgetGroupDomainEntity target) {
-        var ownerId = source.getOwner().getId();
-        target.setOwnerId(ownerId);
-
-        Set<Long> membersId = source.getListOfMembers().stream()
-                .map(member -> {
-                    var memberId = member.getId();
-                    return memberId;
-                }).collect(Collectors.toSet());
-        target.setListOfMembersId(membersId);
+    public BudgetGroupMapper(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
-    @Mapping(target = "listOfMembers", ignore = true)
-    @Mapping(target = "owner", ignore = true)
-    BudgetGroupSqlEntity toSqlEntity(BudgetGroupDomainEntity budgetGroupDomainEntity);
-
-    @AfterMapping
-    default void handleAfterMapping(BudgetGroupDomainEntity source,
-                                    @MappingTarget BudgetGroupSqlEntity target,
-                                    @Autowired UserMapperRepository userRepository) {
-        if (source.getId() != null) {
-            var ownerId = source.getOwnerId();
-            UserSqlEntity userSqlEntity = userRepository.findById(ownerId)
-                    .orElseThrow(() -> new UserNotFoundException(ownerId));
-            target.setOwner(userSqlEntity);
-
-
+    public BudgetGroupSqlEntity toSqlEntity(BudgetGroupDomainEntity domainEntity) {
+        if (domainEntity == null) {
+            return null;
         }
-        final Set<Long> listOfMembersId = source.getListOfMembersId();
-        Set<UserSqlEntity> setOfUsers = userRepository.findAllById(listOfMembersId).stream().collect(Collectors.toSet());
-        target.setListOfMembers(setOfUsers);
 
+        BudgetGroupSqlEntity budgetGroupSqlEntity = new BudgetGroupSqlEntity();
+        budgetGroupSqlEntity.setId(domainEntity.getId());
+        budgetGroupSqlEntity.setDescription(domainEntity.getDescription());
+
+        if (domainEntity.getOwnerId() != null) {
+            UserSqlEntity owner = entityManager.find(UserSqlEntity.class, domainEntity.getOwnerId());
+            if (owner != null) {
+                budgetGroupSqlEntity.setOwner(owner);
+                budgetGroupSqlEntity.setListOfMembers(Set.of(owner));
+                owner.setBudgetGroup(budgetGroupSqlEntity);
+            } else {
+                log.warn("Owner with id {} not found", domainEntity.getOwnerId());
+            }
+        }
+//        log.info("Mapped to SQL entity: {}", budgetGroupSqlEntity);
+
+        return budgetGroupSqlEntity;
     }
 
+    public BudgetGroupDomainEntity toDomainEntity(BudgetGroupSqlEntity budgetGroupSql) {
+        if (budgetGroupSql == null) {
+            return null;
+        }
 
-//    @AfterMapping
-//    default void handleBudgetGroupMembers(BudgetGroupDomainEntity budgetGroupDomainEntity,
-//                                          @MappingTarget BudgetGroupSqlEntity budgetGroupSqlEntity) {
-//
-//        if (budgetGroupDomainEntity.getListOfMembersId() != null) {
-//
-//            Set<UserSqlEntity> members = budgetGroupDomainEntity.getListOfMembersId().stream()
-//                    .map(user -> {
-//                        UserSqlEntity userSql = UserMapper.INSTANCE.toSqlEntity(user);
-//                        return userSql;
-//                    }).collect(Collectors.toSet());
-//            budgetGroupSqlEntity.setListOfMembers(members);
-//        }
-//
-//    }
+        BudgetGroupDomainEntity domainEntity = new BudgetGroupDomainEntity();
+        domainEntity.setId(budgetGroupSql.getId());
+        domainEntity.setDescription(budgetGroupSql.getDescription());
+
+        if (budgetGroupSql.getOwner() != null) {
+            domainEntity.setOwnerId(budgetGroupSql.getOwner().getId());
+        }
+
+        domainEntity.setListOfMembersId(budgetGroupSql.getListOfMembers().stream()
+                .map(UserSqlEntity::getId)
+                .collect(Collectors.toSet()));
+//        log.info("Mapped to domain entity: {}", domainEntity);
+        return domainEntity;
+    }
 }
-
-//    @AfterMapping
-//    default void handleBudgetGroupMembers(BudgetGroupSqlEntity budgetGroupSqlEntity, @MappingTarget BudgetGroupDomainEntity budgetGroupDomainEntity) {
-//
-//        if (budgetGroupSqlEntity.getListOfMembers() != null) {
-//            Set<UserDomainEntity> members = budgetGroupSqlEntity.getListOfMembers().stream()
-//                    .map(user -> {
-//                        UserDomainEntity userDomain = UserMapper.INSTANCE.toDomainEntity(user);
-//                        return userDomain;
-//                    }).collect(Collectors.toSet());
-//
-//            budgetGroupDomainEntity.setListOfMembers(members);
-//
-//        }
-//
-//    }
-////
-//    @AfterMapping
-//    default void handleOwnerOfBudgetGroup(BudgetGroupDomainEntity budgetGroupDomainEntity, @MappingTarget BudgetGroupSqlEntity budgetGroupSqlEntity) {
-//
-//        UserSqlEntity owner = UserMapper.INSTANCE.toSqlEntity(budgetGroupDomainEntity.getOwnerId());
-//        budgetGroupSqlEntity.setOwner(owner);
-//
-//    }
-//
-//    @AfterMapping
-//    default void handleOwnerOfBudgetGroup(BudgetGroupSqlEntity budgetGroupSql, @MappingTarget BudgetGroupDomainEntity budgetGroupDomainEntity) {
-//
-//        UserDomainEntity owner = UserMapper.INSTANCE.toDomainEntity(budgetGroupSql.getOwner());
-//        budgetGroupDomainEntity.setOwner(owner);
-//
-//    }
-
-
-
-

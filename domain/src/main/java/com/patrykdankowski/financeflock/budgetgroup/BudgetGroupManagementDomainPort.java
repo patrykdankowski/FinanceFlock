@@ -10,7 +10,9 @@ public interface BudgetGroupManagementDomainPort {
     BudgetGroupDomainEntity createBudgetGroup(BudgetGroupRequest budgetGroupRequest,
                                               final UserDomainEntity userFromContext);
 
-    void closeBudgetGroup(final UserDomainEntity userFromContext, final Long id, final List<UserDomainEntity> listOfUsers);
+    List<UserDomainEntity> closeBudgetGroup(final UserDomainEntity userFromContext,
+                                            final Long id,
+                                            final List<UserDomainEntity> listOfUsers, BudgetGroupDomainEntity budgetGroupDomainEntity);
 
 
 }

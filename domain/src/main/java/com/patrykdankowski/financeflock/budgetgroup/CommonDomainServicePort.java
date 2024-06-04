@@ -20,4 +20,6 @@ public interface CommonDomainServicePort {
     void checkIdGroupWithGivenId(final Long givenId,
                                  final Long idFromUserObject);
 
+    void validateGroupForPotentialOwner(UserDomainEntity userFromContext, Long groupId, BudgetGroupDomainEntity budgetGroupDomainEntity);
+
 }

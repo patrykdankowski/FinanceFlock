@@ -11,7 +11,7 @@ import java.util.Optional;
 
     UserDomainEntity save(UserDomainEntity user);
 
-    List<UserDomainEntity> saveAll(Iterable<UserDomainEntity> entities);
+    List<UserDomainEntity> saveAll(List<UserDomainEntity> entities);
 
     List<UserDomainEntity> findAllByIdIn(List<Long> ids);
 

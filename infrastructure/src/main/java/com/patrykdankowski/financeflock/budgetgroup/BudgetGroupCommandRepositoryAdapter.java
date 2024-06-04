@@ -22,13 +22,13 @@ public interface BudgetGroupCommandRepositoryAdapter extends Repository<BudgetGr
 @Slf4j
 class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPort {
 
-    private final BudgetGroupCommandRepositoryAdapter budgetGroupQueryRepositoryAdapter;
+    private final BudgetGroupCommandRepositoryAdapter budgetGroupCommandRepository;
     private final BudgetGroupMapper mapper;
 //    private final BudgetGroupMapperClass mapper;
 
-    BudgetGroupCommandRepositoryImpl(final BudgetGroupCommandRepositoryAdapter budgetGroupQueryRepositoryAdapter,
+    BudgetGroupCommandRepositoryImpl(final BudgetGroupCommandRepositoryAdapter budgetGroupCommandRepository,
                                      final BudgetGroupMapper mapper) {
-        this.budgetGroupQueryRepositoryAdapter = budgetGroupQueryRepositoryAdapter;
+        this.budgetGroupCommandRepository = budgetGroupCommandRepository;
         this.mapper = mapper;
     }
 
@@ -36,19 +36,21 @@ class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPo
     @Override
     public Optional<BudgetGroupDomainEntity> findById(final long id) {
 
-        return budgetGroupQueryRepositoryAdapter.findById(id)
+        return budgetGroupCommandRepository.findById(id)
                 .map(group -> mapper.toDomainEntity(group));
     }
 
     @Override
     public BudgetGroupDomainEntity save(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        BudgetGroupSqlEntity entityToSaved = budgetGroupQueryRepositoryAdapter.save(mapper.toSqlEntity(budgetGroupDomainEntity));
+        BudgetGroupSqlEntity entityToSaved = budgetGroupCommandRepository.save(mapper.toSqlEntity(budgetGroupDomainEntity));
         return mapper.toDomainEntity(entityToSaved);
     }
 
     @Override
     public void delete(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
 
-        budgetGroupQueryRepositoryAdapter.delete(mapper.toSqlEntity(budgetGroupDomainEntity));
+        log.info("before deleting {}", budgetGroupDomainEntity.getId());
+        budgetGroupCommandRepository.delete(mapper.toSqlEntity(budgetGroupDomainEntity));
+        log.info("after deleting");
     }
 }

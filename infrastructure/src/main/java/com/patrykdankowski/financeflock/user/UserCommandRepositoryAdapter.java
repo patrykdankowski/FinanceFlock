@@ -1,6 +1,8 @@
 package com.patrykdankowski.financeflock.user;
 
 import com.patrykdankowski.financeflock.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -10,22 +12,23 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 
-interface UserCommandRepositoryAdapter extends Repository<UserSqlEntity, Long> {
+interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long> {
 
     Optional<UserSqlEntity> findByEmail(String email);
-
-    Optional<UserSqlEntity> findById(Long id);
-
-    UserSqlEntity save(UserSqlEntity user);
-
-    List<UserSqlEntity> saveAll(Iterable<UserSqlEntity> entities);
-
+//
+//    Optional<UserSqlEntity> findById(Long id);
+//
+//    UserSqlEntity save(UserSqlEntity user);
+//
+//    List<UserSqlEntity> saveAll(List<UserSqlEntity> entities);
+//
     @Query("SELECT u FROM UserSqlEntity u WHERE u.id IN :ids")
     List<UserSqlEntity> findAllByIdIn(List<Long> ids);
-
+//
     boolean existsUserByEmail(String email);
 }
 
+@Slf4j
 @org.springframework.stereotype.Repository
 class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
@@ -64,10 +67,24 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
     }
 
     @Override
-    public List<UserDomainEntity> saveAll(Iterable<UserDomainEntity> entities) {
-        return userCommandRepository.saveAll(StreamSupport.stream(entities.spliterator(), false)
-                        .map(user -> mapper.toSqlEntity(user)).collect(Collectors.toList())).stream()
-                .map(user -> mapper.toDomainEntity(user)).collect(Collectors.toList());
+    public List<UserDomainEntity> saveAll(List<UserDomainEntity> entities) {
+        List<UserSqlEntity> usersSqlToSave = entities.stream()
+                .map(user -> {
+                    log.info("Mapping user to SQL entity: {}", user);
+                    return mapper.toSqlEntity(user);
+                }).collect(Collectors.toList());
+
+        log.info("Mapping to SQL entities repo {}", usersSqlToSave);
+
+        List<UserSqlEntity> saved = userCommandRepository.saveAll(usersSqlToSave);
+
+        log.info("After saving: {}", saved);
+
+        return saved.stream()
+                .map(user -> {
+                    log.info("Mapping SQL entity to domain entity: {}", user);
+                    return mapper.toDomainEntity(user);
+                }).collect(Collectors.toList());
     }
 
     @Override

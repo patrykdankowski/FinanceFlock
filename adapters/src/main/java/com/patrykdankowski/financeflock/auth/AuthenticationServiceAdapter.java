@@ -19,7 +19,6 @@ class AuthenticationServiceAdapter implements AuthenticationServicePort {
     @Override
     public UserDomainEntity getUserFromContext() {
 
-
         Authentication authentication = userContextService.getAuthenticationFromContext();
         String userEmail = authentication.getName();
         return userCacheService.getUserFromEmail(userEmail);

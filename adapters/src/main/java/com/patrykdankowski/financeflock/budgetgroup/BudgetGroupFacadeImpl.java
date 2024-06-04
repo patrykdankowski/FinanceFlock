@@ -37,20 +37,23 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         log.info("Starting process of create budget group");
 
-        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
-        log.info("Before creating");
+        BudgetGroupDomainEntity createdDomainGroup =
+                budgetGroupManagementDomain.createBudgetGroup(budgetGroupRequest, loggedUser);
 
-        final BudgetGroupDomainEntity budgetGroupDomainEntity =
-                budgetGroupManagementDomain.createBudgetGroup(budgetGroupRequest, userFromContext);
-        log.info("Before saving {}", budgetGroupDomainEntity);
+        BudgetGroupDomainEntity savedDomainGroup = budgetGroupCommandService.saveBudgetGroup(createdDomainGroup);
 
-        Long id = budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity).getId();
-        log.info("after saving group");
-        userCommandService.saveUser(userFromContext);
+        //this setter must be used here because before saving group, groupId in User is null
+        loggedUser.setBudgetGroupId(savedDomainGroup.getId());
+
+        UserDomainEntity savedLoggedUser = userCommandService.saveUser(loggedUser);
+
+        long groupId = savedLoggedUser.getBudgetGroupId();
+
         log.info("Successfully finished process of create budget group");
 
-        return id;
+        return groupId;
 
     }
 
@@ -61,15 +64,19 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         log.info("Starting process of close group");
 
-        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-        Long userGroup = userFromContext.getBudgetGroupId();
-        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupCommandService.findBudgetGroupById(userGroup);
-        //TODO getListOfMembersId().stream().toList()) - czy warto do osobnej metody
-        List<UserDomainEntity> listOfUsers = userCommandService.listOfUsersFromIds(budgetGroupDomainEntity.getListOfMembersId().stream().toList());
-        budgetGroupManagementDomain.closeBudgetGroup(userFromContext, id, listOfUsers);
+        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
-        userCommandService.saveAllUsers(listOfUsers);
-        budgetGroupCommandService.deleteBudgetGroup(budgetGroupDomainEntity);
+        Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
+
+        BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(groupIdFromLoggedUser);
+
+        //TODO getListOfMembersId().stream().toList()) - czy warto do osobnej metody
+        List<UserDomainEntity> listOfUsers = userCommandService.listOfUsersFromIds(budgetGroupFromLoggedUser.getListOfMembersId().stream().toList());
+
+        List<UserDomainEntity> mappedEntities = budgetGroupManagementDomain.closeBudgetGroup(loggedUser, id, listOfUsers, budgetGroupFromLoggedUser);
+
+        budgetGroupCommandService.deleteBudgetGroup(budgetGroupFromLoggedUser);
+        userCommandService.saveAllUsers(mappedEntities);
 
         log.info("Finished process of close group");
     }
@@ -79,14 +86,15 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
     public void addUserToGroup(final String email, final Long id) {
 
         log.info("Starting process to add user to group");
-        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+
         UserDomainEntity userToAdd = userCommandService.findUserByEmail(email);
-        BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupCommandService.findBudgetGroupById(userFromContext.getBudgetGroupId());
-//        User userToAdd = commandRepository.findByEmail(email).get();
-        budgetGroupMembershipDomain.addUserToGroup(userFromContext, userToAdd, id, budgetGroupDomainEntity);
 
+        BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(loggedUser.getBudgetGroupId());
 
-        budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity);
+        budgetGroupMembershipDomain.addUserToGroup(loggedUser, userToAdd, id, budgetGroupFromLoggedUser);
+
+        budgetGroupCommandService.saveBudgetGroup(budgetGroupFromLoggedUser);
         userCommandService.saveUser(userToAdd);
 
         log.info("Successfully finished process to add user to group");
@@ -99,19 +107,21 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         log.info("Starting process to remove user from group");
 
-        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-        Long budgetGroupDomainEntityId = userFromContext.getBudgetGroupId();
-        BudgetGroupDomainEntity budgetGroupDomainEntity =
+        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
-                budgetGroupCommandService.findBudgetGroupById(budgetGroupDomainEntityId);
+        Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
+
+        BudgetGroupDomainEntity budgetGroupFromLoggedUser =
+                budgetGroupCommandService.findBudgetGroupById(groupIdFromLoggedUser);
+
         UserDomainEntity userToRemove = userCommandService.findUserByEmail(email);
 
-        budgetGroupMembershipDomain.removeUserFromGroup(userFromContext,
+        budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
                 userToRemove,
-                budgetGroupDomainEntity,
+                budgetGroupFromLoggedUser,
                 id);
 
-        budgetGroupCommandService.saveBudgetGroup(budgetGroupDomainEntity);
+        budgetGroupCommandService.saveBudgetGroup(budgetGroupFromLoggedUser);
         userCommandService.saveUser(userToRemove);
 
         log.info("Successfully finished process to remove user from group");

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 //@Component
- class UserWarmup implements CommandLineRunner {
+class UserWarmup implements CommandLineRunner {
 
     UserWarmup(final PasswordEncoder passwordEncoder, final UserCommandRepositoryPort userCommandRepository, final UserQueryRepositoryPort userQueryRepository) {
         this.passwordEncoder = passwordEncoder;
@@ -23,22 +23,23 @@ import java.util.List;
     @Override
     public void run(final String... args) throws Exception {
 
-//        if (userQueryRepository.count() == 0) {
-//            UserDomainEntity user1 = new UserDomainEntity();
-//            user1.setName("Patryk");
-//            user1.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
-//            user1.setEmail("patryk@gmail.com");
-//            user1.setRole(Role.USER);
-//            user1.setShareData(true);
-//
-//            UserDomainEntity user2 = new UserDomainEntity();
-//            user2.setName("Kuba");
-//            user2.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
-//            user2.setEmail("kuba@gmail.com");
-//            user2.setRole(Role.USER);
-//            user2.setShareData(true);
-//
-//            userCommandRepository.saveAll(List.of(user1, user2));
+        if (userQueryRepository.count() == 0) {
+            UserDomainEntity user1 = new UserDomainEntity();
+            user1.setName("Patryk");
+            user1.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
+            user1.setEmail("patryk@gmail.com");
+            user1.setRole(Role.USER);
+            user1.setShareData(true);
+
+            UserDomainEntity user2 = new UserDomainEntity();
+            user2.setName("Kuba");
+            user2.setPassword(passwordEncoder.encode("Qweasdzxc123!"));
+            user2.setEmail("kuba@gmail.com");
+            user2.setRole(Role.USER);
+            user2.setShareData(true);
+
+            userCommandRepository.saveAll(List.of(user1, user2));
         }
     }
+}
 

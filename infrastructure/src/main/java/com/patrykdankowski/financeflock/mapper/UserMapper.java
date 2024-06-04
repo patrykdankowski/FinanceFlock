@@ -1,70 +1,71 @@
 package com.patrykdankowski.financeflock.mapper;
 
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
-import com.patrykdankowski.financeflock.expense.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserSqlEntity;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-@Mapper(componentModel = "spring", uses = {BudgetGroupMapper.class, ExpenseMapper.class})
-public interface UserMapper {
+@Slf4j
+@Component
+public class UserMapper {
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+    private final EntityManager entityManager;
 
-    @Mapping(target = "budgetGroupId", ignore = true)
-    @Mapping(target = "expenseListId", ignore = true)
-    UserDomainEntity toDomainEntity(UserSqlEntity userSqlEntity);
-
-    @AfterMapping
-    default void handleAfterMapping(UserSqlEntity source,
-                                    @MappingTarget UserDomainEntity target) {
-
-        if (source.getBudgetGroup() != null) {
-            target.setBudgetGroupId(source.getId());
-
-        }
-        if (source.getExpenseList() != null) {
-            Set<Long> expenseListIdAfterMapping = source.getExpenseList().stream()
-                    .map(ExpenseSqlEntity::getId).collect(Collectors.toSet());
-
-            target.setExpenseListId(expenseListIdAfterMapping);
-        }
-
+    public UserMapper(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
-    @Mapping(target = "budgetGroup", ignore = true)
-    @Mapping(target = "expenseList", ignore = true)
-    UserSqlEntity toSqlEntity(UserDomainEntity userDomainEntity);
-
-    @AfterMapping
-    default void handleAfterMapping(UserDomainEntity source,
-                                    @MappingTarget UserSqlEntity target,
-                                    @Autowired ExpenseMapperRepository expenseRepository,
-                                    @Autowired BudgetGroupMapperRepository budgetGroupRepository) {
-        Long budgetGroupId = source.getBudgetGroupId();
-
-        if (budgetGroupId != null) {
-            BudgetGroupSqlEntity budgetGroupSqlEntity = budgetGroupRepository.findById(budgetGroupId)
-                    .orElseThrow(() -> new BudgetGroupNotFoundException(budgetGroupId));
-            target.setBudgetGroup(budgetGroupSqlEntity);
+    public UserSqlEntity toSqlEntity(UserDomainEntity userDomainEntity) {
+        if (userDomainEntity == null) {
+            return null;
         }
 
-        Set<Long> expensesId = source.getExpenseListId();
+        UserSqlEntity userSqlEntity = new UserSqlEntity();
+        userSqlEntity.setId(userDomainEntity.getId());
+        userSqlEntity.setEmail(userDomainEntity.getEmail());
+        userSqlEntity.setPassword(userDomainEntity.getPassword());
+        userSqlEntity.setName(userDomainEntity.getName());
+        userSqlEntity.setLastLoggedInAt(userDomainEntity.getLastLoggedInAt());
+        userSqlEntity.setCreatedAt(userDomainEntity.getCreatedAt());
+        userSqlEntity.setRole(userDomainEntity.getRole());
+        userSqlEntity.setShareData(userDomainEntity.isShareData());
 
-        if (expensesId != null) {
-            Set<ExpenseSqlEntity> expenseSqlEntities = expenseRepository.findAllById(expensesId).stream().collect(Collectors.toSet());
-
-            target.setExpenseList(expenseSqlEntities);
+        if (userDomainEntity.getBudgetGroupId() != null) {
+            BudgetGroupSqlEntity budgetGroupSql = entityManager.find(BudgetGroupSqlEntity.class, userDomainEntity.getBudgetGroupId());
+            if (budgetGroupSql != null) {
+//                log.info("Budget group is not null");
+                userSqlEntity.setBudgetGroup(budgetGroupSql);
+            } else {
+                log.warn("Budget group with id {} not found", userDomainEntity.getBudgetGroupId());
+            }
         }
+//        log.info("Mapped to SQL entity: {}", userSqlEntity);
+        return userSqlEntity;
+    }
+
+    public UserDomainEntity toDomainEntity(UserSqlEntity userSqlEntity) {
+        if (userSqlEntity == null) {
+            return null;
+        }
+
+        UserDomainEntity userDomainEntity = new UserDomainEntity();
+        userDomainEntity.setId(userSqlEntity.getId());
+        userDomainEntity.setName(userSqlEntity.getName());
+        userDomainEntity.setPassword(userSqlEntity.getPassword());
+        userDomainEntity.setEmail(userSqlEntity.getEmail());
+        userDomainEntity.setLastLoggedInAt(userSqlEntity.getLastLoggedInAt());
+        userDomainEntity.setCreatedAt(userSqlEntity.getCreatedAt());
+        userDomainEntity.setRole(userSqlEntity.getRole());
+        userDomainEntity.setShareData(userSqlEntity.isShareData());
+
+        if (userSqlEntity.getBudgetGroup() != null) {
+            userDomainEntity.setBudgetGroupId(userSqlEntity.getBudgetGroup().getId());
+        } else {
+            log.info("Budget group is null for user: {}", userSqlEntity.getId());
+        }
+//        log.info("Mapped to domain entity: {}", userDomainEntity);
+        return userDomainEntity;
     }
 }
-
-

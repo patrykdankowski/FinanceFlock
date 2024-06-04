@@ -27,56 +27,57 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
 //        commonDomainService.checkIfGroupExists(userFromContext, potentialGroupId);
 
 //        validateIfUserIsAdmin(userFromContext);
-
         validateGroup(potentialGroupOwner, budgetGroup, givenGroupId);
-        commonDomainService.checkRoleForUser(potentialGroupOwner, Role.GROUP_ADMIN);
-
         validateUserIfPossibleToAddToBudgetGroup(budgetGroup, userToAdd);
         addUserToBudgetGroup(budgetGroup, userToAdd);
-
+//        boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(potentialGroupOwner, budgetGroup);
+//        if(isMember){
+//            log.warn("User {} is not a member of this group", potentialGroupOwner.getName());
+//            throw new IllegalStateException("User is not a member of the group");
+//        }
         assignRoleAndBudgetGroupForUser(userToAdd, budgetGroup.getId(), Role.GROUP_MEMBER);
 
 
     }
 
-    private void validateGroup(final UserDomainEntity user,
+    private void validateGroup(final UserDomainEntity potentialOwner,
                                final BudgetGroupDomainEntity budgetGroup,
                                final Long givenGroupId) {
-        commonDomainService.checkIfGroupIsNotNull(user);
-        commonDomainService.checkIdGroupWithGivenId(givenGroupId, user.getBudgetGroupId());
-        final boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(user, budgetGroup);
-        if (!isMember) {
-            log.warn("User {} is not a member of this group", user.getName());
-            throw new IllegalStateException("User is not a member of the group");
-        }
+//        commonDomainService.checkIfGroupIsNotNull(potentialOwner);
+//        commonDomainService.checkIdGroupWithGivenId(givenGroupId, potentialOwner.getBudgetGroupId());
+//        commonDomainService.checkIfUserIsMemberOfGroup()
+
+        commonDomainService.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
+//        final boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(potentialOwner, budgetGroup);
+////        if (isMember) {
+////            log.warn("User {} is not a member of this group", potentialOwner.getName());
+////            throw new IllegalStateException("User is not a member of the group");
+////        }
 
     }
 
 
     private void validateUserIfPossibleToAddToBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity,
                                                           final UserDomainEntity userToAdd) {
-//        if (userToAdd.getBudgetGroupId() != null || userToAdd.getRole() != Role.USER) {
-//            log.warn("User {} is already a member of different group", userToAdd.getName());
-//            throw new BudgetGroupValidationException("User is already a member of a different group group");
-//        }
-//        if (budgetGroupDomainEntity.getListOfMembersId().contains(userToAdd.getId())) {
-//            log.warn("User {} is already a member of this group", userToAdd.getName());
-//            throw new BudgetGroupValidationException("User is already a member of this group");
-//
-//        }
         commonDomainService.checkRoleForUser(userToAdd, Role.USER);
 
-        final boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(userToAdd, budgetGroupDomainEntity);
-        if (!isMember) {
-            log.warn("User {} is not a member of this group", userToAdd.getName());
-            throw new IllegalStateException("User is not a member of the group");
+        if (userToAdd.getBudgetGroupId() == null) {
+            return;
+        } else {
+            if (budgetGroupDomainEntity.getListOfMembersId().size() >= AppConstants.MAX_BUDGET_GROUP_SIZE) {
+                log.warn("Budget group reached full size '{}'", AppConstants.MAX_BUDGET_GROUP_SIZE);
+                throw new MaxUserCountInBudgetGroupException();
+            }
+            final boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(userToAdd, budgetGroupDomainEntity);
+            if (isMember) {
+                log.warn("User {} is already a member of this group", userToAdd.getName());
+                throw new IllegalStateException("User is already a  member of this group");
+            } else {
+                log.warn("User {} is already a member of different group", userToAdd.getName());
+                throw new IllegalStateException("User is already a  member of different group");
+            }
         }
 
-
-        if (budgetGroupDomainEntity.getListOfMembersId().size() >= AppConstants.MAX_BUDGET_GROUP_SIZE) {
-            log.warn("Budget group reached full size '{}'", AppConstants.MAX_BUDGET_GROUP_SIZE);
-            throw new MaxUserCountInBudgetGroupException();
-        }
 
     }
 
@@ -114,9 +115,9 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
 //        commonDomainService.checkIfGroupExists(userFromContext, id);
 
 //        validateIsUserAdminOfBudgetGroup(userToRemove, budgetGroupDomainEntity);
-
-        validateGroup(potentialGroupOwner, budgetGroup, givenGroupId);
-        commonDomainService.checkRoleForUser(potentialGroupOwner, Role.GROUP_ADMIN);
+        commonDomainService.validateGroupForPotentialOwner(potentialGroupOwner, givenGroupId, budgetGroup);
+//        validateGroup(potentialGroupOwner, budgetGroup, givenGroupId);
+//        commonDomainService.checkRoleForUser(potentialGroupOwner, Role.GROUP_ADMIN);
 
         validateUserToRemoveFromBudgetGroup(userToRemove, budgetGroup);
         assignRoleAndBudgetGroupForUser(userToRemove, null, Role.USER);
@@ -133,7 +134,8 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
 //    }
 
 
-    private void validateUserToRemoveFromBudgetGroup(final UserDomainEntity userToRemove, final BudgetGroupDomainEntity budgetGroupDomainEntity) {
+    private void validateUserToRemoveFromBudgetGroup(final UserDomainEntity userToRemove,
+                                                     final BudgetGroupDomainEntity budgetGroupDomainEntity) {
         commonDomainService.checkRoleForUser(userToRemove, Role.GROUP_MEMBER);
 
         final boolean isMember = commonDomainService.checkIfUserIsMemberOfGroup(userToRemove, budgetGroupDomainEntity);

@@ -9,9 +9,9 @@ public interface UserCommandServicePort {
 
     void checkIfUserExists(String userEmail);
 
-    void saveUser(UserDomainEntity user);
+    UserDomainEntity saveUser(UserDomainEntity user);
 
-    void saveAllUsers(List<UserDomainEntity> users);
+    List<UserDomainEntity> saveAllUsers(List<UserDomainEntity> users);
 
     List<UserDomainEntity> listOfUsersFromIds(List<Long> userIds);
 }

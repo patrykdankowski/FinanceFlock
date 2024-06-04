@@ -59,6 +59,9 @@ public class BudgetGroupDomainEntity {
         this.listOfMembersId = listOfMembersId;
     }
 
+    public BudgetGroupDomainEntity() {
+    }
+
     public Set<Long> getListOfMembersId() {
         return listOfMembersId;
     }
