@@ -3,7 +3,6 @@ package com.patrykdankowski.financeflock.expense;
 import com.patrykdankowski.financeflock.auth.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.user.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
-import com.patrykdankowski.financeflock.user.UserQueryRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,7 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
 
     ExpenseFacadeImpl(
             final ExpenseManagementDomainPort expenseManagementDomain,
-//            final ExpenseCommandRepositoryPort expenseCommandRepository,
+            final ExpenseCommandRepositoryPort expenseCommandRepository,
             final AuthenticationServicePort authenticationService,
             final ExpenseCommandServicePort expenseCommandService,
             final ExpenseGeolocationServicePort expenseGeolocationService,
@@ -34,22 +33,22 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
     private final UserCommandServicePort userCommandService;
 
     @Override
-    public long addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp) {
+    public Long addExpense(ExpenseDtoWriteModel expenseDtoWriteModel, String userIp) {
 
-        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
         final ExpenseDtoWriteModel expenseDtoValidated = expenseGeolocationService.validateAndPrepareExpense(expenseDtoWriteModel,
                 userIp);
 
         final ExpenseDomainEntity expenseDomainEntity = expenseManagementDomain.createExpense(expenseDtoValidated,
-                userFromContext);
+                loggedUser);
 
         final ExpenseDomainEntity savedExpense = expenseCommandService.saveExpense(expenseDomainEntity);
 
-        userFromContext.addExpense(savedExpense.getId());
+        loggedUser.addExpense(savedExpense.getId());
 
         // saving user must be after saving expense because we need expense id to connect expense with user
-        userCommandService.saveUser(userFromContext);
+        userCommandService.saveUser(loggedUser);
 
         return savedExpense.getId();
 
@@ -57,14 +56,14 @@ public class ExpenseFacadeImpl implements ExpenseFacade {
 
     @Override
     public void updateExpense(Long id, ExpenseDtoWriteModel expenseSourceDto) {
-
         final ExpenseDomainEntity expenseDomainEntity = expenseCommandService.findExpenseById(id);
 
-        final UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
-        final Long userGroupIdFromGivenExpenseId = userCommandService.findUserById(expenseDomainEntity.getUserId()).getBudgetGroupId();
+        // its used to check if expense is in same group but u are not a owner (u are admin) - different response
+        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseDomainEntity.getUserId());
 
-        expenseManagementDomain.validateUserAccessToExpense(userFromContext, expenseDomainEntity, userGroupIdFromGivenExpenseId);
+        expenseManagementDomain.validateUserAccessToExpense(loggedUser, userFromGivenIdExpense, expenseDomainEntity);
 
         expenseManagementDomain.validateAndSetFieldsForExpense(expenseSourceDto, expenseDomainEntity);
 

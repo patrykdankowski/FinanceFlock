@@ -49,14 +49,14 @@ class BudgetGroupQueryServiceImpl implements BudgetGroupQueryService {
         List<UserDomainEntity> listOfUsers = userQueryRepository.findAllByIdIn(mappedId);
 
         return listOfUsers.stream().map(
-                user -> {
-                    return new UserDtoResponse(
-                            user.getName(),
-                            user.getEmail());
-                }
-                    )
+                        user -> {
+                            return new UserDtoResponse(
+                                    user.getName(),
+                                    user.getEmail());
+                        }
+                )
 
-                        .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override

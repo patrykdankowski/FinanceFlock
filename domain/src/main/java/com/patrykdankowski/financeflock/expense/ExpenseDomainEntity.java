@@ -28,7 +28,7 @@ public class ExpenseDomainEntity {
         return id;
     }
 
-   public void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -40,15 +40,15 @@ public class ExpenseDomainEntity {
         this.userId = userId;
     }
 
-    BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    void setAmount(final BigDecimal amount) {
+    public void setAmount(final BigDecimal amount) {
         this.amount = amount;
     }
 
-    LocalDateTime getExpenseDate() {
+    public LocalDateTime getExpenseDate() {
         return expenseDate;
     }
 
@@ -56,7 +56,7 @@ public class ExpenseDomainEntity {
         this.expenseDate = expenseDate;
     }
 
-    String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -64,11 +64,11 @@ public class ExpenseDomainEntity {
         this.description = description;
     }
 
-    String getLocation() {
+    public String getLocation() {
         return location;
     }
 
-    void setLocation(final String location) {
+    public void setLocation(final String location) {
         this.location = location;
     }
 }

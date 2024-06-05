@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.expense;
 
+import com.patrykdankowski.financeflock.budgetgroup.CommonDomainServicePort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
@@ -8,6 +9,11 @@ import java.time.LocalDateTime;
 
 class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
+    private final CommonDomainServicePort commonDomainService;
+
+    ExpenseManagementDomainAdapter(CommonDomainServicePort commonDomainService) {
+        this.commonDomainService = commonDomainService;
+    }
 
     @Override
     public ExpenseDomainEntity createExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
@@ -40,29 +46,42 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
     }
 
     @Override
-    public void validateUserAccessToExpense(final UserDomainEntity userFromContext,
-                                            final ExpenseDomainEntity expenseDomainEntity,
-                                            final Long userGroupIdFromGivenExpenseId) {
+    public void validateUserAccessToExpense(final UserDomainEntity loggedUser,
+                                            final UserDomainEntity userFromGivenIdExpense, final ExpenseDomainEntity expenseDomainEntity) {
+
+
+        boolean isExpenseOfUser = validateIfExpenseOfUser(loggedUser, expenseDomainEntity);
+        boolean isExpenseInSameUserGroup = checkIfExpenseIsInSameGroup(loggedUser, userFromGivenIdExpense);
+
 
         //for group admin only - different exception
-        boolean isExpenseInSameUserGroup = userFromContext.getRole().equals(Role.GROUP_ADMIN) &&
-                userFromContext.getBudgetGroupId().equals(userGroupIdFromGivenExpenseId);
-
-        boolean isExpenseOfUser = userFromContext.getExpenseListId().contains(expenseDomainEntity.getId()) &&
-                expenseDomainEntity.getUserId().equals(userFromContext.getId());
-
-
         if (isExpenseInSameUserGroup && !isExpenseOfUser) {
-            throw new ExpenseNotBelongToUserException(userFromContext.getId(), expenseDomainEntity.getId());
+            throw new ExpenseNotBelongToUserException(userFromGivenIdExpense.getId(), expenseDomainEntity.getId());
         } else if (!isExpenseOfUser) {
             throw new ExpenseNotFoundException(expenseDomainEntity.getId());
 
         }
+
+    }
+
+    private boolean checkIfExpenseIsInSameGroup(UserDomainEntity loggedUser,
+                                                UserDomainEntity userFromGivenIdExpense) {
+        // TODO fix
+        commonDomainService.checkRoleForUser(loggedUser, Role.GROUP_ADMIN);
+        commonDomainService.checkIdGroupWithGivenId(userFromGivenIdExpense.getBudgetGroupId(), loggedUser.getBudgetGroupId());
+
+        return true;
+
+    }
+
+    private boolean validateIfExpenseOfUser(UserDomainEntity userFromContext, ExpenseDomainEntity expenseDomainEntity) {
+        return userFromContext.getExpenseListId().contains(expenseDomainEntity.getId()) &&
+                expenseDomainEntity.getUserId().equals(userFromContext.getId());
     }
 
     @Override
     public void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
-                                                final ExpenseDomainEntity expenseDomainEntity) {
+                                               final ExpenseDomainEntity expenseDomainEntity) {
         if (expenseDtoWriteModel.getExpenseDate() != null) {
             expenseDomainEntity.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
         }

@@ -62,8 +62,11 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
     @Override
     public UserDomainEntity save(UserDomainEntity user) {
+        log.info("before saving");
+UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user));
+        log.info("after saving");
 
-        return mapper.toDomainEntity(userCommandRepository.save(mapper.toSqlEntity(user)));
+return mapper.toDomainEntity(sqlUserSaved);
     }
 
     @Override

@@ -5,8 +5,6 @@ import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 public interface CommonDomainServicePort {
 
-    void checkIfGroupExists(final UserDomainEntity userFromContext, final Long id);
-
     Long checkIfGroupExistsOld(final UserDomainEntity userFromContext);
 
     void checkIfGroupIsNotNull(final UserDomainEntity user);
@@ -20,6 +18,8 @@ public interface CommonDomainServicePort {
     void checkIdGroupWithGivenId(final Long givenId,
                                  final Long idFromUserObject);
 
-    void validateGroupForPotentialOwner(UserDomainEntity userFromContext, Long groupId, BudgetGroupDomainEntity budgetGroupDomainEntity);
+    void validateGroupForPotentialOwner(UserDomainEntity userFromContext,
+                                        Long groupId,
+                                        BudgetGroupDomainEntity budgetGroupDomainEntity);
 
 }

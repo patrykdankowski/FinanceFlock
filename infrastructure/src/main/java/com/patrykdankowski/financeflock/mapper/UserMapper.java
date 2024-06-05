@@ -1,11 +1,17 @@
 package com.patrykdankowski.financeflock.mapper;
 
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
+import com.patrykdankowski.financeflock.expense.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserSqlEntity;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -35,13 +41,27 @@ public class UserMapper {
         if (userDomainEntity.getBudgetGroupId() != null) {
             BudgetGroupSqlEntity budgetGroupSql = entityManager.find(BudgetGroupSqlEntity.class, userDomainEntity.getBudgetGroupId());
             if (budgetGroupSql != null) {
-//                log.info("Budget group is not null");
+                log.info("Budget group is not null");
                 userSqlEntity.setBudgetGroup(budgetGroupSql);
             } else {
                 log.warn("Budget group with id {} not found", userDomainEntity.getBudgetGroupId());
             }
         }
-//        log.info("Mapped to SQL entity: {}", userSqlEntity);
+        Set<ExpenseSqlEntity> sqlExpenses = new HashSet<>();
+        if (userDomainEntity.getExpenseListId() != null) {
+            sqlExpenses = userDomainEntity.getExpenseListId().stream()
+                    .map(expenseId -> {
+                                ExpenseSqlEntity expenseSql = entityManager.find(ExpenseSqlEntity.class, expenseId);
+                                if (expenseSql != null) {
+                                    expenseSql.setUser(userSqlEntity);
+                                }
+                                return expenseSql;
+                            }
+                    ).collect(Collectors.toSet());
+        }
+        userSqlEntity.setExpenseList(sqlExpenses);
+
+        log.info("Mapped to SQL entity: {}", userSqlEntity);
         return userSqlEntity;
     }
 
@@ -65,7 +85,13 @@ public class UserMapper {
         } else {
             log.info("Budget group is null for user: {}", userSqlEntity.getId());
         }
-//        log.info("Mapped to domain entity: {}", userDomainEntity);
+        if (userSqlEntity.getExpenseList() != null) {
+            Set<Long> listWithIds = userSqlEntity.getExpenseList().stream().map(
+                    ExpenseSqlEntity::getId).collect(Collectors.toSet());
+            userDomainEntity.setExpenseListId(listWithIds);
+        }
+
+        log.info("Mapped to domain entity: {}", userDomainEntity);
         return userDomainEntity;
     }
 }

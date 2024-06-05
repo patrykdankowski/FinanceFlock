@@ -29,7 +29,7 @@ class ExpenseController implements ExpenseControllerApi {
         String userIp = geolocationService.getUserIpAddress(request);
         final long expenseId = expenseFacade.addExpense(expenseDtoWriteModel, userIp);
 
-        return String.format("Expense created with id {}", expenseId);
+        return String.format("Expense created with id %d", expenseId);
 
     }
 

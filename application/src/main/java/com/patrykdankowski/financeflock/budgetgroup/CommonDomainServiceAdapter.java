@@ -11,19 +11,6 @@ public class CommonDomainServiceAdapter implements CommonDomainServicePort {
     private final org.slf4j.Logger logger = Logger.getLogger(this.getClass());
 
 
-    @Override
-    public void checkIfGroupExists(final UserDomainEntity userFromContext,
-                                   final Long givenIdGroup) {
-//            Long groupToValidateId = userFromContext.getBudgetGroupId();
-//            if (userFromContext.getBudgetGroupId() == null) {
-//                logger.warn("User {} is not a member of any group", userFromContext.getName());
-//                throw new IllegalStateException("User does not belong to any budget group");
-//            }
-//            if (!groupToValidateId.equals(givenIdGroup)) {
-//                logger.warn("Given id group {} is not the same as your group", givenIdGroup);
-//                throw new IllegalStateException("U are not a member of given id group");
-//        }
-    }
 
     @Override
     public Long checkIfGroupExistsOld(final UserDomainEntity userFromContext) {
