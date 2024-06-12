@@ -9,13 +9,10 @@ class BudgetGroupFactory {
 
     public BudgetGroupDomainEntity createBudgetGroupFromRequest(UserDomainEntity userFromContext, BudgetGroupRequest budgetGroupRequest) {
 
-//        return BudgetGroupDomainEntity.builder()
-//                .owner(userFromContext.getId())
-//                .description(budgetGroupRequest.getDescription())
-//                .member(userFromContext.getId())
-//                .build();
-        return new BudgetGroupDomainEntity(
-                null, budgetGroupRequest.getDescription(), userFromContext.getId(), Set.of(userFromContext.getId()));
+        var budgetGroup = new BudgetGroupDomainEntity(
+                null, budgetGroupRequest.getDescription(), userFromContext.getId());
+        budgetGroup.updateListOfMembers(Set.of(userFromContext.getId()));
 
+        return budgetGroup;
     }
 }

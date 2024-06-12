@@ -7,6 +7,8 @@ import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,17 +51,15 @@ public class BudgetGroupMapper {
             return null;
         }
 
-        BudgetGroupDomainEntity domainEntity = new BudgetGroupDomainEntity();
-        domainEntity.setId(budgetGroupSql.getId());
-        domainEntity.setDescription(budgetGroupSql.getDescription());
+        Set<Long> ListOfIds = budgetGroupSql.getListOfMembers().stream().map(UserSqlEntity::getId).collect(Collectors.toSet());
 
-        if (budgetGroupSql.getOwner() != null) {
-            domainEntity.setOwnerId(budgetGroupSql.getOwner().getId());
-        }
+        BudgetGroupDomainEntity domainEntity = new BudgetGroupDomainEntity(budgetGroupSql.getId(),
+                budgetGroupSql.getDescription(),
+                budgetGroupSql.getOwner().getId());
 
-        domainEntity.setListOfMembersId(budgetGroupSql.getListOfMembers().stream()
-                .map(UserSqlEntity::getId)
-                .collect(Collectors.toSet()));
+        domainEntity.updateListOfMembers(ListOfIds);
+
+
 //        log.info("Mapped to domain entity: {}", domainEntity);
         return domainEntity;
     }

@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.budgetgroup.CommonDomainServiceAdapter;
+import com.patrykdankowski.financeflock.common.CommonDomainServiceAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

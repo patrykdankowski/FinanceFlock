@@ -8,13 +8,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-
- public class ExpenseDtoWriteModel {
+public class ExpenseDtoWriteModel {
     @Length(min = 2)
     @NotBlank(groups = onCreate.class)
     private String description;
     @Digits(groups = onCreate.class, integer = 7, fraction = 2)
     private BigDecimal amount;
+    @NotBlank(groups = onCreate.class)
     private String location;
     private LocalDateTime expenseDate;
 
@@ -48,7 +48,7 @@ import java.time.LocalDateTime;
         return expenseDate;
     }
 
-     public void setExpenseDate(final LocalDateTime expenseDate) {
-         this.expenseDate = expenseDate;
-     }
- }
+    public void setExpenseDate(final LocalDateTime expenseDate) {
+        this.expenseDate = expenseDate;
+    }
+}

@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationServicePort;
+import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserCommandServicePort;
 import jakarta.transaction.Transactional;
@@ -45,7 +46,7 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         BudgetGroupDomainEntity savedDomainGroup = budgetGroupCommandService.saveBudgetGroup(createdDomainGroup);
 
         //this setter must be used here because before saving group, groupId in User is null
-        loggedUser.setBudgetGroupId(savedDomainGroup.getId());
+        loggedUser.menageGroupMembership(savedDomainGroup.getId(), Role.GROUP_ADMIN);
 
         UserDomainEntity savedLoggedUser = userCommandService.saveUser(loggedUser);
 
@@ -65,6 +66,8 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         log.info("Starting process of close group");
 
         UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+
+        validateIfGroupIsNoNull(loggedUser);
 
         Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
 
@@ -88,9 +91,11 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
         log.info("Starting process to add user to group");
         UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
-        UserDomainEntity userToAdd = userCommandService.findUserByEmail(email);
+        validateIfGroupIsNoNull(loggedUser);
 
         BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(loggedUser.getBudgetGroupId());
+
+        UserDomainEntity userToAdd = userCommandService.findUserByEmail(email);
 
         budgetGroupMembershipDomain.addUserToGroup(loggedUser, userToAdd, id, budgetGroupFromLoggedUser);
 
@@ -109,6 +114,8 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
+        validateIfGroupIsNoNull(loggedUser);
+
         Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
 
         BudgetGroupDomainEntity budgetGroupFromLoggedUser =
@@ -126,6 +133,12 @@ public class BudgetGroupFacadeImpl implements BudgetGroupFacade {
 
         log.info("Successfully finished process to remove user from group");
 
+    }
+
+    private void validateIfGroupIsNoNull(UserDomainEntity loggedUser) {
+        if (loggedUser.getBudgetGroupId() == null) {
+            throw new BudgetGroupNotFoundException(null);
+        }
     }
 
 

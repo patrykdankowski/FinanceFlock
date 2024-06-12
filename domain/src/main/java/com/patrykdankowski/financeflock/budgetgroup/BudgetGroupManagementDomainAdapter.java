@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
+import com.patrykdankowski.financeflock.common.CommonDomainServicePort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,6 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
         BudgetGroupDomainEntity budgetGroupDomainEntity =
                 budgetGroupFactory.createBudgetGroupFromRequest(userFromContext, budgetGroupRequest);
 
-        assignRoleAndBudgetGroupForUser(userFromContext, budgetGroupDomainEntity.getId(), Role.GROUP_ADMIN);
 
         return budgetGroupDomainEntity;
     }
@@ -69,7 +69,7 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
         return listOfUsers.stream().map(
                 userToMap ->
                 {
-                    assignRoleAndBudgetGroupForUser(userToMap, null, Role.USER);
+                    userToMap.menageGroupMembership(null, Role.USER);
                     return userToMap;
                 }
 
@@ -78,10 +78,5 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
 
     }
 
-    private void assignRoleAndBudgetGroupForUser(final UserDomainEntity userFromContext,
-                                                 final Long budgetGroupDomainEntity,
-                                                 final Role role) {
-        userFromContext.setRole(role);
-        userFromContext.setBudgetGroupId(budgetGroupDomainEntity);
-    }
+
 }

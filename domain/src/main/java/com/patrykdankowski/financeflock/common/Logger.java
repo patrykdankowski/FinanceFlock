@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock;
+package com.patrykdankowski.financeflock.common;
 
 
 import org.slf4j.LoggerFactory;

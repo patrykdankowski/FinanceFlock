@@ -1,7 +1,6 @@
-package com.patrykdankowski.financeflock.budgetgroup;
+package com.patrykdankowski.financeflock.common;
 
-import com.patrykdankowski.financeflock.Logger;
-import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CommonDomainServiceAdapter implements CommonDomainServicePort {
 
     private final org.slf4j.Logger logger = Logger.getLogger(this.getClass());
-
 
 
     @Override
@@ -36,9 +34,14 @@ public class CommonDomainServiceAdapter implements CommonDomainServicePort {
     @Override
     public void validateGroupForPotentialOwner(UserDomainEntity userFromContext, Long groupId, BudgetGroupDomainEntity budgetGroupDomainEntity) {
         checkIfGroupIsNotNull(userFromContext);
-        checkRoleForUser(userFromContext, Role.GROUP_ADMIN);
-        checkIfUserIsMemberOfGroup(userFromContext, budgetGroupDomainEntity);
         checkIdGroupWithGivenId(groupId, userFromContext.getBudgetGroupId());
+        checkIfUserIsMemberOfGroup(userFromContext, budgetGroupDomainEntity);
+        checkRoleForUser(userFromContext, Role.GROUP_ADMIN);
+    }
+
+    @Override
+    public void assignRoleAndBudgetGroupForUser(UserDomainEntity user, Long budgetGroupId, Role role) {
+        user.menageGroupMembership(budgetGroupId,role);
     }
 
     @Override
@@ -53,9 +56,8 @@ public class CommonDomainServiceAdapter implements CommonDomainServicePort {
     public void checkRoleForUser(final UserDomainEntity user,
                                  final Role role) {
         if (user.getRole() != role) {
-            //TODO customowy exception
             logger.warn("User {} has wrong role ", user.getName());
-            throw new IllegalStateException("Bad role");
+            throw new BadRoleException(user.getName(), user.getRole().toString());
         }
     }
 

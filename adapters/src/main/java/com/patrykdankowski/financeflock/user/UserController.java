@@ -23,7 +23,7 @@ class UserController implements UserControllerApi {
     @Override
     @PostMapping("/leaveGroup/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER')")
     public String leaveBudgetGroup(@PathVariable Long id) {
 
         log.info("Attempting to leave budget group");
@@ -38,7 +38,7 @@ class UserController implements UserControllerApi {
     @Override
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/updateShareDataPreference")
-    @PreAuthorize("hasAnyAuthority('USER','GROUP_ADMIN','GROUP_MEMBER')")
+//    @PreAuthorize("hasAnyAuthority('USER','GROUP_ADMIN','GROUP_MEMBER')")
     public String updateShareDataPreference() {
 
         log.info("Attempting to update share data preference");

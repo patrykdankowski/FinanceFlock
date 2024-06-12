@@ -5,6 +5,8 @@ import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class UserFactory {
 
@@ -25,12 +27,19 @@ public class UserFactory {
 //                .shareData(true)
 //                .build();
 
-        UserDomainEntity userDomainEntity = new UserDomainEntity();
-        userDomainEntity.setName(registerDtoRequest.getName());
-        userDomainEntity.setEmail(registerDtoRequest.getEmail());
-        userDomainEntity.setPassword(passwordEncoder.encode(registerDtoRequest.getPassword()));
-        userDomainEntity.setRole(Role.USER);
-        userDomainEntity.setShareData(true);
+
+        UserDomainEntity userDomainEntity = new UserDomainEntity(null,
+                registerDtoRequest.getName(),
+                passwordEncoder.encode(registerDtoRequest.getPassword()),
+                registerDtoRequest.getEmail(),
+                LocalDateTime.now());
+//        userDomainEntity.setName(registerDtoRequest.getName());
+//        userDomainEntity.setEmail(registerDtoRequest.getEmail());
+//        userDomainEntity.setPassword(passwordEncoder.encode(registerDtoRequest.getPassword()));
+        userDomainEntity.changeRole(Role.USER);
+        userDomainEntity.initializeShareData();
+//        userDomainEntity.setRole(Role.USER);
+//        userDomainEntity.setShareData(true);
         return userDomainEntity;
     }
 

@@ -8,6 +8,8 @@ import com.patrykdankowski.financeflock.auth.PasswordValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.MaxUserCountInBudgetGroupException;
+import com.patrykdankowski.financeflock.common.BadRoleException;
+import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
 import com.patrykdankowski.financeflock.expense.ExpenseNotBelongToUserException;
 import com.patrykdankowski.financeflock.expense.ExpenseNotFoundException;
 import com.patrykdankowski.financeflock.user.UserAlreadyExistsException;
@@ -179,24 +181,33 @@ class GlobalExceptionHandler {
                 "Please enter a different email address.",
                 HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(BudgetGroupValidationException.class)
-    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(BudgetGroupValidationException budgetGroupValidationException) {
+    ResponseEntity<ErrorDetails> handleGroupValidationException(BudgetGroupValidationException budgetGroupValidationException) {
         return setErrorDetails("Exception occurred during budget group validation",
                 budgetGroupValidationException.getMessage(),
                 HttpStatus.CONFLICT);
     }
-    @ExceptionHandler(StackOverflowError.class)
-    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(StackOverflowError budgetGroupValidationException) {
-        return setErrorDetails("Stack overflowexception",
-                budgetGroupValidationException.getMessage(),
+    @ExceptionHandler(BadRoleException.class)
+    ResponseEntity<ErrorDetails> handleGroupValidationException(BadRoleException badRoleException) {
+        return setErrorDetails("User has wrong role",
+                badRoleException.getMessage()+" has wrong role ("+badRoleException.getRoleName()+")",
                 HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(ShareDataPreferenceException.class)
+    ResponseEntity<ErrorDetails> handleShareDataPreferenceException(ShareDataPreferenceException shareDataPreferenceException) {
+        return setErrorDetails("Error during toggling share data",
+                "Your last request was at "+ shareDataPreferenceException.getLastSharedData() + " try again at "+ shareDataPreferenceException.getNextPossibleShareData(),
+                HttpStatus.TOO_EARLY );
+    }
+
     @ExceptionHandler(Exception.class)
-    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(Exception budgetGroupValidationException) {
-        return setErrorDetails("Exception accurred ",
-                budgetGroupValidationException.getMessage(),
+    ResponseEntity<ErrorDetails> handleException(Exception exception) {
+        return setErrorDetails(exception.getClass().toString(),
+                exception.getMessage(),
                 HttpStatus.CONFLICT);
     }
+
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);
         return new ResponseEntity<>(errorDetails, httpStatus);

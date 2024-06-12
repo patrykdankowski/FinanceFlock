@@ -68,6 +68,17 @@ public class UserSqlEntity {
 
     private boolean shareData;
 
+    private LocalDateTime lastToggledShareData;
+
+    public LocalDateTime getLastToggledShareData() {
+
+        return lastToggledShareData;
+    }
+
+    public void setLastToggledShareData(LocalDateTime lastToggledShareData) {
+        this.lastToggledShareData = lastToggledShareData;
+    }
+
     public boolean isShareData() {
         return shareData;
     }

@@ -63,7 +63,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 //        UserDomainEntity userToSave = user.toBuilder()
 //                .lastLoggedInAt(LocalDateTime.now())
 //                .build();
-        user.setLastLoggedInAt(LocalDateTime.now());
+        user.login();
         userCommandService.saveUser(user);
     }
 

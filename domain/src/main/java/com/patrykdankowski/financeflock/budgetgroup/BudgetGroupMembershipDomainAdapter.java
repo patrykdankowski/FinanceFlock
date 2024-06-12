@@ -1,10 +1,10 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.AppConstants;
+import com.patrykdankowski.financeflock.common.CommonDomainServicePort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 
 
 @Slf4j
@@ -35,11 +35,10 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
 //            log.warn("User {} is not a member of this group", potentialGroupOwner.getName());
 //            throw new IllegalStateException("User is not a member of the group");
 //        }
-        assignRoleAndBudgetGroupForUser(userToAdd, budgetGroup.getId(), Role.GROUP_MEMBER);
+        commonDomainService.assignRoleAndBudgetGroupForUser(userToAdd, budgetGroup.getId(), Role.GROUP_MEMBER);
 
 
     }
-
     private void validateGroup(final UserDomainEntity potentialOwner,
                                final BudgetGroupDomainEntity budgetGroup,
                                final Long givenGroupId) {
@@ -96,13 +95,7 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
         budgetGroupDomainEntity.getListOfMembersId().add(userToAdd.getId());
     }
 
-    private void assignRoleAndBudgetGroupForUser(final UserDomainEntity user,
-                                                 final Long budgetGroupId,
-                                                 final Role role) {
-        user.setRole(role);
-        user.setBudgetGroupId(budgetGroupId);
 
-    }
 
 
     @Override
@@ -120,7 +113,7 @@ public class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembership
 //        commonDomainService.checkRoleForUser(potentialGroupOwner, Role.GROUP_ADMIN);
 
         validateUserToRemoveFromBudgetGroup(userToRemove, budgetGroup);
-        assignRoleAndBudgetGroupForUser(userToRemove, null, Role.USER);
+        commonDomainService.assignRoleAndBudgetGroupForUser(userToRemove, null, Role.USER);
 
         removeUserFromBudgetGroup(budgetGroup, userToRemove);
 

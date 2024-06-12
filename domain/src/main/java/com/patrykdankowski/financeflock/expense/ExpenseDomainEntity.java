@@ -1,6 +1,5 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,8 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class ExpenseDomainEntity {
 
 
@@ -19,56 +16,64 @@ public class ExpenseDomainEntity {
 
     private BigDecimal amount;
     private LocalDateTime expenseDate;
-
     private String description;
-
     private String location;
+
+    public ExpenseDomainEntity(Long id,
+                               Long userId,
+                               BigDecimal amount,
+                               LocalDateTime expenseDate,
+                               String description,
+                               String location) {
+        this.id = id;
+        this.userId = userId;
+        this.amount = amount;
+        this.expenseDate = expenseDate;
+        this.description = description;
+        this.location = location;
+    }
+
+    public void updateInfo(BigDecimal amount,
+                           LocalDateTime expenseDate,
+                           String description,
+                           String location) {
+
+        if (amount != null) {
+            this.amount = amount;
+        }
+        if (expenseDate != null) {
+            this.expenseDate = expenseDate;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+        if (location != null) {
+            this.location = location;
+        }
+    }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
     }
 
     public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(final Long userId) {
-        this.userId = userId;
-    }
-
     public BigDecimal getAmount() {
         return amount;
-    }
-
-    public void setAmount(final BigDecimal amount) {
-        this.amount = amount;
     }
 
     public LocalDateTime getExpenseDate() {
         return expenseDate;
     }
 
-    public void setExpenseDate(final LocalDateTime expenseDate) {
-        this.expenseDate = expenseDate;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
     }
 
     public String getLocation() {
         return location;
     }
 
-    public void setLocation(final String location) {
-        this.location = location;
-    }
 }

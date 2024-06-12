@@ -1,6 +1,6 @@
-package com.patrykdankowski.financeflock.budgetgroup;
+package com.patrykdankowski.financeflock.common;
 
-import com.patrykdankowski.financeflock.common.Role;
+import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 
 public interface CommonDomainServicePort {
@@ -22,4 +22,7 @@ public interface CommonDomainServicePort {
                                         Long groupId,
                                         BudgetGroupDomainEntity budgetGroupDomainEntity);
 
+    void assignRoleAndBudgetGroupForUser(final UserDomainEntity user,
+                                         final Long budgetGroupId,
+                                         final Role role);
 }

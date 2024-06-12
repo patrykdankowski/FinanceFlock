@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.mapper;
 
 import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
+import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.expense.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserSqlEntity;
@@ -9,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +37,7 @@ public class UserMapper {
         userSqlEntity.setCreatedAt(userDomainEntity.getCreatedAt());
         userSqlEntity.setRole(userDomainEntity.getRole());
         userSqlEntity.setShareData(userDomainEntity.isShareData());
+        userSqlEntity.setLastToggledShareData(userDomainEntity.getLastToggledShareData());
 
         if (userDomainEntity.getBudgetGroupId() != null) {
             BudgetGroupSqlEntity budgetGroupSql = entityManager.find(BudgetGroupSqlEntity.class, userDomainEntity.getBudgetGroupId());
@@ -70,25 +71,28 @@ public class UserMapper {
             return null;
         }
 
-        UserDomainEntity userDomainEntity = new UserDomainEntity();
-        userDomainEntity.setId(userSqlEntity.getId());
-        userDomainEntity.setName(userSqlEntity.getName());
-        userDomainEntity.setPassword(userSqlEntity.getPassword());
-        userDomainEntity.setEmail(userSqlEntity.getEmail());
-        userDomainEntity.setLastLoggedInAt(userSqlEntity.getLastLoggedInAt());
-        userDomainEntity.setCreatedAt(userSqlEntity.getCreatedAt());
-        userDomainEntity.setRole(userSqlEntity.getRole());
-        userDomainEntity.setShareData(userSqlEntity.isShareData());
+        UserDomainEntity userDomainEntity = new UserDomainEntity(userSqlEntity.getId(),
+                userSqlEntity.getName(),
+                userSqlEntity.getPassword(),
+                userSqlEntity.getEmail(),
+                userSqlEntity.getCreatedAt());
+
+        userDomainEntity.updateInfo(userSqlEntity.isShareData(),
+                userSqlEntity.getLastToggledShareData(),
+                userSqlEntity.getLastLoggedInAt());
 
         if (userSqlEntity.getBudgetGroup() != null) {
-            userDomainEntity.setBudgetGroupId(userSqlEntity.getBudgetGroup().getId());
+            userDomainEntity.menageGroupMembership(userSqlEntity.getBudgetGroup().getId(), userSqlEntity.getRole());
         } else {
+            userDomainEntity.menageGroupMembership(null, Role.USER);
             log.info("Budget group is null for user: {}", userSqlEntity.getId());
         }
         if (userSqlEntity.getExpenseList() != null) {
-            Set<Long> listWithIds = userSqlEntity.getExpenseList().stream().map(
-                    ExpenseSqlEntity::getId).collect(Collectors.toSet());
-            userDomainEntity.setExpenseListId(listWithIds);
+//            Set<Long> listWithIds = userSqlEntity.getExpenseList().stream().map(
+//                    ExpenseSqlEntity::getId).collect(Collectors.toSet());
+//            userDomainEntity.setExpenseListId(listWithIds);
+
+            userSqlEntity.getExpenseList().forEach(expense -> userDomainEntity.addExpense(expense.getId()));
         }
 
         log.info("Mapped to domain entity: {}", userDomainEntity);

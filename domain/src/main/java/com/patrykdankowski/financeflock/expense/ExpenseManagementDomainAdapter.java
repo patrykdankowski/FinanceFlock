@@ -1,14 +1,17 @@
 package com.patrykdankowski.financeflock.expense;
 
-import com.patrykdankowski.financeflock.budgetgroup.CommonDomainServicePort;
+import com.patrykdankowski.financeflock.common.CommonDomainServicePort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
 
 class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
+    private static final Logger log = LoggerFactory.getLogger(ExpenseManagementDomainAdapter.class);
     private final CommonDomainServicePort commonDomainService;
 
     ExpenseManagementDomainAdapter(CommonDomainServicePort commonDomainService) {
@@ -55,7 +58,7 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
 
         //for group admin only - different exception
-        if (isExpenseInSameUserGroup && !isExpenseOfUser) {
+        if (isExpenseInSameUserGroup && !isExpenseOfUser && isAdmin(loggedUser)) {
             throw new ExpenseNotBelongToUserException(userFromGivenIdExpense.getId(), expenseDomainEntity.getId());
         } else if (!isExpenseOfUser) {
             throw new ExpenseNotFoundException(expenseDomainEntity.getId());
@@ -64,10 +67,15 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
     }
 
+    private boolean isAdmin(UserDomainEntity loggedUser) {
+        return loggedUser.getRole().equals(Role.GROUP_ADMIN);
+    }
+
     private boolean checkIfExpenseIsInSameGroup(UserDomainEntity loggedUser,
                                                 UserDomainEntity userFromGivenIdExpense) {
-        // TODO fix
-        commonDomainService.checkRoleForUser(loggedUser, Role.GROUP_ADMIN);
+        if (loggedUser.getBudgetGroupId() == null) {
+            return false;
+        }
         commonDomainService.checkIdGroupWithGivenId(userFromGivenIdExpense.getBudgetGroupId(), loggedUser.getBudgetGroupId());
 
         return true;
@@ -82,18 +90,10 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
     @Override
     public void validateAndSetFieldsForExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
                                                final ExpenseDomainEntity expenseDomainEntity) {
-        if (expenseDtoWriteModel.getExpenseDate() != null) {
-            expenseDomainEntity.setExpenseDate(expenseDtoWriteModel.getExpenseDate());
-        }
-        if (expenseDtoWriteModel.getDescription() != null && !expenseDtoWriteModel.getDescription().isBlank()) {
-            expenseDomainEntity.setDescription(expenseDtoWriteModel.getDescription());
-        }
-        if (expenseDtoWriteModel.getAmount() != null) {
-            expenseDomainEntity.setAmount(expenseDtoWriteModel.getAmount());
-        }
-        if (expenseDtoWriteModel.getLocation() != null && !expenseDtoWriteModel.getLocation().isBlank()) {
-            expenseDomainEntity.setLocation(expenseDtoWriteModel.getLocation());
-        }
+        expenseDomainEntity.updateInfo(expenseDtoWriteModel.getAmount(),
+                expenseDtoWriteModel.getExpenseDate(),
+                expenseDtoWriteModel.getDescription(),
+                expenseDtoWriteModel.getLocation());
     }
 }
 

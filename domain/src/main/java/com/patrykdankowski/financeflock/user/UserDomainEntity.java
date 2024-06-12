@@ -1,35 +1,23 @@
 package com.patrykdankowski.financeflock.user;
 
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.expense.ExpenseDomainEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
+import lombok.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
-@Getter
-@Setter
 @ToString
 @AllArgsConstructor
 public class UserDomainEntity {
 
     private Long id;
-
     private String name;
-
     private String password;
-
     private String email;
-
-    private LocalDateTime lastLoggedInAt;
-
     private LocalDateTime createdAt;
 
     private Role role;
@@ -38,7 +26,92 @@ public class UserDomainEntity {
 
     private Set<Long> expenseListId = new HashSet<>();
 
+    private LocalDateTime lastLoggedInAt;
+
     private boolean shareData;
+    private LocalDateTime lastToggledShareData;
+
+
+    public UserDomainEntity(Long id, String name, String password, String email, LocalDateTime createdAt) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.createdAt = createdAt;
+    }
+
+    public void login() {
+        this.lastLoggedInAt = LocalDateTime.now();
+    }
+
+    public void updateInfo(boolean shareData,
+                           LocalDateTime lastToggledShareData,
+                           LocalDateTime lastLoggedInAt) {
+        this.shareData = shareData;
+        this.lastToggledShareData = lastToggledShareData;
+        this.lastLoggedInAt = lastLoggedInAt;
+    }
+
+    public void changeRole(Role newRole) {
+        if (newRole != null && newRole != this.role) {
+            this.role = newRole;
+        }
+    }
+
+    public void menageGroupMembership(Long budgetGroupId, Role role) {
+        if (budgetGroupId != null) {
+            this.budgetGroupId = budgetGroupId;
+            this.role = role;
+        } else {
+            this.budgetGroupId = null;
+            this.role = Role.USER;
+        }
+    }
+
+
+    public void addExpense(Long expenseDomainId) {
+        if (expenseListId.contains(expenseDomainId)) {
+            return;
+        }
+        this.expenseListId.add(expenseDomainId);
+    }
+
+    public void removeExpense(Long expenseDomainId) {
+        if (expenseDomainId != null) {
+            this.expenseListId.remove(expenseDomainId);
+        }
+    }
+
+    public void toggleShareData() {
+        var now = LocalDateTime.now();
+        if (canToggleShareData(now)) {
+            this.shareData = !this.shareData;
+            this.lastToggledShareData = now;
+        }
+    }
+
+    public void initializeShareData() {
+        if (this.id != null) {
+            throw new IllegalStateException("Cannot initialize shareData for an existing user.");
+        }
+        this.shareData = true;
+    }
+
+    private boolean canToggleShareData(LocalDateTime now) {
+        if (now == null) {
+            throw new IllegalStateException("test");
+        }
+        if (this.lastToggledShareData != null) {
+            Duration duration = Duration.between(this.lastToggledShareData, now);
+            if (duration.toMinutes() < 5) {
+                throw new ShareDataPreferenceException(this.lastToggledShareData);
+            }
+        }
+        return true;
+    }
+
+
+
 
     public Long getId() {
         return id;
@@ -56,12 +129,12 @@ public class UserDomainEntity {
         return email;
     }
 
-    public LocalDateTime getLastLoggedInAt() {
-        return lastLoggedInAt;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getLastLoggedInAt() {
+        return lastLoggedInAt;
     }
 
     public Role getRole() {
@@ -80,174 +153,97 @@ public class UserDomainEntity {
         return shareData;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public LocalDateTime getLastToggledShareData() {
+        return lastToggledShareData;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setLastLoggedInAt(LocalDateTime lastLoggedInAt) {
-        this.lastLoggedInAt = lastLoggedInAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setBudgetGroupId(Long budgetGroupId) {
-        this.budgetGroupId = budgetGroupId;
-    }
-
-    public void setExpenseListId(Set<Long> expenseListId) {
-        this.expenseListId = expenseListId;
-    }
-
-    public void setShareData(boolean shareData) {
-        this.shareData = shareData;
-    }
-
-//    private UserDomainEntity(final Builder builder) {
-//        this.id = builder.id;
-//        this.name = builder.name;
-//        this.password = builder.password;
-//        this.email = builder.email;
-//        this.lastLoggedInAt = builder.lastLoggedInAt;
-//        this.createdAt = builder.createdAt;
-//        this.role = builder.role;
-//        this.budgetGroupId = builder.budgetGroupId;
-//        this.expenseListId = builder.expenseListId;
-//        this.shareData = builder.shareData;
+    //    public LocalDateTime getLastToggledShareData() {
+//
+//        return lastToggledShareData;
 //    }
 //
-//    public Builder toBuilder() {
-//        return builder()
-//                .id(this.id)
-//                .name(this.name)
-//                .password(this.password)
-//                .email(this.email)
-//                .lastLoggedInAt(this.lastLoggedInAt)
-//                .createdAt(this.createdAt)
-//                .role(this.role)
-//                .budgetGroup(this.budgetGroupId)
-//                .expenseList(this.expenseListId)
-//                .shareData(this.shareData);
+//    public void setLastToggledShareData(LocalDateTime lastToggledShareData) {
+//        this.lastToggledShareData = lastToggledShareData;
 //    }
 //
-//    public static Builder builder() {
-//        return new Builder();
+//    public Long getId() {
+//        return id;
 //    }
 //
-    public void addExpense(Long expenseDomainId) {
-        if (expenseListId.contains(expenseDomainId)) {
-            return;
-        }
-        this.expenseListId.add(expenseDomainId);
-    }
+//    public String getName() {
+//        return name;
+//    }
 //
+//    public String getPassword() {
+//        return password;
+//    }
 //
-//    public static class Builder {
+//    public String getEmail() {
+//        return email;
+//    }
 //
-//        private Builder() {
-//        }
+//    public LocalDateTime getLastLoggedInAt() {
+//        return lastLoggedInAt;
+//    }
 //
-//        private Long id;
+//    public LocalDateTime getCreatedAt() {
+//        return createdAt;
+//    }
 //
-//        private String name;
+//    public Role getRole() {
+//        return role;
+//    }
 //
-//        private String password;
+//    public Long getBudgetGroupId() {
+//        return budgetGroupId;
+//    }
 //
-//        private String email;
+//    public Set<Long> getExpenseListId() {
+//        return expenseListId;
+//    }
 //
-//        private LocalDateTime lastLoggedInAt;
+//    public boolean isShareData() {
+//        return shareData;
+//    }
 //
-//        private LocalDateTime createdAt;
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 //
-//        private Role role;
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 //
-//        private Long budgetGroupId;
+//    public void setPassword(String password) {
+//        this.password = password;
+//    }
 //
-//        private Set<Long> expenseListId = new HashSet<>();
+//    public void setEmail(String email) {
+//        this.email = email;
+//    }
 //
-//        private boolean shareData;
+//    public void setLastLoggedInAt(LocalDateTime lastLoggedInAt) {
+//        this.lastLoggedInAt = lastLoggedInAt;
+//    }
 //
+//    public void setCreatedAt(LocalDateTime createdAt) {
+//        this.createdAt = createdAt;
+//    }
 //
-//        public UserDomainEntity build() {
-//            return new UserDomainEntity(this);
-//        }
+//    public void setRole(Role role) {
+//        this.role = role;
+//    }
 //
+//    public void setBudgetGroupId(Long budgetGroupId) {
+//        this.budgetGroupId = budgetGroupId;
+//    }
 //
-//        public Builder id(final Long id) {
-//            this.id = id;
-//            return this;
-//        }
+//    public void setExpenseListId(Set<Long> expenseListId) {
+//        this.expenseListId = expenseListId;
+//    }
 //
-//        public Builder name(final String name) {
-//            this.name = name;
-//            return this;
-//
-//        }
-//
-//        public Builder password(final String password) {
-//            this.password = password;
-//            return this;
-//
-//        }
-//
-//        public Builder email(final String email) {
-//            this.email = email;
-//            return this;
-//
-//        }
-//
-//        public Builder lastLoggedInAt(final LocalDateTime lastLoggedInAt) {
-//            this.lastLoggedInAt = lastLoggedInAt;
-//            return this;
-//
-//        }
-//
-//        public Builder createdAt(final LocalDateTime createdAt) {
-//            this.createdAt = createdAt;
-//            return this;
-//
-//        }
-//
-//        public Builder role(final Role role) {
-//            this.role = role;
-//            return this;
-//
-//        }
-//
-//        public Builder budgetGroup(final Long budgetGroupId) {
-//            this.budgetGroupId = budgetGroupId;
-//            return this;
-//
-//        }
-//
-//        public Builder expenseList(final Set<Long> expenseListId) {
-//            this.expenseListId = expenseListId;
-//            return this;
-//
-//        }
-//
-//        public Builder shareData(final boolean shareData) {
-//            this.shareData = shareData;
-//            return this;
-//
-//        }
+//    public void setShareData(boolean shareData) {
+//        this.shareData = shareData;
 //    }
 
 }

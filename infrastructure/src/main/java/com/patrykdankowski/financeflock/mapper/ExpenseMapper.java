@@ -46,16 +46,13 @@ public class ExpenseMapper {
             return null;
 
         }
-        ExpenseDomainEntity expenseDomainEntity = new ExpenseDomainEntity();
-        expenseDomainEntity.setId(expenseSqlEntity.getId());
-        expenseDomainEntity.setExpenseDate(expenseSqlEntity.getExpenseDate());
-        expenseDomainEntity.setAmount(expenseSqlEntity.getAmount());
-        expenseDomainEntity.setLocation(expenseSqlEntity.getLocation());
-        expenseDomainEntity.setDescription(expenseSqlEntity.getDescription());
+        ExpenseDomainEntity expenseDomainEntity = new ExpenseDomainEntity(expenseSqlEntity.getId(),
+                expenseSqlEntity.getUser().getId(),
+                expenseSqlEntity.getAmount(),
+                expenseSqlEntity.getExpenseDate(),
+                expenseSqlEntity.getDescription(),
+                expenseSqlEntity.getLocation());
 
-        if (expenseSqlEntity.getUser() != null) {
-            expenseDomainEntity.setUserId(expenseSqlEntity.getUser().getId());
-        }
         return expenseDomainEntity;
     }
 }

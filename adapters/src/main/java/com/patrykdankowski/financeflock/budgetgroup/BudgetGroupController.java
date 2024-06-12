@@ -19,7 +19,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('USER')")
+//    @PreAuthorize("hasAuthority('USER')")
     @ResponseStatus(HttpStatus.CREATED)
     public String createBudgetGroup(@Valid @RequestBody BudgetGroupRequest budgetGroupRequest) {
         Long budgetGroupId = budgetGroupFacade.createBudgetGroup(budgetGroupRequest);
@@ -28,7 +28,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+//    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBudgetGroup(@PathVariable Long id) {
         budgetGroupFacade.closeBudgetGroup(id);
@@ -36,7 +36,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @PostMapping("/addUser/{id}")
-    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public String addUserToGroup(@PathVariable Long id, @RequestBody EmailDtoReadModel emailDto) {
         budgetGroupFacade.addUserToGroup(emailDto.getEmail(), id);
@@ -45,7 +45,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @PostMapping("/removeUser/{id}")
-    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public String removeUserFromGroup(@PathVariable Long id, @RequestBody EmailDtoReadModel emailDto) {
         budgetGroupFacade.removeUserFromGroup(emailDto.getEmail(), id);
@@ -54,7 +54,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @GetMapping("/listOfMembers")
-    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDtoResponse> getListOfMembersInBudgetGroup() {
         List<UserDtoResponse> list = budgetGroupQueryService.listOfUsersInGroup();
@@ -63,7 +63,7 @@ class BudgetGroupController implements BudgetGroupControllerApi {
 
     @Override
     @GetMapping("/list")
-    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDtoProjections> getList() {
 

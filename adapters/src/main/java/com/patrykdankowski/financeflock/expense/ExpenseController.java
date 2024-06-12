@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.expense;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ class ExpenseController implements ExpenseControllerApi {
     @Override
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
+    public String addExpense(@Validated(ExpenseDtoWriteModel.onCreate.class) @Valid @RequestBody ExpenseDtoWriteModel expenseDtoWriteModel,
                              HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);

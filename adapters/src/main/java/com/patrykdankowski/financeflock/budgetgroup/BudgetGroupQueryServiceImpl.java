@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.budgetgroup;
 
 import com.patrykdankowski.financeflock.auth.AuthenticationServicePort;
+import com.patrykdankowski.financeflock.common.CommonDomainServicePort;
 import com.patrykdankowski.financeflock.user.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.UserDtoProjections;
 import com.patrykdankowski.financeflock.user.UserDtoResponse;
