@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.auth.dto;
 
-import com.patrykdankowski.financeflock.validation.EqualsPassword;
-import com.patrykdankowski.financeflock.validation.ValidPassword;
+import com.patrykdankowski.financeflock.auth.dto.validation.EqualsPassword;
+import com.patrykdankowski.financeflock.auth.dto.validation.ValidPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

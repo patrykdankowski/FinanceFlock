@@ -1,6 +1,9 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.user.UserDomainEntity;
+import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
+import com.patrykdankowski.financeflock.auth.port.UserCacheServicePort;
+import com.patrykdankowski.financeflock.auth.port.UserContextServicePort;
+import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 

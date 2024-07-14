@@ -1,19 +1,19 @@
 package com.patrykdankowski.financeflock.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.patrykdankowski.financeflock.AppConstants;
-import com.patrykdankowski.financeflock.ErrorDetails;
-import com.patrykdankowski.financeflock.auth.CustomJwtException;
-import com.patrykdankowski.financeflock.auth.PasswordValidationException;
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupNotFoundException;
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupValidationException;
-import com.patrykdankowski.financeflock.budgetgroup.MaxUserCountInBudgetGroupException;
+import com.patrykdankowski.financeflock.common.AppConstants;
+import com.patrykdankowski.financeflock.common.ErrorDetails;
+import com.patrykdankowski.financeflock.auth.exception.CustomJwtException;
+import com.patrykdankowski.financeflock.auth.exception.PasswordValidationException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupNotFoundException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.MaxUserCountInBudgetGroupException;
 import com.patrykdankowski.financeflock.common.BadRoleException;
 import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
-import com.patrykdankowski.financeflock.expense.ExpenseNotBelongToUserException;
-import com.patrykdankowski.financeflock.expense.ExpenseNotFoundException;
-import com.patrykdankowski.financeflock.user.UserAlreadyExistsException;
-import com.patrykdankowski.financeflock.user.UserNotFoundException;
+import com.patrykdankowski.financeflock.expense.exception.ExpenseNotBelongToUserException;
+import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
+import com.patrykdankowski.financeflock.user.exception.UserAlreadyExistsException;
+import com.patrykdankowski.financeflock.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -189,7 +189,7 @@ class GlobalExceptionHandler {
                 HttpStatus.CONFLICT);
     }
     @ExceptionHandler(BadRoleException.class)
-    ResponseEntity<ErrorDetails> handleGroupValidationException(BadRoleException badRoleException) {
+    ResponseEntity<ErrorDetails> handleBadRoleException(BadRoleException badRoleException) {
         return setErrorDetails("User has wrong role",
                 badRoleException.getMessage()+" has wrong role ("+badRoleException.getRoleName()+")",
                 HttpStatus.CONFLICT);

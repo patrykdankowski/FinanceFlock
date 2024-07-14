@@ -1,10 +1,10 @@
 package com.patrykdankowski.financeflock.mapper;
 
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
+import com.patrykdankowski.financeflock.budgetgroup.entity.BudgetGroupSqlEntity;
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.expense.ExpenseSqlEntity;
-import com.patrykdankowski.financeflock.user.UserDomainEntity;
-import com.patrykdankowski.financeflock.user.UserSqlEntity;
+import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
+import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -82,9 +82,9 @@ public class UserMapper {
                 userSqlEntity.getLastLoggedInAt());
 
         if (userSqlEntity.getBudgetGroup() != null) {
-            userDomainEntity.menageGroupMembership(userSqlEntity.getBudgetGroup().getId(), userSqlEntity.getRole());
+            userDomainEntity.manageGroupMembership(userSqlEntity.getBudgetGroup().getId(), userSqlEntity.getRole());
         } else {
-            userDomainEntity.menageGroupMembership(null, Role.USER);
+            userDomainEntity.manageGroupMembership(null, Role.USER);
             log.info("Budget group is null for user: {}", userSqlEntity.getId());
         }
         if (userSqlEntity.getExpenseList() != null) {

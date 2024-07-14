@@ -1,8 +1,8 @@
 package com.patrykdankowski.financeflock.mapper;
 
-import com.patrykdankowski.financeflock.expense.ExpenseDomainEntity;
-import com.patrykdankowski.financeflock.expense.ExpenseSqlEntity;
-import com.patrykdankowski.financeflock.user.UserSqlEntity;
+import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity;
+import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
+import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

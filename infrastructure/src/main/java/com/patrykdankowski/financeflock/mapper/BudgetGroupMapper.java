@@ -1,14 +1,12 @@
 package com.patrykdankowski.financeflock.mapper;
 
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupDomainEntity;
-import com.patrykdankowski.financeflock.budgetgroup.BudgetGroupSqlEntity;
-import com.patrykdankowski.financeflock.user.UserSqlEntity;
+import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
+import com.patrykdankowski.financeflock.budgetgroup.entity.BudgetGroupSqlEntity;
+import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

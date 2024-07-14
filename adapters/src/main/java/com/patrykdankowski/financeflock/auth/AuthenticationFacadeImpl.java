@@ -2,9 +2,10 @@ package com.patrykdankowski.financeflock.auth;
 
 import com.patrykdankowski.financeflock.auth.dto.LoginDto;
 import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
-import com.patrykdankowski.financeflock.user.UserDomainEntity;
-import com.patrykdankowski.financeflock.user.UserFactory;
-import com.patrykdankowski.financeflock.user.UserCommandServicePort;
+import com.patrykdankowski.financeflock.auth.port.AuthenticationFacade;
+import com.patrykdankowski.financeflock.auth.port.JwtTokenProviderPort;
+import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
+import com.patrykdankowski.financeflock.user.port.UserFactoryPort;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,15 +13,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
     AuthenticationFacadeImpl(final AuthenticationManager authenticationManager,
-                             final JwtTokenProvider jwtTokenProvider,
+                             final JwtTokenProviderPort jwtTokenProvider,
                              final UserCommandServicePort userCommandService,
-                             final UserFactory userFactory) {
+                             final UserFactoryPort userFactory) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userCommandService = userCommandService;
@@ -28,9 +27,9 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
     }
 
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProviderPort jwtTokenProvider;
     private final UserCommandServicePort userCommandService;
-    private final UserFactory userFactory;
+    private final UserFactoryPort userFactory;
 
     @Override
     public String login(LoginDto loginDto) {
