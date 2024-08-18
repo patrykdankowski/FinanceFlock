@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Builder
 @Getter
 public class ExpenseDomainEntity {
 
@@ -33,7 +32,7 @@ public class ExpenseDomainEntity {
     private String description;
     private String location;
 
-    public ExpenseDomainEntity(Long id,
+    private ExpenseDomainEntity(Long id,
                                Long userId,
                                BigDecimal amount,
                                LocalDateTime expenseDate,

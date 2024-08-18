@@ -12,7 +12,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +25,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class ExpenseSqlEntity {
 
     @Id
@@ -41,53 +45,7 @@ public class ExpenseSqlEntity {
 
     private String location;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public UserSqlEntity getUser() {
-        return user;
-    }
-
-    public void setUser(final UserSqlEntity user) {
-        this.user = user;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(final BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public LocalDateTime getExpenseDate() {
-        return expenseDate;
-    }
-
-    public void setExpenseDate(final LocalDateTime expenseDate) {
-        this.expenseDate = expenseDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(final String location) {
-        this.location = location;
-    }
 
     @Override
     public String toString() {

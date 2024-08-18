@@ -30,12 +30,13 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
                                                final Long groupId,
                                                final BudgetGroupDomainEntity budgetGroupDomainEntity) {
         validateGroup(loggedUser, groupId, budgetGroupDomainEntity);
+
     }
 
     @Override
-    public void isAbleToLeaveBudgetGroup(final UserDomainEntity loggedUser,
-                                         final BudgetGroupDomainEntity budgetGroupDomainEntity,
-                                         final Long groupId) {
+    public void isMemberOfGivenGroup(final UserDomainEntity loggedUser,
+                                     final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                                     final Long groupId) {
         validateGroup(loggedUser, groupId, budgetGroupDomainEntity);
 
     }
@@ -43,18 +44,18 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
     private void validateGroup(final UserDomainEntity loggedUser,
                                final Long groupId,
                                final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        checkIfGroupIsNotNull(loggedUser);
         checkIdGroupWithGivenId(groupId, loggedUser.getBudgetGroupId());
         checkIfUserIsMemberOfGroup(loggedUser, budgetGroupDomainEntity);
     }
 
-    @Override
-    public void checkIfGroupIsNotNull(final UserDomainEntity user) {
-        if (user.getBudgetGroupId() == null) {
-            log.warn("User {} is not a member of any group", user.getName());
-            throw new BudgetGroupValidationException("User does not belong to any budget group");
-        }
+    public boolean isMember(final UserDomainEntity userToRemove,
+                            final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                            final Long groupId) {
+        return budgetGroupDomainEntity.getListOfMembersId().contains(userToRemove.getId()) &&
+                userToRemove.getBudgetGroupId().equals(groupId);
+
     }
+
 
     private void checkIfUserIsMemberOfGroup(final UserDomainEntity user,
                                             final BudgetGroupDomainEntity group) {

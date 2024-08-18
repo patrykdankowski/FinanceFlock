@@ -1,5 +1,7 @@
 package com.patrykdankowski.financeflock.budgetgroup.entity;
 
+import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
+import com.patrykdankowski.financeflock.expense_category.entity.ExpenseCategorySqlEntity;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +28,9 @@ public class BudgetGroupSqlEntity {
 
     @OneToMany(mappedBy = "budgetGroup", fetch = FetchType.EAGER)
     private Set<UserSqlEntity> listOfMembers = new HashSet<>();
+
+    @OneToMany(mappedBy = "budgetGroup",  fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private Set<ExpenseCategorySqlEntity> listOfCategories = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -57,6 +62,14 @@ public class BudgetGroupSqlEntity {
 
     public void setListOfMembers(final Set<UserSqlEntity> listOfMembers) {
         this.listOfMembers = listOfMembers;
+    }
+
+    public Set<ExpenseCategorySqlEntity> getListOfCategories() {
+        return listOfCategories;
+    }
+
+    public void setListOfCategories(final Set<ExpenseCategorySqlEntity> listOfCategories) {
+        this.listOfCategories = listOfCategories;
     }
 }
 

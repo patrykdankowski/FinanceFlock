@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserContextServiceAdapter implements UserContextServicePort {
+ class UserContextServiceAdapter implements UserContextServicePort {
 
     @Override
     public Authentication getAuthenticationFromContext() {

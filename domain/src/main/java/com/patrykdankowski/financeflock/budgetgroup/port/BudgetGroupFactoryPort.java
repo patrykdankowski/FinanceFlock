@@ -6,5 +6,6 @@ import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 
 public interface BudgetGroupFactoryPort {
 
-    BudgetGroupDomainEntity createBudgetGroupFromRequest(UserDomainEntity userFromContext, BudgetGroupDescription budgetGroupDescription);
+    BudgetGroupDomainEntity createBudgetGroupFromRequest(final Long userId,
+                                                        final BudgetGroupDescription budgetGroupDescription);
 }

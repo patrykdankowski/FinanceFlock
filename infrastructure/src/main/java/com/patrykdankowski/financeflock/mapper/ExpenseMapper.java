@@ -46,13 +46,12 @@ public class ExpenseMapper {
             return null;
 
         }
-        ExpenseDomainEntity expenseDomainEntity = new ExpenseDomainEntity(expenseSqlEntity.getId(),
+        return ExpenseDomainEntity.buildExpense(expenseSqlEntity.getId(),
                 expenseSqlEntity.getUser().getId(),
                 expenseSqlEntity.getAmount(),
                 expenseSqlEntity.getExpenseDate(),
                 expenseSqlEntity.getDescription(),
                 expenseSqlEntity.getLocation());
 
-        return expenseDomainEntity;
     }
 }

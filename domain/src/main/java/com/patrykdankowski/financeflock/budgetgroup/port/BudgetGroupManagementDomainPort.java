@@ -9,13 +9,9 @@ import java.util.List;
 public interface BudgetGroupManagementDomainPort {
 
 
-    BudgetGroupDomainEntity createBudgetGroup(BudgetGroupDescription budgetGroupRequest,
-                                              final UserDomainEntity userFromContext);
-
-    List<UserDomainEntity> closeBudgetGroup(final UserDomainEntity userFromContext,
-                                            final Long id,
-                                            final List<UserDomainEntity> listOfUsers,
-                                            BudgetGroupDomainEntity budgetGroupDomainEntity);
+    BudgetGroupDomainEntity createBudgetGroup(BudgetGroupDescription budgetGroupDescription,
+                                              final Long userId);
 
 
+    List<UserDomainEntity> closeBudgetGroup(List<UserDomainEntity> listOfUsers);
 }

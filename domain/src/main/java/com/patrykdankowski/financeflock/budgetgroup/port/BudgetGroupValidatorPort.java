@@ -11,11 +11,10 @@ public interface BudgetGroupValidatorPort {
                                         Long groupId,
                                         BudgetGroupDomainEntity budgetGroupDomainEntity);
 
-    void isAbleToLeaveBudgetGroup(UserDomainEntity loggedUser,
-                                  BudgetGroupDomainEntity budgetGroupDomainEntity,
-                                  Long groupId);
+    void isMemberOfGivenGroup(UserDomainEntity loggedUser,
+                              BudgetGroupDomainEntity budgetGroupDomainEntity,
+                              Long groupId);
 
-    void checkIfGroupIsNotNull(UserDomainEntity user);
 
     void validateSizeOfGroup(BudgetGroupDomainEntity budgetGroup);
 }

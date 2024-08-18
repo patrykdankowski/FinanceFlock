@@ -5,6 +5,7 @@ import com.patrykdankowski.financeflock.user.exception.UserNotFoundException;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.port.UserCommandRepositoryPort;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
+@Slf4j
 public class UserCommandServiceAdapter implements UserCommandServicePort {
     private final UserCommandRepositoryPort userCommandRepository;
 
@@ -22,18 +24,27 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     @Override
     public UserDomainEntity findUserByEmail(String email) {
         return userCommandRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException(email));
+                () -> {
+                    log.warn("User with email {} not found", email);
+                    return new UserNotFoundException(email);
+                }
+        );
     }
 
     @Override
     public UserDomainEntity findUserById(final Long id) {
         return userCommandRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(
+                        () -> {
+                            log.warn("User with id {} not found", id);
+                            return new UserNotFoundException(id);
+                        });
     }
 
     @Override
     public void checkIfUserExists(String userEmail) {
         if (userCommandRepository.existsUserByEmail(userEmail)) {
+            log.warn("User with email {} already exists", userEmail);
             throw new UserAlreadyExistsException(userEmail, VALID_EMAIL_MESSAGE);
 
         }

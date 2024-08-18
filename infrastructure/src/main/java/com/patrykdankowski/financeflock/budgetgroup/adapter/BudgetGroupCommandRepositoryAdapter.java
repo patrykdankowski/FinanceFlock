@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface BudgetGroupCommandRepositoryAdapter extends Repository<BudgetGroupSqlEntity, Long> {
 
-    Optional<BudgetGroupSqlEntity> findById(long id);
+    Optional<BudgetGroupSqlEntity> findById(Long id);
 
     BudgetGroupSqlEntity save(BudgetGroupSqlEntity budgetGroupDomainEntity);
 
@@ -44,15 +44,13 @@ class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPo
 
     @Override
     public BudgetGroupDomainEntity save(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        BudgetGroupSqlEntity entityToSaved = budgetGroupCommandRepository.save(mapper.toSqlEntity(budgetGroupDomainEntity));
-        return mapper.toDomainEntity(entityToSaved);
+        BudgetGroupSqlEntity entitySaved = budgetGroupCommandRepository.save(mapper.toSqlEntity(budgetGroupDomainEntity));
+        return mapper.toDomainEntity(entitySaved);
     }
 
     @Override
     public void delete(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
 
-        log.info("before deleting {}", budgetGroupDomainEntity.getId());
         budgetGroupCommandRepository.delete(mapper.toSqlEntity(budgetGroupDomainEntity));
-        log.info("after deleting");
     }
 }

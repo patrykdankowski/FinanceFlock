@@ -10,6 +10,7 @@ import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidat
 import com.patrykdankowski.financeflock.budgetgroup.exception.MaxUserCountInBudgetGroupException;
 import com.patrykdankowski.financeflock.common.BadRoleException;
 import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
+import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotBelongToUserException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
 import com.patrykdankowski.financeflock.user.exception.UserAlreadyExistsException;
@@ -201,12 +202,20 @@ class GlobalExceptionHandler {
                 HttpStatus.TOO_EARLY );
     }
 
+    @ExceptionHandler(ErrorDuringFetchingLocationFromIpException.class)
+    ResponseEntity<ErrorDetails> handleException() {
+        return setErrorDetails("Exception occurred during fetching location from ip",
+                "Try again or simply enter a location name for given expense",
+                HttpStatus.BAD_GATEWAY);
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ErrorDetails> handleException(Exception exception) {
         return setErrorDetails(exception.getClass().toString(),
                 exception.getMessage(),
                 HttpStatus.CONFLICT);
     }
+
 
     private ResponseEntity<ErrorDetails> setErrorDetails(String message, String details, HttpStatus httpStatus) {
         var errorDetails = new ErrorDetails(new Date(), message, details, httpStatus);

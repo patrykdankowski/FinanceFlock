@@ -11,11 +11,11 @@ import java.util.Set;
 @Service
 class BudgetGroupFactoryAdapter implements BudgetGroupFactoryPort {
 
-    public BudgetGroupDomainEntity createBudgetGroupFromRequest(UserDomainEntity userFromContext, BudgetGroupDescription budgetGroupDescription) {
+    public BudgetGroupDomainEntity createBudgetGroupFromRequest(Long userId, BudgetGroupDescription budgetGroupDescription) {
 
-        var budgetGroup = new BudgetGroupDomainEntity(
-                null, budgetGroupDescription.getValue(), userFromContext.getId());
-        budgetGroup.updateListOfMembers(Set.of(userFromContext.getId()));
+        var budgetGroup = BudgetGroupDomainEntity.buildBudgetGroup(
+                null, budgetGroupDescription.getValue(), userId);
+        budgetGroup.updateListOfMembers(Set.of(userId));
 
         return budgetGroup;
     }

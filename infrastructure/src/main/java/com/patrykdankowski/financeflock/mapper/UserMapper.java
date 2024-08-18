@@ -71,7 +71,7 @@ public class UserMapper {
             return null;
         }
 
-        UserDomainEntity userDomainEntity = new UserDomainEntity(userSqlEntity.getId(),
+        UserDomainEntity userDomainEntity =  UserDomainEntity.buildUser(userSqlEntity.getId(),
                 userSqlEntity.getName(),
                 userSqlEntity.getPassword(),
                 userSqlEntity.getEmail(),
@@ -88,9 +88,6 @@ public class UserMapper {
             log.info("Budget group is null for user: {}", userSqlEntity.getId());
         }
         if (userSqlEntity.getExpenseList() != null) {
-//            Set<Long> listWithIds = userSqlEntity.getExpenseList().stream().map(
-//                    ExpenseSqlEntity::getId).collect(Collectors.toSet());
-//            userDomainEntity.setExpenseListId(listWithIds);
 
             userSqlEntity.getExpenseList().forEach(expense -> userDomainEntity.addExpense(expense.getId()));
         }

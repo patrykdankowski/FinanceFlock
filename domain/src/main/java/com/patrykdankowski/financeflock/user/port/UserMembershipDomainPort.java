@@ -8,7 +8,7 @@ public interface UserMembershipDomainPort {
 
     void leaveBudgetGroup(final UserDomainEntity userFromContext,
                           final BudgetGroupDomainEntity budgetGroup,
-                          final Long id);
+                          final boolean hasRole, final Long id);
 
     boolean toggleShareData(final UserDomainEntity userFromContext);
 

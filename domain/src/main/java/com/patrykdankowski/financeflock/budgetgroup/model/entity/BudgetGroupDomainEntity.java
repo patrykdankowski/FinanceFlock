@@ -1,9 +1,19 @@
 package com.patrykdankowski.financeflock.budgetgroup.model.entity;
 
+import lombok.ToString;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@ToString
 public class BudgetGroupDomainEntity {
+
+    public static BudgetGroupDomainEntity buildBudgetGroup(final Long id,
+    final String description,
+    final Long ownerId) {
+
+        return new BudgetGroupDomainEntity(id, description, ownerId);
+    }
 
 
     private Long id;
@@ -14,6 +24,8 @@ public class BudgetGroupDomainEntity {
 
     private Set<Long> listOfMembersId = new HashSet<>();
 
+    private Set<Long> listOfCategoriesId = new HashSet<>();
+
     public void updateInfo(String description) {
         if (description != null && !description.isBlank()) {
             this.description = description;
@@ -21,6 +33,13 @@ public class BudgetGroupDomainEntity {
     }
 
     public void updateListOfMembers(Set<Long> listOfIds) {
+        listOfIds.forEach(element -> {
+            if (element > 0) {
+                this.listOfMembersId.add(element);
+            }
+        });
+    }
+    public void updateListOfCategories(Set<Long> listOfIds) {
         listOfIds.forEach(element -> {
             if (element > 0) {
                 this.listOfMembersId.add(element);
@@ -38,8 +57,19 @@ public class BudgetGroupDomainEntity {
         }
     }
 
+    public void addCategory(Long categoryId) {
+        if (categoryId > 0) {
+           listOfCategoriesId.add(categoryId);
+        }
+    }
+    public void removeCategory(Long categoryId) {
+        if (categoryId > 0) {
+            this.listOfCategoriesId.remove(categoryId);
+        }
+    }
 
-    public BudgetGroupDomainEntity(final Long id,
+
+    private BudgetGroupDomainEntity(final Long id,
                                    final String description,
                                    final Long ownerId) {
         this.id = id;
@@ -64,6 +94,10 @@ public class BudgetGroupDomainEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public Set<Long> getListOfCategoriesId() {
+        return listOfCategoriesId;
     }
 
 }

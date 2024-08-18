@@ -25,44 +25,37 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
     }
 
     @Override
-    public void addUserToGroup(final UserDomainEntity potentialGroupOwner,
+    public void addUserToGroup(
                                final UserDomainEntity userToAdd,
-                               final Long givenGroupId,
                                final BudgetGroupDomainEntity budgetGroup) {
 
-        budgetGroupValidator.validateGroupForPotentialOwner(potentialGroupOwner, givenGroupId, budgetGroup);
-        userValidator.hasGivenRole(potentialGroupOwner, Role.GROUP_ADMIN);
         budgetGroupValidator.validateSizeOfGroup(budgetGroup);
 
-        boolean hasRole = userValidator.hasGivenRole(userToAdd, Role.USER);
-        boolean GroupIsNull = userValidator.groupIsNull(userToAdd);
-
-        if (hasRole && GroupIsNull) {
-            budgetGroup.addUser(userToAdd.getId());
-            userToAdd.manageGroupMembership(budgetGroup.getId(), Role.GROUP_MEMBER);
-        }
-
+        budgetGroup.addUser(userToAdd.getId());
+        userToAdd.manageGroupMembership(budgetGroup.getId(), Role.GROUP_MEMBER);
     }
 
 
-    @Override
-    public void removeUserFromGroup(final UserDomainEntity potentialOwner,
-                                    final UserDomainEntity userToRemove,
-                                    final BudgetGroupDomainEntity budgetGroup,
-                                    final Long givenGroupId) {
-
-        budgetGroupValidator.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
-        userValidator.hasGivenRole(potentialOwner, Role.GROUP_ADMIN);
 
 
-        boolean hasRole = userValidator.hasGivenRole(userToRemove, Role.GROUP_MEMBER);
-        boolean GroupIsNull = userValidator.groupIsNull(userToRemove);
+@Override
+public void removeUserFromGroup(final UserDomainEntity potentialOwner,
+                                final UserDomainEntity userToRemove,
+                                final BudgetGroupDomainEntity budgetGroup,
+                                final Long givenGroupId) {
 
-        if (hasRole && !GroupIsNull) {
-            budgetGroup.removeUser(userToRemove.getId());
-            userToRemove.manageGroupMembership(null, Role.USER);
-        }
+    budgetGroupValidator.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
+    userValidator.hasGivenRole(potentialOwner, Role.GROUP_ADMIN);
 
 
+    boolean hasRole = userValidator.hasGivenRole(userToRemove, Role.GROUP_MEMBER);
+    boolean GroupIsNull = userValidator.groupIsNull(userToRemove);
+
+    if (hasRole && !GroupIsNull) {
+        budgetGroup.removeUser(userToRemove.getId());
+        userToRemove.manageGroupMembership(null, Role.USER);
     }
+
+
+}
 }

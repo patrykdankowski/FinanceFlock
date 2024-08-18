@@ -22,7 +22,7 @@ public class UserFactoryAdapter implements UserFactoryPort {
     public UserDomainEntity createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest) {
 
 
-        UserDomainEntity userDomainEntity = new UserDomainEntity(null,
+        UserDomainEntity userDomainEntity = UserDomainEntity.buildUser(null,
                 registerDtoRequest.getName(),
                 passwordEncoder.encode(registerDtoRequest.getPassword()),
                 registerDtoRequest.getEmail(),
