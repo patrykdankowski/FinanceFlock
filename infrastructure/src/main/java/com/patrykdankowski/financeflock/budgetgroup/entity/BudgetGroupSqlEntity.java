@@ -1,10 +1,19 @@
 package com.patrykdankowski.financeflock.budgetgroup.entity;
 
-import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.expense_category.entity.ExpenseCategorySqlEntity;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,11 +35,11 @@ public class BudgetGroupSqlEntity {
     @JoinColumn(name = "owner_id")
     private UserSqlEntity owner;
 
-    @OneToMany(mappedBy = "budgetGroup", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "budgetGroup", fetch = FetchType.LAZY)
     private Set<UserSqlEntity> listOfMembers = new HashSet<>();
 
-    @OneToMany(mappedBy = "budgetGroup",  fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private Set<ExpenseCategorySqlEntity> listOfCategories = new HashSet<>();
+//    @OneToMany(mappedBy = "budgetGroup",  fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+//    private Set<ExpenseCategorySqlEntity> listOfCategories = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -64,12 +73,12 @@ public class BudgetGroupSqlEntity {
         this.listOfMembers = listOfMembers;
     }
 
-    public Set<ExpenseCategorySqlEntity> getListOfCategories() {
-        return listOfCategories;
-    }
-
-    public void setListOfCategories(final Set<ExpenseCategorySqlEntity> listOfCategories) {
-        this.listOfCategories = listOfCategories;
-    }
+//    public Set<ExpenseCategorySqlEntity> getListOfCategories() {
+//        return listOfCategories;
+//    }
+//
+//    public void setListOfCategories(final Set<ExpenseCategorySqlEntity> listOfCategories) {
+//        this.listOfCategories = listOfCategories;
+//    }
 }
 

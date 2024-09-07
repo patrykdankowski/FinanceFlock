@@ -27,24 +27,38 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         boolean isPasswordValid = hasUpperCase && hasSpecialChar && hasDigit && isLongEnough;
 
         List<String> errorMessages = new ArrayList<>();
+//        List<String> errorMessages = new ArrayList<>();
 
         if (!isLongEnough) {
-            errorMessages.add("Password must be at least 10 characters long. ");
+            errorMessages.add("10 characters long");
         }
         if (!hasSpecialChar) {
-            errorMessages.add("Password must contain at least 1 special character. ");
+
+            errorMessages.add("1 special character");
         }
         if (!hasDigit) {
-            errorMessages.add("Password must contain at least 1 digit. ");
+
+            errorMessages.add("1 digit");
         }
         if (!hasUpperCase) {
-            errorMessages.add("Password must contain at least 1 uppercase letter. ");
+
+            errorMessages.add("1 uppercase letter");
         }
 
         if (!errorMessages.isEmpty()) {
-            throw new PasswordValidationException(errorMessages);
-        }
 
-        return isPasswordValid;
+            StringBuilder combinedErrorMessages = new StringBuilder();
+            combinedErrorMessages.append("Password must contain at least ");
+            for (int i = 0; i < errorMessages.size(); i++) {
+
+                combinedErrorMessages.append(errorMessages.get(i));
+                if (i < errorMessages.size() - 1) {
+                    combinedErrorMessages.append(", ");
+
+                }
+            }
+            throw new PasswordValidationException(combinedErrorMessages.toString());
+        }
+        return true;
     }
 }

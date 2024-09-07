@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProviderPort jwtTokenProvider;
     private final UserDetailsService userDetailsService;
@@ -30,7 +32,6 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         try {
             String token = getTokenFromRequest(request);
             if (StringUtils.hasText(token) && jwtTokenProvider.validateJwtToken(token)) {
@@ -45,6 +46,7 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
+
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

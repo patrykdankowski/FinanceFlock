@@ -1,8 +1,8 @@
 package com.patrykdankowski.financeflock.user.adapter;
 
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.user.model.record.UserRegisterVO;
 import com.patrykdankowski.financeflock.user.port.UserFactoryPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,13 +19,13 @@ public class UserFactoryAdapter implements UserFactoryPort {
     }
 
     @Override
-    public UserDomainEntity createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest) {
+    public UserDomainEntity createUserFromVO(UserRegisterVO registerDto) {
 
 
         UserDomainEntity userDomainEntity = UserDomainEntity.buildUser(null,
-                registerDtoRequest.getName(),
-                passwordEncoder.encode(registerDtoRequest.getPassword()),
-                registerDtoRequest.getEmail(),
+                registerDto.name(),
+                passwordEncoder.encode(registerDto.password()),
+                registerDto.email(),
                 LocalDateTime.now());
 
         userDomainEntity.changeRole(Role.USER);

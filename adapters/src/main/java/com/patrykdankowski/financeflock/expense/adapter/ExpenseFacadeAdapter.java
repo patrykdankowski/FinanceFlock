@@ -2,12 +2,13 @@ package com.patrykdankowski.financeflock.expense.adapter;
 
 import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity;
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
+import com.patrykdankowski.financeflock.expense.model.vo.AmountVO;
 import com.patrykdankowski.financeflock.expense.port.ExpenseCommandServicePort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFacadePort;
 import com.patrykdankowski.financeflock.external_api.ExpenseGeolocationServicePort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseManagementDomainPort;
-import com.patrykdankowski.financeflock.expense.model.vo.ExpenseValueObject;
+import com.patrykdankowski.financeflock.expense.model.vo.ExpenseCreateVO;
 import com.patrykdankowski.financeflock.expense.port.ExpenseValidatorPort;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
@@ -46,22 +47,22 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 
 
     @Override
-    public Long createExpense(final ExpenseDto expenseDto, final String userIp) {
+    public Long createExpense(final ExpenseCreateDto expenseCreateDto, final String userIp) {
 
         final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
 
 
 //        final ExpenseDtoWriteModel expenseDtoValidated = expenseGeolocationService.prepareExpense(expenseDtoWriteModel, userIp);
-        prepareExpenseIfLocationIsNull(expenseDto, userIp);
+        prepareExpenseIfLocationIsNull(expenseCreateDto, userIp);
 
-        ExpenseValueObject expenseValueObject = new ExpenseValueObject(
-                expenseDto.getDescription(),
-                expenseDto.getAmount(),
-                expenseDto.getLocation(),
-                expenseDto.getExpenseDate()
+        ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
+                expenseCreateDto.getDescription(),
+                new AmountVO(expenseCreateDto.getAmount()),
+                expenseCreateDto.getLocation(),
+                expenseCreateDto.getExpenseDate()
         );
 
-        final ExpenseDomainEntity expenseDomainEntity = expenseManagementDomain.createExpense(expenseValueObject,
+        final ExpenseDomainEntity expenseDomainEntity = expenseManagementDomain.createExpense(expenseCreateVO,
                 loggedUser);
 
         final ExpenseDomainEntity savedExpense = expenseCommandService.saveExpense(expenseDomainEntity);
@@ -77,7 +78,7 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
     }
 
     @Override
-    public void updateExpense(final Long id,final ExpenseDto expenseSourceDto) {
+    public void updateExpense(final Long id, final ExpenseCreateDto expenseSourceDto) {
         final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
 
@@ -87,14 +88,14 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 
         expenseValidator.validateAccessToExpense(loggedUser, userFromGivenIdExpense, expenseById);
 
-        ExpenseValueObject expenseValueObject = new ExpenseValueObject(
+        ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
                 expenseSourceDto.getDescription(),
-                expenseSourceDto.getAmount(),
+                new AmountVO(expenseSourceDto.getAmount()),
                 expenseSourceDto.getLocation(),
                 expenseSourceDto.getExpenseDate()
         );
 
-        expenseManagementDomain.updateExpense(expenseValueObject, expenseById);
+        expenseManagementDomain.updateExpense(expenseCreateVO, expenseById);
 
         // connection between user and expense already exists so we don't have to save user separately
 
@@ -116,9 +117,9 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 
     }
 
-    private void prepareExpenseIfLocationIsNull(final ExpenseDto expenseDto, final String userIp) {
-        if (expenseDto.getLocation() == null || expenseDto.getLocation().isEmpty()) {
-            expenseGeolocationService.setLocationForExpenseFromUserIp(expenseDto, userIp);
+    private void prepareExpenseIfLocationIsNull(final ExpenseCreateDto expenseCreateDto, final String userIp) {
+        if (expenseCreateDto.getLocation() == null || expenseCreateDto.getLocation().isEmpty()) {
+            expenseGeolocationService.setLocationForExpenseFromUserIp(expenseCreateDto, userIp);
 
         }
     }

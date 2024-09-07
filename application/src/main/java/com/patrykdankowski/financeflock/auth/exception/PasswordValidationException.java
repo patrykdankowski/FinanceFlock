@@ -1,15 +1,13 @@
 package com.patrykdankowski.financeflock.auth.exception;
 
-import java.util.List;
- public class PasswordValidationException extends  RuntimeException{
-    private final List<String> errorMessage;
+public class PasswordValidationException extends RuntimeException {
+    private final String errorMessage;
 
-    public PasswordValidationException(List<String> errorMessage) {
-        super(errorMessage.toString());
+    public PasswordValidationException(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 
-    List<String> getErrorMessage() {
+    public String getErrorMessage() {
         return errorMessage;
     }
 }

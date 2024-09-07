@@ -9,8 +9,8 @@ import java.util.Set;
 public class BudgetGroupDomainEntity {
 
     public static BudgetGroupDomainEntity buildBudgetGroup(final Long id,
-    final String description,
-    final Long ownerId) {
+                                                           final String description,
+                                                           final Long ownerId) {
 
         return new BudgetGroupDomainEntity(id, description, ownerId);
     }
@@ -39,6 +39,7 @@ public class BudgetGroupDomainEntity {
             }
         });
     }
+
     public void updateListOfCategories(Set<Long> listOfIds) {
         listOfIds.forEach(element -> {
             if (element > 0) {
@@ -46,22 +47,25 @@ public class BudgetGroupDomainEntity {
             }
         });
     }
-    public void addUser(Long userId){
-        if(userId > 0){
+
+    public void addUser(Long userId) {
+        if (userId > 0 && !listOfMembersId.contains(userId)) {
             listOfMembersId.add(userId);
         }
     }
+
     public void removeUser(Long userId) {
-        if(userId > 0){
+        if (userId > 0 && listOfMembersId.contains(userId)) {
             listOfMembersId.remove(userId);
         }
     }
 
     public void addCategory(Long categoryId) {
         if (categoryId > 0) {
-           listOfCategoriesId.add(categoryId);
+            listOfCategoriesId.add(categoryId);
         }
     }
+
     public void removeCategory(Long categoryId) {
         if (categoryId > 0) {
             this.listOfCategoriesId.remove(categoryId);
@@ -70,8 +74,8 @@ public class BudgetGroupDomainEntity {
 
 
     private BudgetGroupDomainEntity(final Long id,
-                                   final String description,
-                                   final Long ownerId) {
+                                    final String description,
+                                    final Long ownerId) {
         this.id = id;
         this.description = description;
         this.ownerId = ownerId;

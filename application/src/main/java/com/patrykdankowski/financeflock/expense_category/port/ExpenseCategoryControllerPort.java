@@ -5,6 +5,6 @@ import com.patrykdankowski.financeflock.expense_category.dto.ExpenseCategoryDto;
 public interface ExpenseCategoryControllerPort {
 
 
-    String createCategory(ExpenseCategoryDto expenseCategoryDto);
+//    String createCategory(ExpenseCategoryDto expenseCategoryDto);
 
 }

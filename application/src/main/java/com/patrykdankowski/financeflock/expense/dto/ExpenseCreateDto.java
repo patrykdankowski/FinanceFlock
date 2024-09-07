@@ -2,26 +2,22 @@ package com.patrykdankowski.financeflock.expense.dto;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-public class ExpenseDto {
-    @Length(min = 2)
-    @NotBlank(groups = onCreate.class)
+public class ExpenseCreateDto {
+
+    @NotBlank
     private String description;
-    @Digits(groups = onCreate.class, integer = 7, fraction = 2)
     private BigDecimal amount;
+    @NotBlank
     private String location;
     private LocalDateTime expenseDate;
 
     public interface onCreate {
     }
-
-//    public interface onUpdate {
-//    }
 
 
     public String getDescription() {

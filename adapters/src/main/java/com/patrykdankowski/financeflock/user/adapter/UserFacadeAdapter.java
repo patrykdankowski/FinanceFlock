@@ -25,7 +25,8 @@ import org.springframework.stereotype.Service;
     UserFacadeAdapter(final BudgetGroupCommandServicePort budgetGroupCommandService,
                       final UserMembershipDomainPort userMembershipDomain,
                       final UserCommandServicePort userCommandService,
-                      final AuthenticationServicePort authenticationService, final UserValidatorPort userValidator) {
+                      final AuthenticationServicePort authenticationService,
+                      final UserValidatorPort userValidator) {
         this.budgetGroupCommandService = budgetGroupCommandService;
         this.userMembershipDomain = userMembershipDomain;
         this.userCommandService = userCommandService;
@@ -61,6 +62,4 @@ import org.springframework.stereotype.Service;
 
         return isSharingData;
     }
-
-
 }

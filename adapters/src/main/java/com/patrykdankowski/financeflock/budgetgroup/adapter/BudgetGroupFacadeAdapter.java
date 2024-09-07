@@ -4,6 +4,7 @@ import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupDto;
 import com.patrykdankowski.financeflock.budgetgroup.dto.EmailDto;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.SelfManagementInGroupException;
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.model.record.BudgetGroupDescription;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupCommandServicePort;
@@ -36,7 +37,8 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
                              final BudgetGroupCommandServicePort budgetGroupCommandService,
                              final AuthenticationServicePort authenticationService,
                              final BudgetGroupManagementDomainPort budgetGroupManagementDomain,
-                             final UserValidatorPort userValidator, final BudgetGroupValidatorAdapter budgetGroupValidator) {
+                             final UserValidatorPort userValidator,
+                             final BudgetGroupValidatorAdapter budgetGroupValidator) {
         this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
         this.authenticationService = authenticationService;
         this.userCommandService = userCommandService;
@@ -56,7 +58,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
         final BudgetGroupDescription budgetGroupDescription = new BudgetGroupDescription(budgetGroupDto.getDescription());
 
-        boolean isAbleToCreateGroup = isNotMemberOfAnyGroup(loggedUser);
+        boolean isAbleToCreateGroup = budgetGroupValidator.isNotMemberOfAnyGroup(loggedUser);
 
         if (isAbleToCreateGroup) {
             final BudgetGroupDomainEntity createdDomainGroup = budgetGroupManagementDomain.createBudgetGroup(budgetGroupDescription, loggedUser.getId());
@@ -94,7 +96,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 //        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
-        validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
+        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
 
         //TODO getListOfMembersId().stream().toList()) - czy warto do osobnej metody
         List<UserDomainEntity> listOfUsers = getUsersFromGroup(budgetGroupById);
@@ -108,13 +110,12 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
     }
 
-    private void validateIfUserIsAdmin(final UserDomainEntity loggedUser,
-                                       final Long id, final BudgetGroupDomainEntity budgetGroup) {
-
-        budgetGroupValidator.validateGroupForPotentialOwner(loggedUser, id, budgetGroup);
-
-        userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
-    }
+//    private void validateIfUserIsAdmin(final UserDomainEntity loggedUser,
+//                                       final Long id, final BudgetGroupDomainEntity budgetGroup) {
+//
+//        budgetGroupValidator.validateGroupForPotentialOwner(loggedUser, id, budgetGroup);
+//        userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
+//    }
 
     private void saveEntities(final BudgetGroupDomainEntity budgetGroupFromLoggedUser, final List<UserDomainEntity> mappedEntities) {
         budgetGroupCommandService.deleteBudgetGroup(budgetGroupFromLoggedUser);
@@ -125,12 +126,12 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         return userCommandService.listOfUsersFromIds(budgetGroupFromLoggedUser.getListOfMembersId().stream().toList());
     }
 
-    private BudgetGroupDomainEntity retrieveBudgetGroupFromUser(final UserDomainEntity loggedUser) {
-        Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
-
-        BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(groupIdFromLoggedUser);
-        return budgetGroupFromLoggedUser;
-    }
+//    private BudgetGroupDomainEntity retrieveBudgetGroupFromUser(final UserDomainEntity loggedUser) {
+//        Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
+//
+//        BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(groupIdFromLoggedUser);
+//        return budgetGroupFromLoggedUser;
+//    }
 
     @Transactional
     @Override
@@ -139,28 +140,52 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         log.info("Starting process to add user to group");
         UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        UserDomainEntity userToAdd = getUserFromEmail(email);
 
+        if (loggedUser.getId().equals(userToAdd.getId())) {
+            throw new SelfManagementInGroupException("You cannot add yourself to the group where you are already an admin.");
+        }
 //        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
-        validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
-        UserDomainEntity userToAdd = getUserFromEmail(email);
+        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
 
 
-        boolean isAbleToJoinGroup = isNotMemberOfAnyGroup(userToAdd);
+        budgetGroupMembershipDomain.addUserToGroup(userToAdd, budgetGroupById);
 
-        if (isAbleToJoinGroup) {
-            budgetGroupMembershipDomain.addUserToGroup(userToAdd, budgetGroupById);
-
-            saveGroupAndUser(budgetGroupById, userToAdd);
-
-        } else {
-            log.warn("User is not able to join budget group");
-            throw new BudgetGroupValidationException("Cannot add user to budget group" +
-                    " because user is already member of some group");
-        }
+        saveGroupAndUser(budgetGroupById, userToAdd);
 
     }
+//    @Transactional
+//    @Override
+//    public void addUserToGroup(final EmailDto email,
+//                               final Long id) {
+//
+//        log.info("Starting process to add user to group");
+//        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+//
+////        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
+//        BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
+//
+//        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
+//
+//        UserDomainEntity userToAdd = getUserFromEmail(email);
+//
+//
+//        boolean isAbleToJoinGroup = budgetGroupValidator.isNotMemberOfAnyGroup(userToAdd);
+//
+//        if (isAbleToJoinGroup) {
+//            budgetGroupMembershipDomain.addUserToGroup(userToAdd, budgetGroupById);
+//
+//            saveGroupAndUser(budgetGroupById, userToAdd);
+//
+//        } else {
+//            log.warn("User is not able to join budget group");
+//            throw new BudgetGroupValidationException("Cannot add user to budget group" +
+//                    " because user is already member of some group");
+//        }
+//
+//    }
 
     private void saveGroupAndUser(final BudgetGroupDomainEntity budgetGroupFromLoggedUser, final UserDomainEntity userToAdd) {
         budgetGroupCommandService.saveBudgetGroup(budgetGroupFromLoggedUser);
@@ -181,12 +206,17 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         log.info("Starting process to remove user from group");
 
         UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        UserDomainEntity userToRemove = getUserFromEmail(email);
+
+        if (loggedUser.getId().equals(userToRemove.getId())) {
+            throw new SelfManagementInGroupException("You cannot remove yourself from the group. To leave the group, you need to close the group first.");
+        }
+
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
-        validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
+        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
 
-        UserDomainEntity userToRemove = getUserFromEmail(email);
-        boolean canBeRemovedFromGroup = isMemberOfGivenGroup(userToRemove, budgetGroupById);
+        boolean canBeRemovedFromGroup = budgetGroupValidator.isMemberOfGivenGroup(userToRemove, budgetGroupById);
 
         if (canBeRemovedFromGroup) {
             budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
@@ -206,20 +236,20 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
     }
 
-    private boolean isNotMemberOfAnyGroup(final UserDomainEntity loggedUser) {
+//    private boolean isNotMemberOfAnyGroup(final UserDomainEntity loggedUser) {
+//
+//        boolean hasRole = userValidator.hasGivenRole(loggedUser, Role.USER);
+//        boolean GroupIsNull = userValidator.groupIsNull(loggedUser);
+//        return hasRole && GroupIsNull;
+//    }
 
-        boolean hasRole = userValidator.hasGivenRole(loggedUser, Role.USER);
-        boolean GroupIsNull = userValidator.groupIsNull(loggedUser);
-        return hasRole && GroupIsNull;
-    }
-
-
-    private boolean isMemberOfGivenGroup(final UserDomainEntity user,
-                                         final BudgetGroupDomainEntity budgetGroup) {
-        boolean hasRole = userValidator.hasGivenRole(user, Role.GROUP_MEMBER);
-        boolean groupIsNullNotNull = !userValidator.groupIsNull(user);
-        boolean isMemberOfGroup = budgetGroupValidator.isMember(user, budgetGroup, user.getBudgetGroupId());
-        return hasRole && groupIsNullNotNull && isMemberOfGroup;
-    }
+//
+//    private boolean isMemberOfGivenGroup(final UserDomainEntity user,
+//                                         final BudgetGroupDomainEntity budgetGroup) {
+//        boolean hasRole = userValidator.hasGivenRole(user, Role.GROUP_MEMBER);
+//        boolean groupIsNullNotNull = !userValidator.groupIsNull(user);
+//        boolean isMemberOfGroup = budgetGroupValidator.isMember(user, budgetGroup, user.getBudgetGroupId());
+//        return hasRole && groupIsNullNotNull && isMemberOfGroup;
+//    }
 
 }

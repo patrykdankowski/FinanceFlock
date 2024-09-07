@@ -6,10 +6,14 @@ import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupControllerPo
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupFacadePort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryServicePort;
 import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
-import com.patrykdankowski.financeflock.user.model.record.UserDtoResponse;
+import com.patrykdankowski.financeflock.user.dto.UserLightDto;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +22,13 @@ import java.util.List;
 @RequestMapping("/budgetGroups")
 @RequiredArgsConstructor
 class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
+    private static final Logger log = LoggerFactory.getLogger(BudgetGroupControllerAdapter.class);
     private final BudgetGroupFacadePort budgetGroupFacade;
     private final BudgetGroupQueryServicePort budgetGroupQueryService;
 
     @Override
     @PostMapping("/create")
-//    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     @ResponseStatus(HttpStatus.CREATED)
     public String createBudgetGroup(@Valid @RequestBody BudgetGroupDto budgetGroupDto) {
         Long budgetGroupId = budgetGroupFacade.createBudgetGroup(budgetGroupDto);
@@ -32,7 +37,7 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
 
     @Override
     @DeleteMapping("/delete/{id}")
-//    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBudgetGroup(@PathVariable Long id) {
         budgetGroupFacade.closeBudgetGroup(id);
@@ -40,7 +45,7 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
 
     @Override
     @PostMapping("/addUser/{id}")
-//    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public String addUserToGroup(@PathVariable Long id,
                                  @Valid @RequestBody EmailDto emailDto) {
@@ -50,31 +55,36 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
 
     @Override
     @PostMapping("/removeUser/{id}")
-//    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public String removeUserFromGroup(@PathVariable Long id,
                                       @Valid @RequestBody EmailDto emailDto) {
+        log.info("1");
         budgetGroupFacade.removeUserFromGroup(emailDto, id);
         return "User successfully removed from group";
     }
 
     @Override
-    @GetMapping("/listOfMembers")
-//    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+    @GetMapping("/listOfMembers/{id}")
+    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDtoResponse> getListOfMembersInBudgetGroup() {
-        List<UserDtoResponse> list = budgetGroupQueryService.listOfUsersInGroup();
+    public List<UserLightDto> listOfMembers(Long id,
+                                            int page,
+                                            int size,
+                                            String sortBy,
+                                            String sortDirection) {
+        log.info("kontroler");
+        List<UserLightDto> list = budgetGroupQueryService.listOfUsersInGroup(id, page, size, sortBy, sortDirection);
         return list;
     }
 
     @Override
     @GetMapping("/list")
-//    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
+    @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDtoProjections> getList() {
+    public List<UserDtoProjections> listOfExpansesInGroup() {
 
-        List<UserDtoProjections> budgetGroupExpenses = budgetGroupQueryService.getBudgetGroupExpenses();
-        return budgetGroupExpenses;
+        return budgetGroupQueryService.getBudgetGroupExpenses();
 
     }
 

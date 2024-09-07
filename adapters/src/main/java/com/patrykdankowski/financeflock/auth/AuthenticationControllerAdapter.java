@@ -2,7 +2,7 @@ package com.patrykdankowski.financeflock.auth;
 
 import com.patrykdankowski.financeflock.auth.dto.JwtAuthenticationResponse;
 import com.patrykdankowski.financeflock.auth.dto.LoginDto;
-import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
+import com.patrykdankowski.financeflock.auth.dto.RegisterDto;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationControllerPort;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationFacadePort;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,14 @@ class AuthenticationControllerAdapter implements AuthenticationControllerPort {
     private final AuthenticationFacadePort authenticationFacade;
 
     public ResponseEntity<JwtAuthenticationResponse> login(LoginDto loginDto) {
-        String token = authenticationFacade.login(loginDto);
-        var response = new JwtAuthenticationResponse();
-        response.setToken(token);
+
+        final JwtAuthenticationResponse response = authenticationFacade.login(loginDto);
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<String> register(RegisterDtoRequest registerDtoRequest) {
-        String response = authenticationFacade.register(registerDtoRequest);
+    public ResponseEntity<String> register(RegisterDto registerDto) {
+
+        final String response = authenticationFacade.register(registerDto);
         return ResponseEntity.ok(response);
     }
 

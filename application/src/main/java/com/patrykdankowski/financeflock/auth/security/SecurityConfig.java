@@ -39,7 +39,7 @@ class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/users/test").authenticated()
+                                .requestMatchers("/budgetGroups/**").permitAll()
                                 .anyRequest().permitAll())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)

@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 
 
 @EqualsPassword
-public class RegisterDtoRequest {
+public class RegisterDto {
 
     @NotNull(message = "Name cannot be null")
     @Size(min = 3, message = "Name should be at least 3 letters")

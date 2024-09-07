@@ -19,7 +19,6 @@ class BudgetGroupCommandServiceAdapter implements BudgetGroupCommandServicePort 
 
     @Override
     public BudgetGroupDomainEntity saveBudgetGroup(final BudgetGroupDomainEntity budgetGroupDomainEntity) {
-        log.info("grupa");
         return budgetGroupCommandRepository.save(budgetGroupDomainEntity);
     }
 

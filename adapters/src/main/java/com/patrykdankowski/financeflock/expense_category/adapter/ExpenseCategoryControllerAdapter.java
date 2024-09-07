@@ -27,24 +27,24 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 class ExpenseCategoryControllerAdapter implements ExpenseCategoryControllerPort {
-
-    private final AuthenticationServicePort authenticationService;
-    private final ExpenseCategoryFacadePort expenseCategoryFacade;
-    private final BudgetGroupCommandServicePort budgetGroupCommandService;
-
-
-    @Override
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
-    public String createCategory(@Valid @RequestBody ExpenseCategoryDto expenseCategoryDto) {
-
-        final Long categoryId = expenseCategoryFacade.createCategory(expenseCategoryDto);
-        return String.format("Category created with id %d", categoryId);
-    }
-
-    @GetMapping("/list/{id}")
-    public Set<Long> listAllCategories(@PathVariable Long id) {
-        final BudgetGroupDomainEntity budgetGroup = budgetGroupCommandService.findBudgetGroupById(id);
-        return budgetGroup.getListOfCategoriesId();
-    }
+//
+//    private final AuthenticationServicePort authenticationService;
+//    private final ExpenseCategoryFacadePort expenseCategoryFacade;
+//    private final BudgetGroupCommandServicePort budgetGroupCommandService;
+//
+//
+//    @Override
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @PostMapping("/create")
+//    public String createCategory(@Valid @RequestBody ExpenseCategoryDto expenseCategoryDto) {
+//
+//        final Long categoryId = expenseCategoryFacade.createCategory(expenseCategoryDto);
+//        return String.format("Category created with id %d", categoryId);
+//    }
+//
+//    @GetMapping("/list/{id}")
+//    public Set<Long> listAllCategories(@PathVariable Long id) {
+//        final BudgetGroupDomainEntity budgetGroup = budgetGroupCommandService.findBudgetGroupById(id);
+//        return budgetGroup.getListOfCategoriesId();
+//    }
 }

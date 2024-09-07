@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.expense.adapter;
 
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import com.patrykdankowski.financeflock.expense.port.ExpenseControllerPort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFacadePort;
 import com.patrykdankowski.financeflock.external_api.ExpenseGeolocationServicePort;
@@ -24,11 +24,11 @@ class ExpenseControllerAdapter implements ExpenseControllerPort {
     @Override
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addExpense(@Validated(ExpenseDto.onCreate.class) @Valid @RequestBody ExpenseDto expenseDto,
+    public String addExpense(@Validated(ExpenseCreateDto.onCreate.class) @Valid @RequestBody ExpenseCreateDto expenseCreateDto,
                              HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);
-        final long expenseId = expenseFacade.createExpense(expenseDto, userIp);
+        final long expenseId = expenseFacade.createExpense(expenseCreateDto, userIp);
 
         return String.format("Expense created with id %d", expenseId);
 
@@ -38,9 +38,9 @@ class ExpenseControllerAdapter implements ExpenseControllerPort {
     @PatchMapping("/update/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String updateExpense(@PathVariable Long id,
-                                @RequestBody ExpenseDto expenseDto) {
+                                @RequestBody ExpenseCreateDto expenseCreateDto) {
 
-        expenseFacade.updateExpense(id, expenseDto);
+        expenseFacade.updateExpense(id, expenseCreateDto);
         return "Resource updated";
     }
 

@@ -19,6 +19,8 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
 
     UserCommandServiceAdapter(final UserCommandRepositoryPort userCommandRepository) {
         this.userCommandRepository = userCommandRepository;
+
+
     }
 
     @Override
@@ -66,5 +68,6 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     public List<UserDomainEntity> listOfUsersFromIds(final List<Long> userIds) {
         return userCommandRepository.findAllByIdIn(userIds);
     }
+
 
 }

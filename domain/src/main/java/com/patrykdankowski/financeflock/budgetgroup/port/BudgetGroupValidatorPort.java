@@ -17,4 +17,11 @@ public interface BudgetGroupValidatorPort {
 
 
     void validateSizeOfGroup(BudgetGroupDomainEntity budgetGroup);
+
+    boolean isMemberOfGivenGroup(final UserDomainEntity user, final BudgetGroupDomainEntity budgetGroup);
+
+    boolean isNotMemberOfAnyGroup(final UserDomainEntity loggedUser);
+
+    void validateIfUserIsAdmin(final UserDomainEntity loggedUser,
+                               final Long id, final BudgetGroupDomainEntity budgetGroup);
 }

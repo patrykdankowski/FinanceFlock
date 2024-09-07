@@ -1,9 +1,9 @@
 package com.patrykdankowski.financeflock.user.port;
 
-import com.patrykdankowski.financeflock.auth.dto.RegisterDtoRequest;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.user.model.record.UserRegisterVO;
 
 public interface UserFactoryPort {
 
-    UserDomainEntity createUserFromRegisterRequest(RegisterDtoRequest registerDtoRequest);
+    UserDomainEntity createUserFromVO(UserRegisterVO registerDto);
 }

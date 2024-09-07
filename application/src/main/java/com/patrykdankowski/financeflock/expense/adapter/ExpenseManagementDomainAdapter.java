@@ -3,11 +3,9 @@ package com.patrykdankowski.financeflock.expense.adapter;
 import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFactoryPort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseManagementDomainPort;
-import com.patrykdankowski.financeflock.expense.model.vo.ExpenseValueObject;
+import com.patrykdankowski.financeflock.expense.model.vo.ExpenseCreateVO;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import org.springframework.stereotype.Service;
-
-import static com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity.buildExpense;
 
 @Service
 class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
@@ -20,15 +18,15 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
 
 
     @Override
-    public ExpenseDomainEntity createExpense(final ExpenseValueObject expenseValueObject,
+    public ExpenseDomainEntity createExpense(final ExpenseCreateVO expenseCreateVO,
                                              final UserDomainEntity userFromContext) {
         return expenseFactory.createExpanseFromRequest(
                 null,
                 userFromContext.getId(),
-                expenseValueObject.getAmount(),
-                expenseValueObject.getExpenseDate(),
-                expenseValueObject.getDescription(),
-                expenseValueObject.getLocation());
+                expenseCreateVO.amountVO().value(),
+                expenseCreateVO.expenseDate(),
+                expenseCreateVO.description(),
+                expenseCreateVO.location());
 
 //        return buildExpense(null,
 //                userFromContext.getId(),
@@ -40,12 +38,12 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
     }
 
     @Override
-    public void updateExpense(final ExpenseValueObject expenseValueObject,
+    public void updateExpense(final ExpenseCreateVO expenseCreateVO,
                               final ExpenseDomainEntity expenseDomainEntity) {
-        expenseDomainEntity.updateInfo(expenseValueObject.getAmount(),
-                expenseValueObject.getExpenseDate(),
-                expenseValueObject.getDescription(),
-                expenseValueObject.getLocation());
+        expenseDomainEntity.updateInfo(expenseCreateVO.amountVO().value(),
+                expenseCreateVO.expenseDate(),
+                expenseCreateVO.description(),
+                expenseCreateVO.location());
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface BudgetGroupQueryRepositoryPort {
 
-    Optional<BudgetGroupDomainEntity> findBudgetGroupById(long id);
+    Optional<BudgetGroupDomainEntity> findBudgetGroupById(Long id);
 
 
 }

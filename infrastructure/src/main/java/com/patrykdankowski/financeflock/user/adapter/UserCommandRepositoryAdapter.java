@@ -1,5 +1,6 @@
 package com.patrykdankowski.financeflock.user.adapter;
 
+import com.patrykdankowski.financeflock.mapper.UserDtoMapper;
 import com.patrykdankowski.financeflock.mapper.UserMapper;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long> {
 
     Optional<UserSqlEntity> findByEmail(String email);
-//
+
+    //
 //    Optional<UserSqlEntity> findById(Long id);
 //
 //    UserSqlEntity save(UserSqlEntity user);
@@ -25,7 +27,8 @@ interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long
 //
     @Query("SELECT u FROM UserSqlEntity u WHERE u.id IN :ids")
     List<UserSqlEntity> findAllByIdIn(List<Long> ids);
-//
+
+    //
     boolean existsUserByEmail(String email);
 }
 
@@ -35,18 +38,17 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
     private final UserCommandRepositoryAdapter userCommandRepository;
     private final UserMapper mapper;
+    private final UserDtoMapper userDtoMapper;
 
     public UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
-                                     final UserMapper mapper) {
+                                     final UserMapper mapper,
+                                     final UserDtoMapper userDtoMapper) {
         this.userCommandRepository = userCommandRepository;
         this.mapper = mapper;
+        this.userDtoMapper = userDtoMapper;
     }
 
-    //    @Override
-//    public Optional<UserDomainEntity> findByEmail(String email) {
-//        return userCommandRepository.findByEmail(email)
-//                .map(UserSqlEntity::toDomainUser);
-//    }
+
     @Override
     public Optional<UserDomainEntity> findByEmail(String email) {
 
@@ -63,9 +65,7 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
     @Override
     public UserDomainEntity save(UserDomainEntity user) {
-        log.info("before saving");
-UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user));
-        log.info("after saving");
+        UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user));
         final UserDomainEntity domainEntity = mapper.toDomainEntity(sqlUserSaved);
 //        domainEntity.
         return domainEntity;
@@ -75,19 +75,15 @@ UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user)
     public List<UserDomainEntity> saveAll(List<UserDomainEntity> entities) {
         List<UserSqlEntity> usersSqlToSave = entities.stream()
                 .map(user -> {
-                    log.info("Mapping user to SQL entity: {}", user);
                     return mapper.toSqlEntity(user);
                 }).collect(Collectors.toList());
 
-        log.info("Mapping to SQL entities repo {}", usersSqlToSave);
 
         List<UserSqlEntity> saved = userCommandRepository.saveAll(usersSqlToSave);
 
-        log.info("After saving: {}", saved);
 
         return saved.stream()
                 .map(user -> {
-                    log.info("Mapping SQL entity to domain entity: {}", user);
                     return mapper.toDomainEntity(user);
                 }).collect(Collectors.toList());
     }
@@ -103,4 +99,8 @@ UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user)
     public boolean existsUserByEmail(String email) {
         return userCommandRepository.existsUserByEmail(email);
     }
+
+
+
+
 }

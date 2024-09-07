@@ -52,21 +52,20 @@ public class BudgetGroupMapper {
                     }
             ).collect(Collectors.toSet());
             budgetGroupSqlEntity.setListOfMembers(users);
-            Set<ExpenseCategorySqlEntity> sqlCategories = new HashSet<>();
-            if (domainEntity.getListOfCategoriesId() != null) {
-                sqlCategories = domainEntity.getListOfCategoriesId().stream().map(
-                        categoryId -> {
-                            ExpenseCategorySqlEntity categorySql = entityManager.find(ExpenseCategorySqlEntity.class, categoryId);
-                            if (categorySql != null) {
-                                categorySql.setBudgetGroup(budgetGroupSqlEntity);
-                            }
-                            return categorySql;
-                        }
-                ).collect(Collectors.toSet());
-            }
-            budgetGroupSqlEntity.setListOfCategories(sqlCategories);
+//            Set<ExpenseCategorySqlEntity> sqlCategories = new HashSet<>();
+//            if (domainEntity.getListOfCategoriesId() != null) {
+//                sqlCategories = domainEntity.getListOfCategoriesId().stream().map(
+//                        categoryId -> {
+//                            ExpenseCategorySqlEntity categorySql = entityManager.find(ExpenseCategorySqlEntity.class, categoryId);
+//                            if (categorySql != null) {
+//                                categorySql.setBudgetGroup(budgetGroupSqlEntity);
+//                            }
+//                            return categorySql;
+//                        }
+//                ).collect(Collectors.toSet());
+//            }
+//            budgetGroupSqlEntity.setListOfCategories(sqlCategories);
         }
-
 
         return budgetGroupSqlEntity;
     }
@@ -80,24 +79,27 @@ public class BudgetGroupMapper {
                 budgetGroupSql.getDescription(),
                 budgetGroupSql.getOwner().getId());
 
-        if (budgetGroupSql.getListOfCategories() != null) {
-
-            budgetGroupSql.getListOfCategories().forEach(
-                    category -> {
-                        domainEntity.addCategory(category.getId());
-                    }
-            );
-
-        }
+//        if (budgetGroupSql.getListOfCategories() != null) {
+//
+//            budgetGroupSql.getListOfCategories().forEach(
+//                    category -> {
+//                        domainEntity.addCategory(category.getId());
+//                    }
+//            );
+//
+//        }
+        log.info("before");
         if (budgetGroupSql.getListOfMembers() != null) {
-
+            log.info("przed dodawaniem");
             budgetGroupSql.getListOfMembers().forEach(
                     member -> {
+                        log.info("dodawanie usera");
                         domainEntity.addUser(member.getId());
                     }
             );
 
         }
+        log.info("after");
         return domainEntity;
     }
 }

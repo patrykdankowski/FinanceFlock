@@ -1,9 +1,13 @@
 package com.patrykdankowski.financeflock.user.port;
 
+import com.patrykdankowski.financeflock.user.dto.UserDetailsDto;
 import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
-import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.user.dto.UserLightDto;
+import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface UserQueryRepositoryPort {
@@ -18,6 +22,10 @@ public interface UserQueryRepositoryPort {
 //    @Query("SELECT u FROM User u WHERE u.id IN :ids")
 //    List<UserDomainEntity> findAllById(Set<Long> ids);
 
-    List<UserDomainEntity> findAllByIdIn(List<Long> ids);
+    List<UserLightDto> findAllByBudgetGroup_Id(Long budgetGroupId, final Pageable pageable);
+
+    Optional<SimpleUserDomainEntity> retrieveUserFromMail(String mail);
+
+    Optional<UserDetailsDto> retrieveUserFromEmail(String email);
 
 }

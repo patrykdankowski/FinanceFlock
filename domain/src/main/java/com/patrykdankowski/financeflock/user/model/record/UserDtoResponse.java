@@ -1,4 +1,6 @@
 package com.patrykdankowski.financeflock.user.model.record;
 
-public record UserDtoResponse(String name, String email) {
+import java.time.LocalDateTime;
+
+public record UserDtoResponse(String name, LocalDateTime lastLoggedInAt) {
 }

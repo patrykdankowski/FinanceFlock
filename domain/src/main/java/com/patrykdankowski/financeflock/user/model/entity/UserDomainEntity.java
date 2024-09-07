@@ -67,12 +67,14 @@ public class UserDomainEntity {
     }
 
     public void manageGroupMembership(Long budgetGroupId, Role role) {
-        if (budgetGroupId != null) {
+        if (budgetGroupId > 0) {
             this.budgetGroupId = budgetGroupId;
             this.role = role;
-        } else {
+        } else if (budgetGroupId == null) {
             this.budgetGroupId = null;
             this.role = Role.USER;
+        } else {
+            throw new IllegalStateException("Given id group is less than 0");
         }
     }
 

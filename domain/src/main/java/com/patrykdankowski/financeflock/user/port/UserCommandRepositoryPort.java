@@ -19,5 +19,4 @@ public interface UserCommandRepositoryPort {
 
     boolean existsUserByEmail(String email);
 
-
 }

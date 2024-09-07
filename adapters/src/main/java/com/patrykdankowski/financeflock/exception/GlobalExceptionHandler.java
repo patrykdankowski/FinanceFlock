@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.SelfManagementInGroupException;
 import com.patrykdankowski.financeflock.common.AppConstants;
 import com.patrykdankowski.financeflock.common.ErrorDetails;
 import com.patrykdankowski.financeflock.auth.exception.CustomJwtException;
@@ -13,6 +14,8 @@ import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
 import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotBelongToUserException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
+import com.patrykdankowski.financeflock.expense.exception.ExpenseValidationException;
+import com.patrykdankowski.financeflock.expense_category.exception.ExpenseCategoryNotFoundException;
 import com.patrykdankowski.financeflock.user.exception.UserAlreadyExistsException;
 import com.patrykdankowski.financeflock.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -75,7 +78,7 @@ class GlobalExceptionHandler {
 
 
         return setErrorDetails("Exception occurred during registration",
-                passwordValidationException.getMessage(),
+                passwordValidationException.getErrorMessage(),
                 HttpStatus.BAD_REQUEST);
 
     }
@@ -203,11 +206,42 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ErrorDuringFetchingLocationFromIpException.class)
-    ResponseEntity<ErrorDetails> handleException() {
+    ResponseEntity<ErrorDetails> handleExceptionDuringFetchingLocationFromUserIp() {
         return setErrorDetails("Exception occurred during fetching location from ip",
                 "Try again or simply enter a location name for given expense",
                 HttpStatus.BAD_GATEWAY);
     }
+
+    @ExceptionHandler(ExpenseCategoryNotFoundException.class)
+    ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseCategoryNotFoundException expenseCategoryNotFoundException) {
+        String message = String.format("Expense category with id %d, doesnt exist in our db", expenseCategoryNotFoundException.getId());
+
+        return setErrorDetails("Cannot find expense category",
+                message,
+                HttpStatus.CONFLICT);
+
+    }
+
+    @ExceptionHandler(ExpenseValidationException.class)
+    ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseValidationException expenseValidationException) {
+
+        return setErrorDetails("Cannot create expense",
+                expenseValidationException.getMessage(),
+                HttpStatus.CONFLICT);
+
+    }
+
+    @ExceptionHandler(SelfManagementInGroupException.class)
+    ResponseEntity<ErrorDetails> handleSelfManagementInGroupException(SelfManagementInGroupException selfManagementInGroupException) {
+
+        return setErrorDetails("Cannot add user to group",
+                selfManagementInGroupException.getExceptionDescription(),
+                HttpStatus.CONFLICT);
+
+    }
+
+
+
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ErrorDetails> handleException(Exception exception) {

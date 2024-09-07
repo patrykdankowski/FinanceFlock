@@ -1,10 +1,14 @@
 package com.patrykdankowski.financeflock.auth.dto;
 
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginDto {
+
+    @Email
     private String email;
+    @NotBlank
     private String password;
 
     public String getEmail() {

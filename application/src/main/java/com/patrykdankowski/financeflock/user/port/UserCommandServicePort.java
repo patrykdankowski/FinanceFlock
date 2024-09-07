@@ -5,9 +5,9 @@ import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import java.util.List;
 
 public interface UserCommandServicePort {
-   UserDomainEntity findUserByEmail(String email);
+    UserDomainEntity findUserByEmail(String email);
 
-   UserDomainEntity findUserById(Long id);
+    UserDomainEntity findUserById(Long id);
 
     void checkIfUserExists(String userEmail);
 
@@ -16,4 +16,5 @@ public interface UserCommandServicePort {
     List<UserDomainEntity> saveAllUsers(List<UserDomainEntity> users);
 
     List<UserDomainEntity> listOfUsersFromIds(List<Long> userIds);
+
 }

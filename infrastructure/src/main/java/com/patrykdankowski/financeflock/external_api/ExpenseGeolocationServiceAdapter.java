@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.external_api;
 
 import com.patrykdankowski.financeflock.expense.dto.ApiExpenseDto;
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,11 +35,11 @@ class ExpenseGeolocationServiceAdapter implements ExpenseGeolocationServicePort 
     }
 
     @Override
-    public void setLocationForExpenseFromUserIp(final ExpenseDto expenseDto,
+    public void setLocationForExpenseFromUserIp(final ExpenseCreateDto expenseCreateDto,
                                                 final String userIp) {
         try {
             String city = getLocationFromUserIp(userIp);
-            expenseDto.setLocation(city);
+            expenseCreateDto.setLocation(city);
         } catch (Exception e) {
             throw new ErrorDuringFetchingLocationFromIpException();
         }

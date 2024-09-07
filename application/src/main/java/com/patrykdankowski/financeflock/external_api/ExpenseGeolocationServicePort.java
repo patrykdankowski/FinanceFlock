@@ -1,6 +1,6 @@
 package com.patrykdankowski.financeflock.external_api;
 
-import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import jakarta.servlet.http.HttpServletRequest;
 
  public interface ExpenseGeolocationServicePort {
@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
     String getUserIpAddress(HttpServletRequest request);
 
 
-    void setLocationForExpenseFromUserIp(final ExpenseDto expenseDto,
+    void setLocationForExpenseFromUserIp(final ExpenseCreateDto expenseCreateDto,
                                          final String userIp);
 
 //    ExpenseDtoWriteModel prepareExpense(ExpenseDtoWriteModel expenseDtoWriteModel,

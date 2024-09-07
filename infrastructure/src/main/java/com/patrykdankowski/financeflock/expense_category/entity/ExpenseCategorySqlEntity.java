@@ -12,19 +12,19 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Table(name = "expense_categories")
-@Setter
-@Getter
+//@Entity
+//@Table(name = "expense_categories")
+//@Setter
+//@Getter
 public class ExpenseCategorySqlEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
-    private BudgetGroupSqlEntity budgetGroup;
-    private boolean defaultCategory;
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//    private String name;
+//    private boolean defaultCategory;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "group_id", nullable = true)
+//    private BudgetGroupSqlEntity budgetGroup;
 }

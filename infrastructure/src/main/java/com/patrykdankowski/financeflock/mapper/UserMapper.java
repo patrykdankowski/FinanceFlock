@@ -48,19 +48,20 @@ public class UserMapper {
                 log.warn("Budget group with id {} not found", userDomainEntity.getBudgetGroupId());
             }
         }
-        Set<ExpenseSqlEntity> sqlExpenses = new HashSet<>();
-        if (userDomainEntity.getExpenseListId() != null) {
-            sqlExpenses = userDomainEntity.getExpenseListId().stream()
-                    .map(expenseId -> {
-                                ExpenseSqlEntity expenseSql = entityManager.find(ExpenseSqlEntity.class, expenseId);
-                                if (expenseSql != null) {
-                                    expenseSql.setUser(userSqlEntity);
-                                }
-                                return expenseSql;
-                            }
-                    ).collect(Collectors.toSet());
-        }
-        userSqlEntity.setExpenseList(sqlExpenses);
+//        if (userDomainEntity.getExpenseListId() != null) {
+//            Set<ExpenseSqlEntity> sqlExpenses = new HashSet<>();
+//            sqlExpenses = userDomainEntity.getExpenseListId().stream()
+//                    .map(expenseId -> {
+//                                ExpenseSqlEntity expenseSql = entityManager.find(ExpenseSqlEntity.class, expenseId);
+//                                if (expenseSql != null) {
+//                                    expenseSql.setUser(userSqlEntity);
+//                                }
+//                                return expenseSql;
+//                            }
+//                    ).collect(Collectors.toSet());
+//
+//            userSqlEntity.setExpenseList(sqlExpenses);
+//        }
 
         log.info("Mapped to SQL entity: {}", userSqlEntity);
         return userSqlEntity;
@@ -71,7 +72,7 @@ public class UserMapper {
             return null;
         }
 
-        UserDomainEntity userDomainEntity =  UserDomainEntity.buildUser(userSqlEntity.getId(),
+        UserDomainEntity userDomainEntity = UserDomainEntity.buildUser(userSqlEntity.getId(),
                 userSqlEntity.getName(),
                 userSqlEntity.getPassword(),
                 userSqlEntity.getEmail(),

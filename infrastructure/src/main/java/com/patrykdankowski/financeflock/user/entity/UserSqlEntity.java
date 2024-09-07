@@ -31,8 +31,6 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
