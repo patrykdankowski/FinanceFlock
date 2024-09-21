@@ -11,5 +11,5 @@ public interface AuthenticationFacadePort {
 
     String register(RegisterDto registerDto);
 
-    void updateLastLoginAsync(Authentication authentication);
+//    void updateLastLoginAsync(Authentication authentication);
 }

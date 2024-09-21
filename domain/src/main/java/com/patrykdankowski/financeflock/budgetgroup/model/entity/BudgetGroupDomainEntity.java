@@ -32,6 +32,9 @@ public class BudgetGroupDomainEntity {
         }
     }
 
+
+
+
     public void updateListOfMembers(Set<Long> listOfIds) {
         listOfIds.forEach(element -> {
             if (element > 0) {

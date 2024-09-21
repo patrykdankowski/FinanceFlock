@@ -5,6 +5,7 @@ import com.patrykdankowski.financeflock.auth.dto.LoginDto;
 import com.patrykdankowski.financeflock.auth.dto.RegisterDto;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationFacadePort;
 import com.patrykdankowski.financeflock.auth.port.JwtTokenProviderPort;
+import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.model.record.UserLoginVO;
 import com.patrykdankowski.financeflock.user.model.record.UserRegisterVO;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
@@ -13,6 +14,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Driver;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -42,18 +46,15 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
     private final UserFactoryPort userFactory;
 
     @Override
+    @Transactional
     public JwtAuthenticationResponse login(LoginDto loginDto) {
 
         UserLoginVO userLoginVO = new UserLoginVO(loginDto.getEmail(),
                 loginDto.getPassword());
-        log.info("1");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 userLoginVO.email(), userLoginVO.password()));
-        log.info("2");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("3");
-
-//        updateLastLoginAsync(authentication);
+        updateLastLoginAsync(LocalDateTime.now(), userLoginVO.email());
         JwtAuthenticationResponse response = new JwtAuthenticationResponse();
         final String token = jwtTokenProvider.generateJwtToken(authentication);
         response.setToken(token);
@@ -62,6 +63,7 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
     }
 
     @Override
+    @Transactional
     public String register(RegisterDto registerDto) {
         userCommandService.checkIfUserExists(registerDto.getEmail());
 
@@ -71,21 +73,29 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
 
         var user = userFactory.createUserFromVO(userRegisterVO);
         userCommandService.saveUser(user);
+
+
         return "Registered";
     }
 
 
-    //    @Async = protected
-    @Override
-    public void updateLastLoginAsync(Authentication authentication) {
-        //TODO duplikacja kodu + zastanowić się czy warto asynchroniecznie
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
+    @Async
+    void updateLastLoginAsync(LocalDateTime now, String email) {
+        try {
+            userCommandService.updateLastLoggedInAt(now, email);
+        } catch (Exception e) {
+            log.error("Error updating last login time for user {}", email, e);
         }
-        String userMail = authentication.getName();
-        var user = userCommandService.findUserByEmail(userMail);
-        user.login();
-        userCommandService.saveUser(user);
-    }
 
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
+//        }
+//        String userMail = authentication.getName();
+//        var user = userCommandService.findUserByEmail(userMail);
+//        user.login();
+//        userCommandService.saveUser(user);
+//    }
+
+
+    }
 }

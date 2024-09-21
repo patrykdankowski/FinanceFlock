@@ -6,6 +6,7 @@ import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@Transactional
 public class UserMapper {
 
     private final EntityManager entityManager;
@@ -48,20 +50,20 @@ public class UserMapper {
                 log.warn("Budget group with id {} not found", userDomainEntity.getBudgetGroupId());
             }
         }
-//        if (userDomainEntity.getExpenseListId() != null) {
-//            Set<ExpenseSqlEntity> sqlExpenses = new HashSet<>();
-//            sqlExpenses = userDomainEntity.getExpenseListId().stream()
-//                    .map(expenseId -> {
-//                                ExpenseSqlEntity expenseSql = entityManager.find(ExpenseSqlEntity.class, expenseId);
-//                                if (expenseSql != null) {
-//                                    expenseSql.setUser(userSqlEntity);
-//                                }
-//                                return expenseSql;
-//                            }
-//                    ).collect(Collectors.toSet());
-//
-//            userSqlEntity.setExpenseList(sqlExpenses);
-//        }
+        if (userDomainEntity.getExpenseListId() != null) {
+            Set<ExpenseSqlEntity> sqlExpenses = new HashSet<>();
+            sqlExpenses = userDomainEntity.getExpenseListId().stream()
+                    .map(expenseId -> {
+                                ExpenseSqlEntity expenseSql = entityManager.find(ExpenseSqlEntity.class, expenseId);
+                                if (expenseSql != null) {
+                                    expenseSql.setUser(userSqlEntity);
+                                }
+                                return expenseSql;
+                            }
+                    ).collect(Collectors.toSet());
+
+            userSqlEntity.setExpenseList(sqlExpenses);
+        }
 
         log.info("Mapped to SQL entity: {}", userSqlEntity);
         return userSqlEntity;
@@ -90,6 +92,7 @@ public class UserMapper {
         }
         if (userSqlEntity.getExpenseList() != null) {
 
+            log.info("halo");
             userSqlEntity.getExpenseList().forEach(expense -> userDomainEntity.addExpense(expense.getId()));
         }
 

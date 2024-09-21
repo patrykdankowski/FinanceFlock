@@ -11,9 +11,13 @@ public interface BudgetGroupMembershipDomainPort {
             UserDomainEntity userToAdd,
             BudgetGroupDomainEntity budgetGroup);
 
-    void removeUserFromGroup(final UserDomainEntity potentialOwner,
-                             final UserDomainEntity userToRemove,
-                             final BudgetGroupDomainEntity budgetGroupDomainEntity,
-                             final Long id);
+//    void removeUserFromGroup(final UserDomainEntity potentialOwner,
+//                             final UserDomainEntity userToRemove,
+//                             final BudgetGroupDomainEntity budgetGroupDomainEntity,
+//                             final Long id);
 
+    void removeUserFromGroup(
+            UserDomainEntity userToRemove,
+            BudgetGroupDomainEntity budgetGroup,
+            Long givenGroupId);
 }

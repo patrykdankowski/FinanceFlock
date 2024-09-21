@@ -41,9 +41,9 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
     }
 
     @Override
-    public void isMemberOfGivenGroup(final UserDomainEntity loggedUser,
-                                     final BudgetGroupDomainEntity budgetGroupDomainEntity,
-                                     final Long groupId) {
+    public void validateMembership(final UserDomainEntity loggedUser,
+                                   final BudgetGroupDomainEntity budgetGroupDomainEntity,
+                                   final Long groupId) {
         validateGroup(loggedUser, groupId, budgetGroupDomainEntity);
 
     }
@@ -69,7 +69,7 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
 
 
         if (!group.getListOfMembersId().contains(user.getId()) ||
-                !group.getOwnerId().equals(user.getId())) {
+                !user.getBudgetGroupId().equals(group.getId())) {
             log.warn("User {} is not a  a member of this group id: {}", user.getName(), group.getId());
             throw new BudgetGroupValidationException("User is not a member of budget group");
         }
@@ -93,10 +93,10 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
     }
 
     @Override
-    public boolean isMemberOfGivenGroup(final UserDomainEntity user, final BudgetGroupDomainEntity budgetGroup) {
+    public boolean isMemberOfGivenIdGroup(final UserDomainEntity user, final BudgetGroupDomainEntity budgetGroup, final Long groupId) {
         boolean hasRole = userValidator.hasGivenRole(user, Role.GROUP_MEMBER);
         boolean groupIsNullNotNull = !userValidator.groupIsNull(user);
-        boolean isMemberOfGroup = isMember(user, budgetGroup, user.getBudgetGroupId());
+        boolean isMemberOfGroup = isMember(user, budgetGroup, groupId);
         return hasRole && groupIsNullNotNull && isMemberOfGroup;
     }
 
@@ -110,6 +110,6 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
     @Override
     public void validateIfUserIsAdmin(final UserDomainEntity loggedUser, final Long id, final BudgetGroupDomainEntity budgetGroup) {
         validateGroupForPotentialOwner(loggedUser, id, budgetGroup);
-        userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
+        userValidator.validateRole(loggedUser, Role.GROUP_ADMIN);
     }
 }

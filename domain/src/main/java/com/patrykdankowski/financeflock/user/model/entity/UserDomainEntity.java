@@ -1,9 +1,8 @@
 package com.patrykdankowski.financeflock.user.model.entity;
 
 import com.patrykdankowski.financeflock.common.Role;
-import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
+import com.patrykdankowski.financeflock.user.exception.ToEarlyShareDataPreferenceException;
 import lombok.*;
-import org.apache.catalina.User;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -67,16 +66,27 @@ public class UserDomainEntity {
     }
 
     public void manageGroupMembership(Long budgetGroupId, Role role) {
-        if (budgetGroupId > 0) {
-            this.budgetGroupId = budgetGroupId;
-            this.role = role;
-        } else if (budgetGroupId == null) {
+        if (budgetGroupId == null) {
             this.budgetGroupId = null;
             this.role = Role.USER;
+        } else if (budgetGroupId > 0) {
+            this.budgetGroupId = budgetGroupId;
+            this.role = role;
         } else {
             throw new IllegalStateException("Given id group is less than 0");
         }
     }
+//    public void manageGroupMembership(Long budgetGroupId, Role role) {
+//        if (budgetGroupId > 0) {
+//            this.budgetGroupId = budgetGroupId;
+//            this.role = role;
+//        } else if (budgetGroupId == null) {
+//            this.budgetGroupId = null;
+//            this.role = Role.USER;
+//        } else {
+//            throw new IllegalStateException("Given id group is less than 0");
+//        }
+//    }
 
 
     public void addExpense(Long expenseDomainId) {
@@ -104,7 +114,7 @@ public class UserDomainEntity {
         if (this.lastToggledShareData != null) {
             Duration duration = Duration.between(this.lastToggledShareData, now);
             if (duration.toMinutes() < 5) {
-                throw new ShareDataPreferenceException(this.lastToggledShareData);
+                throw new ToEarlyShareDataPreferenceException(this.lastToggledShareData);
             }
         }
         return true;

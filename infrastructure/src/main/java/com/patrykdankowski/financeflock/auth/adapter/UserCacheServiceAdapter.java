@@ -8,6 +8,7 @@ import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.port.UserQueryRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +26,7 @@ class UserCacheServiceAdapter implements UserCacheServicePort {
     }
 
 
-    //    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
+        @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
     @Override
     public UserDomainEntity getUserFromEmail(String userEmail) {
         var user = userCommandService.findUserByEmail(userEmail);

@@ -28,31 +28,30 @@ class UserMembershipDomainAdapter implements UserMembershipDomainPort {
 
         log.info("Starting process of leave budget group for user with id {} ", loggedUser.getId());
 
-        budgetGroupValidator.isMemberOfGivenGroup(loggedUser, budgetGroup, givenId);
+        budgetGroupValidator.validateMembership(loggedUser, budgetGroup, givenId);
 
-        if (hasRole) {
-            loggedUser.manageGroupMembership(null, Role.USER);
-            budgetGroup.removeUser(loggedUser.getId());
-            log.info("User with id {} left budget group", loggedUser.getId());
-        } else {
-            throw new BudgetGroupValidationException("Cannot leave budget group as admin");
-        }
 
+        loggedUser.manageGroupMembership(null, Role.USER);
+        budgetGroup.removeUser(loggedUser.getId());
+        log.info("User with id {} left budget group", loggedUser.getId());
 
     }
 
 
-    @Override
-    public boolean toggleShareData(final UserDomainEntity loggedUser) {
-
-        log.info("Starting process of toggle share data");
-
-        loggedUser.toggleShareData();
 
 
-        log.info("Toggled share data for user with id {} ", loggedUser.getId());
 
-        return loggedUser.isShareData();
-    }
+@Override
+public boolean toggleShareData(final UserDomainEntity loggedUser) {
+
+    log.info("Starting process of toggle share data");
+
+    loggedUser.toggleShareData();
+
+
+    log.info("Toggled share data for user with id {} ", loggedUser.getId());
+
+    return loggedUser.isShareData();
+}
 
 }

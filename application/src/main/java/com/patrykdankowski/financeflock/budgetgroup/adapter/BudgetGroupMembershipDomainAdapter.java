@@ -51,22 +51,35 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
 
 
     @Override
-    public void removeUserFromGroup(final UserDomainEntity potentialOwner,
-                                    final UserDomainEntity userToRemove,
+    public void removeUserFromGroup(final UserDomainEntity userToRemove,
                                     final BudgetGroupDomainEntity budgetGroup,
                                     final Long givenGroupId) {
 
-        budgetGroupValidator.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
-        userValidator.hasGivenRole(potentialOwner, Role.GROUP_ADMIN);
 
+        final boolean isAbleToRemove = budgetGroupValidator.isMemberOfGivenIdGroup(userToRemove, budgetGroup, givenGroupId);
+//        budgetGroupValidator.isMemberOfGivenGroup(userToRemove, budgetGroup, givenGroupId);
+//        userValidator.validateRole(userToRemove, Role.GROUP_MEMBER);
+        if (isAbleToRemove) {
 
-        boolean hasRole = userValidator.hasGivenRole(userToRemove, Role.GROUP_MEMBER);
-        boolean GroupIsNull = userValidator.groupIsNull(userToRemove);
-
-        if (hasRole && !GroupIsNull) {
-            budgetGroup.removeUser(userToRemove.getId());
             userToRemove.manageGroupMembership(null, Role.USER);
+            budgetGroup.removeUser(userToRemove.getId());
+        } else {
+            log.warn("User cannot be remove from budget group");
+            throw new BudgetGroupValidationException("Cannot remove user from group" +
+                    " because this user is not a member of your group");
         }
+
+//        budgetGroupValidator.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
+//        userValidator.hasGivenRole(potentialOwner, Role.GROUP_ADMIN);
+//
+//
+//        boolean hasRole = userValidator.hasGivenRole(userToRemove, Role.GROUP_MEMBER);
+//        boolean GroupIsNull = userValidator.groupIsNull(userToRemove);
+//
+//        if (hasRole && !GroupIsNull) {
+//            budgetGroup.removeUser(userToRemove.getId());
+//            userToRemove.manageGroupMembership(null, Role.USER);
+//        }
 
 
     }

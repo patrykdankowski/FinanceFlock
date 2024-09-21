@@ -9,4 +9,6 @@ public interface UserValidatorPort {
 
     boolean groupIsNull(UserDomainEntity user);
 
+    void validateRole(UserDomainEntity user, Role role);
+
 }

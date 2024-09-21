@@ -29,7 +29,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
     private final UserCommandServicePort userCommandService;
     private final BudgetGroupCommandServicePort budgetGroupCommandService;
     private final AuthenticationServicePort authenticationService;
-    private final UserValidatorPort userValidator;
     private final BudgetGroupValidatorAdapter budgetGroupValidator;
 
     BudgetGroupFacadeAdapter(final BudgetGroupMembershipDomainPort budgetGroupMembershipDomain,
@@ -37,14 +36,12 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
                              final BudgetGroupCommandServicePort budgetGroupCommandService,
                              final AuthenticationServicePort authenticationService,
                              final BudgetGroupManagementDomainPort budgetGroupManagementDomain,
-                             final UserValidatorPort userValidator,
                              final BudgetGroupValidatorAdapter budgetGroupValidator) {
         this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
         this.authenticationService = authenticationService;
         this.userCommandService = userCommandService;
         this.budgetGroupCommandService = budgetGroupCommandService;
         this.budgetGroupManagementDomain = budgetGroupManagementDomain;
-        this.userValidator = userValidator;
         this.budgetGroupValidator = budgetGroupValidator;
     }
 
@@ -201,7 +198,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
     @Transactional
     @Override
-    public void removeUserFromGroup(final EmailDto email, final Long id) {
+    public void removeUserFromGroup(final EmailDto email, final Long groupId) {
 
         log.info("Starting process to remove user from group");
 
@@ -212,44 +209,34 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
             throw new SelfManagementInGroupException("You cannot remove yourself from the group. To leave the group, you need to close the group first.");
         }
 
-        BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
+        BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(groupId);
 
-        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
+        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, groupId, budgetGroupById);
 
-        boolean canBeRemovedFromGroup = budgetGroupValidator.isMemberOfGivenGroup(userToRemove, budgetGroupById);
+        budgetGroupMembershipDomain.removeUserFromGroup(userToRemove,budgetGroupById,groupId);
 
-        if (canBeRemovedFromGroup) {
-            budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
-                    userToRemove,
-                    budgetGroupById,
-                    id);
+
+
 
             saveGroupAndUser(budgetGroupById, userToRemove);
 
-            log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), id);
-        } else {
-            log.warn("User cannot be remove from budget group");
-            throw new BudgetGroupValidationException("Cannot remove user from group" +
-                    " because this user is not a member of your group");
+            log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
         }
+//        if (canBeRemovedFromGroup) {
+//            budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
+//                    userToRemove,
+//                    budgetGroupById,
+//                    groupId);
+//
+//            saveGroupAndUser(budgetGroupById, userToRemove);
+//
+//            log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
+//        } else {
+//            log.warn("User cannot be remove from budget group");
+//            throw new BudgetGroupValidationException("Cannot remove user from group" +
+//                    " because this user is not a member of your group");
+//        }
 
 
     }
 
-//    private boolean isNotMemberOfAnyGroup(final UserDomainEntity loggedUser) {
-//
-//        boolean hasRole = userValidator.hasGivenRole(loggedUser, Role.USER);
-//        boolean GroupIsNull = userValidator.groupIsNull(loggedUser);
-//        return hasRole && GroupIsNull;
-//    }
-
-//
-//    private boolean isMemberOfGivenGroup(final UserDomainEntity user,
-//                                         final BudgetGroupDomainEntity budgetGroup) {
-//        boolean hasRole = userValidator.hasGivenRole(user, Role.GROUP_MEMBER);
-//        boolean groupIsNullNotNull = !userValidator.groupIsNull(user);
-//        boolean isMemberOfGroup = budgetGroupValidator.isMember(user, budgetGroup, user.getBudgetGroupId());
-//        return hasRole && groupIsNullNotNull && isMemberOfGroup;
-//    }
-
-}

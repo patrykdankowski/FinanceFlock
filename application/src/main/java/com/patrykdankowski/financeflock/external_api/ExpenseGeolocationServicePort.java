@@ -10,7 +10,4 @@ import jakarta.servlet.http.HttpServletRequest;
 
     void setLocationForExpenseFromUserIp(final ExpenseCreateDto expenseCreateDto,
                                          final String userIp);
-
-//    ExpenseDtoWriteModel prepareExpense(ExpenseDtoWriteModel expenseDtoWriteModel,
-//                                        String userIp);
 }

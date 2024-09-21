@@ -8,6 +8,7 @@ import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_MESSAGE;
@@ -67,6 +68,11 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     @Override
     public List<UserDomainEntity> listOfUsersFromIds(final List<Long> userIds) {
         return userCommandRepository.findAllByIdIn(userIds);
+    }
+
+    @Override
+    public void updateLastLoggedInAt(final LocalDateTime lastLoggedInAt, final String userEmail) {
+        userCommandRepository.updateLastLoginDate(lastLoggedInAt, userEmail);
     }
 
 

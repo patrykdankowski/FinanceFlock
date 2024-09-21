@@ -16,8 +16,7 @@ public class ExpenseCreateDto {
     private String location;
     private LocalDateTime expenseDate;
 
-    public interface onCreate {
-    }
+
 
 
     public String getDescription() {

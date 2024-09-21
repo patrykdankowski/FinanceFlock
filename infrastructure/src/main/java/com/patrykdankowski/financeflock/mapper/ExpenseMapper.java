@@ -4,11 +4,14 @@ import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity
 import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Transactional
 public class ExpenseMapper {
 
     private final EntityManager entityManager;

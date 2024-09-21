@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.expense.adapter;
 
 import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity;
+import com.patrykdankowski.financeflock.expense.model.vo.ExpenseUpdateVO;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFactoryPort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseManagementDomainPort;
 import com.patrykdankowski.financeflock.expense.model.vo.ExpenseCreateVO;
@@ -38,12 +39,12 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
     }
 
     @Override
-    public void updateExpense(final ExpenseCreateVO expenseCreateVO,
+    public void updateExpense(final ExpenseUpdateVO expenseUpdateVO,
                               final ExpenseDomainEntity expenseDomainEntity) {
-        expenseDomainEntity.updateInfo(expenseCreateVO.amountVO().value(),
-                expenseCreateVO.expenseDate(),
-                expenseCreateVO.description(),
-                expenseCreateVO.location());
+        expenseDomainEntity.updateInfo(expenseUpdateVO.amount(),
+                expenseUpdateVO.expenseDate(),
+                expenseUpdateVO.description(),
+                expenseUpdateVO.location());
     }
 
 }

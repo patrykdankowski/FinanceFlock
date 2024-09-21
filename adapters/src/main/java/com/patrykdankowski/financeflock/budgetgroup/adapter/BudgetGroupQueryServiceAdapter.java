@@ -5,9 +5,11 @@ import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupNotFoun
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryRepositoryPort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryServicePort;
-import com.patrykdankowski.financeflock.user.dto.UserLightDto;
+import com.patrykdankowski.financeflock.expense.port.ExpenseQueryRepositoryPort;
+import com.patrykdankowski.financeflock.user.dto.UserDto;
 import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
-import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
+import com.patrykdankowski.financeflock.user.dto.UserLightDto;
+import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.port.UserQueryRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +46,7 @@ class BudgetGroupQueryServiceAdapter implements BudgetGroupQueryServicePort {
         return getListOfMembers(groupId, pageable);
     }
 
+
     private List<UserLightDto> getListOfMembers(final Long budgetGroupId, final Pageable pageable) {
         log.info("Getting members of budget group {}", budgetGroupId);
         BudgetGroupDomainEntity budgetGroupDomainEntity = budgetGroupQueryRepository.findBudgetGroupById(budgetGroupId)
@@ -52,30 +55,83 @@ class BudgetGroupQueryServiceAdapter implements BudgetGroupQueryServicePort {
 
 
         Long groupId = budgetGroupDomainEntity.getId();
-//        Set<Long> listOfMembersId = budgetGroupDomainEntity.getListOfMembersId();
-//        List<Long> mappedId = listOfMembersId.stream().toList();
-log.info("before");
-        List<UserLightDto> listOfUsers = userQueryRepository.findAllByBudgetGroup_Id(groupId, pageable);
-        log.info("after");
-//
-//        return listOfUsers.stream().map(
-//                        user -> new UserDtoResponse(
-//                                user.getName(),
-//                                user.getLastLoggedInAt())
-//                )
-//
-//                .collect(Collectors.toList());
 
-        return listOfUsers;
+        return userQueryRepository.findAllByBudgetGroup_Id(groupId, pageable);
+
+
     }
 
-    @Override
-    public List<UserDtoProjections> getBudgetGroupExpenses() {
-        return null;
-//        // TODO logika zwiazana z podziałem na kategorie
-//
+    //        @Override
+//    public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
 //        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
 //
-//        return new ArrayList<>(userQueryRepository.findAllByShareDataIsTrueAndBudgetGroup_Id(userFromContext.getBudgetGroupId()));
+//        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection),"totalExpenses");
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//
+//
+//        final List<UserDto> userExpenseSummaries = userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId());
+//
+//        userExpenseSummaries.forEach(userDto -> {
+//            BigDecimal totalExpenses = userDto.getExpenses().stream()
+//                    .map(ExpenseDto::getAmount)
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//            userDto.setTotalExpensesForUser(totalExpenses);
+//        });
+//        if ("asc".equalsIgnoreCase(sortDirection)) {
+//            userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser));
+//        } else if ("desc".equalsIgnoreCase(sortDirection)) {
+//            userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser).reversed());
+//        }
+//
+//        return userExpenseSummaries;
+//    }
+//@Override
+//public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
+//    UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+//
+//    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection),"totalExpenses");
+//    Pageable pageable = PageRequest.of(page, size, sort);
+//
+//
+//    final List<UserDto> userExpenseSummaries = userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+//
+//    userExpenseSummaries.forEach(userDto -> {
+//        BigDecimal totalExpenses = userDto.getExpenses().stream()
+//                .map(ExpenseDto::getAmount)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//        userDto.setTotalExpensesForUser(totalExpenses);
+//    });
+//    if ("asc".equalsIgnoreCase(sortDirection)) {
+//        userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser));
+//    } else if ("desc".equalsIgnoreCase(sortDirection)) {
+//        userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser).reversed());
+//    }
+//
+//    return userExpenseSummaries;
+//}
+    @Override
+    public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
+//        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+//        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "totalExpensesForUser");
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//        // Ustawienie paginacji
+////        Pageable pageable = PageRequest.of(page, size);
+//
+//        // Wywołanie metody repozytorium, która zwraca mapowane DTO
+//        return userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+
+        // Tworzymy Pageable z sortowaniem i paginacją
+        Pageable pageable = getPageable(page, size, sortDirection);
+
+        // Wywołujemy repozytorium, które zwraca już zmapowane DTO
+        return userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+    }
+
+    private Pageable getPageable(final int page, final int size, final String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "totalExpensesForUser");
+        return PageRequest.of(page, size, sort);
     }
 }

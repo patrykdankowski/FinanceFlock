@@ -2,6 +2,7 @@ package com.patrykdankowski.financeflock.user.port;
 
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,5 +19,7 @@ public interface UserCommandRepositoryPort {
     List<UserDomainEntity> findAllByIdIn(List<Long> ids);
 
     boolean existsUserByEmail(String email);
+
+    void updateLastLoginDate(LocalDateTime lastLoginDate, String email);
 
 }

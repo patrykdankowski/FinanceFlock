@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <include file="../V1__create_users_table.sql" relativeToChangelogFile="true"/>
+    <include file="../V2__create_expanses_table.sql" relativeToChangelogFile="true"/>
+    <include file="../V3__create_budget_groups_table.sql" relativeToChangelogFile="true"/>
+    <include file="../V11__create_user_expenses_summary.sql" relativeToChangelogFile="true"/>
+    <include file="../V12__create_trigger.sql" relativeToChangelogFile="true"/>
+    <include file="../V13__update_trigger.sql" relativeToChangelogFile="true"/>
+    <include file="../V14__delete_trigger.sql" relativeToChangelogFile="true"/>
+    <include file="../V15__create_user_trigger.sql" relativeToChangelogFile="true"/>
+    <include file="../V16__update_user_expenses_summary_after_group_insert_trigger.sql" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

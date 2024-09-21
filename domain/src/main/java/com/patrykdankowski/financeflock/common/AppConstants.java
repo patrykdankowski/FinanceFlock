@@ -14,6 +14,8 @@ public class AppConstants {
 
     public static final String BUDGET_GROUP_NOT_FOUND = "Budget group with given ID %s does not exist in our database";
 
+    public static final int minutesInHour = 60;
+
     private AppConstants() {
     }
 }

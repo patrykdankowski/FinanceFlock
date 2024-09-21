@@ -1,9 +1,11 @@
 package com.patrykdankowski.financeflock.expense.adapter;
 
 import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseUpdateDto;
 import com.patrykdankowski.financeflock.expense.model.entity.ExpenseDomainEntity;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import com.patrykdankowski.financeflock.expense.model.vo.AmountVO;
+import com.patrykdankowski.financeflock.expense.model.vo.ExpenseUpdateVO;
 import com.patrykdankowski.financeflock.expense.port.ExpenseCommandServicePort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFacadePort;
 import com.patrykdankowski.financeflock.external_api.ExpenseGeolocationServicePort;
@@ -68,8 +70,6 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
         final ExpenseDomainEntity savedExpense = expenseCommandService.saveExpense(expenseDomainEntity);
 
         loggedUser.addExpense(savedExpense.getId());
-        log.info(loggedUser.getExpenseListId().toString());
-
         // saving user must be after saving expense because we need expense id to connect expense with user
         userCommandService.saveUser(loggedUser);
 
@@ -78,37 +78,60 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
     }
 
     @Override
-    public void updateExpense(final Long id, final ExpenseCreateDto expenseSourceDto) {
+    public void updateExpense(final Long id, final ExpenseUpdateDto expenseUpdateDto) {
         final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
 
 
         // its used to check if expense is in same group but u are not a owner (u are admin) - different response
-        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
+//        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
 
-        expenseValidator.validateAccessToExpense(loggedUser, userFromGivenIdExpense, expenseById);
+        expenseValidator.validateAccessToExpense(loggedUser, expenseById);
 
-        ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
-                expenseSourceDto.getDescription(),
-                new AmountVO(expenseSourceDto.getAmount()),
-                expenseSourceDto.getLocation(),
-                expenseSourceDto.getExpenseDate()
+        ExpenseUpdateVO expenseUpdateVO = new ExpenseUpdateVO(
+                expenseUpdateDto.getDescription(),
+                expenseUpdateDto.getAmount(),
+                expenseUpdateDto.getLocation(),
+                expenseUpdateDto.getExpenseDate()
         );
 
-        expenseManagementDomain.updateExpense(expenseCreateVO, expenseById);
+        expenseManagementDomain.updateExpense(expenseUpdateVO, expenseById);
 
         // connection between user and expense already exists so we don't have to save user separately
 
         expenseCommandService.saveExpense(expenseById);
     }
+//    @Override
+//    public void updateExpense(final Long id, final ExpenseCreateDto expenseSourceDto) {
+//        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+//        final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
+//
+//
+//        // its used to check if expense is in same group but u are not a owner (u are admin) - different response
+//        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
+//
+//        expenseValidator.validateAccessToExpense(loggedUser, userFromGivenIdExpense, expenseById);
+//
+//        ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
+//                expenseSourceDto.getDescription(),
+//                new AmountVO(expenseSourceDto.getAmount()),
+//                expenseSourceDto.getLocation(),
+//                expenseSourceDto.getExpenseDate()
+//        );
+//
+//        expenseManagementDomain.updateExpense(expenseCreateVO, expenseById);
+//
+//        // connection between user and expense already exists so we don't have to save user separately
+//
+//        expenseCommandService.saveExpense(expenseById);
+//    }
 
     @Override
     public void deleteExpense(final Long id) {
         final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
-// its used to check if expense is in same group but u are not a owner (u are admin) - different response
-        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
-        expenseValidator.validateAccessToExpense(loggedUser, userFromGivenIdExpense, expenseById);
+
+        expenseValidator.validateAccessToExpense(loggedUser, expenseById);
 
         loggedUser.removeExpense(id);
         userCommandService.saveUser(loggedUser);

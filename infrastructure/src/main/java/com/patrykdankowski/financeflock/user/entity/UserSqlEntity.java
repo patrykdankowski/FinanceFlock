@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.patrykdankowski.financeflock.budgetgroup.entity.BudgetGroupSqlEntity;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -55,11 +56,11 @@ public class UserSqlEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", nullable = true)
     private BudgetGroupSqlEntity budgetGroup;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<ExpenseSqlEntity> expenseList = new HashSet<>();
 
     private boolean shareData;

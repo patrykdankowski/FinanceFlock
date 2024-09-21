@@ -1,12 +1,12 @@
-package com.patrykdankowski.financeflock.common;
+package com.patrykdankowski.financeflock.user.exception;
 
 import java.time.LocalDateTime;
 
-public class ShareDataPreferenceException extends RuntimeException {
+public class ToEarlyShareDataPreferenceException extends RuntimeException {
 
     private LocalDateTime lastSharedData;
 
-    public ShareDataPreferenceException(LocalDateTime lastSharedData) {
+    public ToEarlyShareDataPreferenceException(LocalDateTime lastSharedData) {
         this.lastSharedData = lastSharedData;
     }
 

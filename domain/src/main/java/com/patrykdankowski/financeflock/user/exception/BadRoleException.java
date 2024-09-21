@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.common;
+package com.patrykdankowski.financeflock.user.exception;
 
 public class BadRoleException extends RuntimeException{
     private String name;
@@ -9,7 +9,7 @@ public class BadRoleException extends RuntimeException{
         this.roleName = roleName;
     }
 
-    public String getMessage() {
+    public String getName () {
         return name;
     }
 

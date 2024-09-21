@@ -5,9 +5,8 @@ import com.patrykdankowski.financeflock.budgetgroup.dto.EmailDto;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupControllerPort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupFacadePort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryServicePort;
-import com.patrykdankowski.financeflock.user.dto.UserDtoProjections;
+import com.patrykdankowski.financeflock.user.dto.UserDto;
 import com.patrykdankowski.financeflock.user.dto.UserLightDto;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -73,18 +72,19 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
                                             int size,
                                             String sortBy,
                                             String sortDirection) {
-        log.info("kontroler");
-        List<UserLightDto> list = budgetGroupQueryService.listOfUsersInGroup(id, page, size, sortBy, sortDirection);
-        return list;
+        return budgetGroupQueryService.listOfUsersInGroup(id, page, size, sortBy, sortDirection);
     }
 
     @Override
-    @GetMapping("/list")
+    @GetMapping("/listOfExpanses/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDtoProjections> listOfExpansesInGroup() {
+    public List<UserDto> listOfExpansesInGroup(Long id,
+                                               int page,
+                                               int size,
+                                               String sortDirection) {
 
-        return budgetGroupQueryService.getBudgetGroupExpenses();
+        return budgetGroupQueryService.getBudgetGroupExpenses(id, page, size,sortDirection);
 
     }
 

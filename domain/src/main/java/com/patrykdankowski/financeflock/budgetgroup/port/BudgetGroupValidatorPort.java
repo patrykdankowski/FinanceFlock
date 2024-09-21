@@ -11,14 +11,16 @@ public interface BudgetGroupValidatorPort {
                                         Long groupId,
                                         BudgetGroupDomainEntity budgetGroupDomainEntity);
 
-    void isMemberOfGivenGroup(UserDomainEntity loggedUser,
-                              BudgetGroupDomainEntity budgetGroupDomainEntity,
-                              Long groupId);
+    void validateMembership(UserDomainEntity loggedUser,
+                            BudgetGroupDomainEntity budgetGroupDomainEntity,
+                            Long groupId);
 
 
     void validateSizeOfGroup(BudgetGroupDomainEntity budgetGroup);
 
-    boolean isMemberOfGivenGroup(final UserDomainEntity user, final BudgetGroupDomainEntity budgetGroup);
+    boolean isMemberOfGivenIdGroup(final UserDomainEntity user,
+                                   final BudgetGroupDomainEntity budgetGroup,
+                                   final Long groupId);
 
     boolean isNotMemberOfAnyGroup(final UserDomainEntity loggedUser);
 

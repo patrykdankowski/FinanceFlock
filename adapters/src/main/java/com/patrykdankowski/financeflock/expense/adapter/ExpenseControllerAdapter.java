@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.expense.adapter;
 
 import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
+import com.patrykdankowski.financeflock.expense.dto.ExpenseUpdateDto;
 import com.patrykdankowski.financeflock.expense.port.ExpenseControllerPort;
 import com.patrykdankowski.financeflock.expense.port.ExpenseFacadePort;
 import com.patrykdankowski.financeflock.external_api.ExpenseGeolocationServicePort;
@@ -9,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +24,7 @@ class ExpenseControllerAdapter implements ExpenseControllerPort {
     @Override
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addExpense(@Validated(ExpenseCreateDto.onCreate.class) @Valid @RequestBody ExpenseCreateDto expenseCreateDto,
+    public String addExpense(@Valid @RequestBody ExpenseCreateDto expenseCreateDto,
                              HttpServletRequest request) {
 
         String userIp = geolocationService.getUserIpAddress(request);
@@ -38,9 +38,9 @@ class ExpenseControllerAdapter implements ExpenseControllerPort {
     @PatchMapping("/update/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String updateExpense(@PathVariable Long id,
-                                @RequestBody ExpenseCreateDto expenseCreateDto) {
+                                @RequestBody ExpenseUpdateDto expenseUpdateDto) {
 
-        expenseFacade.updateExpense(id, expenseCreateDto);
+        expenseFacade.updateExpense(id, expenseUpdateDto);
         return "Resource updated";
     }
 

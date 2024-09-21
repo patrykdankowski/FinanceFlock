@@ -7,8 +7,11 @@ import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.port.UserCommandRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 
 interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long> {
 
+    @Query("SELECT u FROM UserSqlEntity u LEFT JOIN FETCH u.expenseList WHERE u.email = :email")
     Optional<UserSqlEntity> findByEmail(String email);
 
     //
@@ -30,6 +34,10 @@ interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long
 
     //
     boolean existsUserByEmail(String email);
+
+    @Modifying
+    @Query("UPDATE UserSqlEntity u SET u.lastLoggedInAt = :lastLoggedInAt WHERE u.email = :email")
+    void update(@Param("lastLoggedInAt") LocalDateTime lastLoggedInAt, @Param("email") String email);
 }
 
 @Slf4j
@@ -100,7 +108,10 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
         return userCommandRepository.existsUserByEmail(email);
     }
 
-
+    @Override
+    public void updateLastLoginDate(final LocalDateTime lastLoginDate, final String email) {
+        userCommandRepository.update(lastLoginDate, email);
+    }
 
 
 }

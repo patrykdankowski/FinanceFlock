@@ -9,8 +9,9 @@ import com.patrykdankowski.financeflock.auth.exception.PasswordValidationExcepti
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.exception.MaxUserCountInBudgetGroupException;
-import com.patrykdankowski.financeflock.common.BadRoleException;
-import com.patrykdankowski.financeflock.common.ShareDataPreferenceException;
+import com.patrykdankowski.financeflock.user.exception.AdminToggleShareDataException;
+import com.patrykdankowski.financeflock.user.exception.BadRoleException;
+import com.patrykdankowski.financeflock.user.exception.ToEarlyShareDataPreferenceException;
 import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotBelongToUserException;
 import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
@@ -195,13 +196,13 @@ class GlobalExceptionHandler {
     @ExceptionHandler(BadRoleException.class)
     ResponseEntity<ErrorDetails> handleBadRoleException(BadRoleException badRoleException) {
         return setErrorDetails("User has wrong role",
-                badRoleException.getMessage()+" has wrong role ("+badRoleException.getRoleName()+")",
+                badRoleException.getName()+" has wrong role ("+badRoleException.getRoleName()+")",
                 HttpStatus.CONFLICT);
     }
-    @ExceptionHandler(ShareDataPreferenceException.class)
-    ResponseEntity<ErrorDetails> handleShareDataPreferenceException(ShareDataPreferenceException shareDataPreferenceException) {
+    @ExceptionHandler(ToEarlyShareDataPreferenceException.class)
+    ResponseEntity<ErrorDetails> handleShareDataPreferenceException(ToEarlyShareDataPreferenceException toEarlyShareDataPreferenceException) {
         return setErrorDetails("Error during toggling share data",
-                "Your last request was at "+ shareDataPreferenceException.getLastSharedData() + " try again at "+ shareDataPreferenceException.getNextPossibleShareData(),
+                "Your last request was at "+ toEarlyShareDataPreferenceException.getLastSharedData() + " try again at "+ toEarlyShareDataPreferenceException.getNextPossibleShareData(),
                 HttpStatus.TOO_EARLY );
     }
 
@@ -236,6 +237,15 @@ class GlobalExceptionHandler {
 
         return setErrorDetails("Cannot add user to group",
                 selfManagementInGroupException.getExceptionDescription(),
+                HttpStatus.CONFLICT);
+
+    }
+
+    @ExceptionHandler(AdminToggleShareDataException.class)
+    ResponseEntity<ErrorDetails> handleAdminToggleShareDataException(AdminToggleShareDataException adminToggleShareDataException) {
+
+        return setErrorDetails("Error during toggling share data",
+                "As group admin u are not able to toggle your share data",
                 HttpStatus.CONFLICT);
 
     }

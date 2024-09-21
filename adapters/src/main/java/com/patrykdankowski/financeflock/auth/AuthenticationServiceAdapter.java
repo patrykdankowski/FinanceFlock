@@ -1,6 +1,5 @@
 package com.patrykdankowski.financeflock.auth;
 
-import com.patrykdankowski.financeflock.auth.dto.CustomUserDetails;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.auth.port.UserCacheServicePort;
 import com.patrykdankowski.financeflock.auth.port.UserContextServicePort;
@@ -24,16 +23,12 @@ class AuthenticationServiceAdapter implements AuthenticationServicePort {
 
     @Override
     public UserDomainEntity getUserFromContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-//        Authentication authentication = userContextService.getAuthenticationFromContext();
-//        String userEmail = authentication.getName();
-//        return userCacheService.getUserFromEmail(userEmail);
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            return userDetails.getUserDomainEntity(); // Zwraca pełny obiekt UserDomainEntity
-        }
-        throw new RuntimeException("User not found in security context");
+
+        Authentication authentication = userContextService.getAuthenticationFromContext();
+        String userEmail = authentication.getName();
+        return userCacheService.getUserFromEmail(userEmail);
+
 
     }
 
