@@ -26,17 +26,10 @@ interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long
             "WHERE u.email = :email")
     Optional<UserSqlEntity> findByEmail(String email);
 
-    //
-//    Optional<UserSqlEntity> findById(Long id);
-//
-//    UserSqlEntity save(UserSqlEntity user);
-//
-//    List<UserSqlEntity> saveAll(List<UserSqlEntity> entities);
-//
     @Query("SELECT u FROM UserSqlEntity u WHERE u.id IN :ids")
     List<UserSqlEntity> findAllByIdIn(List<Long> ids);
 
-    //
+
     boolean existsUserByEmail(String email);
 
     @Modifying
@@ -50,14 +43,11 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
 
     private final UserCommandRepositoryAdapter userCommandRepository;
     private final UserMapper mapper;
-    private final UserDtoMapper userDtoMapper;
 
      UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
-                                     final UserMapper mapper,
-                                     final UserDtoMapper userDtoMapper) {
+                                     final UserMapper mapper) {
         this.userCommandRepository = userCommandRepository;
         this.mapper = mapper;
-        this.userDtoMapper = userDtoMapper;
     }
 
 
@@ -79,7 +69,6 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
     public UserDomainEntity save(UserDomainEntity user) {
         UserSqlEntity sqlUserSaved = userCommandRepository.save(mapper.toSqlEntity(user));
         final UserDomainEntity domainEntity = mapper.toDomainEntity(sqlUserSaved);
-//        domainEntity.
         return domainEntity;
     }
 

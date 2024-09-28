@@ -1,9 +1,8 @@
 package com.patrykdankowski.financeflock.budgetgroup.adapter;
 
-import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupFactoryPort;
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.model.record.BudgetGroupDescription;
-import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupFactoryPort;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;

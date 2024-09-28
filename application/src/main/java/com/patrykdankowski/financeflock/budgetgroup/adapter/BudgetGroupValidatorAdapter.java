@@ -22,17 +22,6 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
 
 
     @Override
-    public boolean belongsToSameBudgetGroup(final UserDomainEntity loggedUser,
-                                            final UserDomainEntity otherUser) {
-        if (loggedUser.getBudgetGroupId() == null) {
-            return false;
-        }
-        checkUserIdGroupWithGivenId(otherUser.getBudgetGroupId(), loggedUser.getBudgetGroupId());
-
-        return true;
-    }
-
-    @Override
     public void validateGroupForPotentialOwner(final UserDomainEntity loggedUser,
                                                final Long groupId,
                                                final BudgetGroupDomainEntity budgetGroupDomainEntity) {

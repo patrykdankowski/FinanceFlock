@@ -2,10 +2,12 @@ package com.patrykdankowski.financeflock.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
+@Getter
 @AllArgsConstructor
 public class ErrorDetails {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -14,20 +16,5 @@ public class ErrorDetails {
     private String details;
     private HttpStatus errorCode;
 
-    public Date getTimeStamp() {
-        return timeStamp;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public HttpStatus getErrorCode() {
-        return errorCode;
-    }
 }
 

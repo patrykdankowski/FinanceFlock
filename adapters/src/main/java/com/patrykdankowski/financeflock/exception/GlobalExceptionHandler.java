@@ -1,22 +1,19 @@
 package com.patrykdankowski.financeflock.exception;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.patrykdankowski.financeflock.budgetgroup.exception.SelfManagementInGroupException;
-import com.patrykdankowski.financeflock.common.AppConstants;
-import com.patrykdankowski.financeflock.common.ErrorDetails;
 import com.patrykdankowski.financeflock.auth.exception.CustomJwtException;
 import com.patrykdankowski.financeflock.auth.exception.PasswordValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupNotFoundException;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.exception.MaxUserCountInBudgetGroupException;
+import com.patrykdankowski.financeflock.budgetgroup.exception.SelfManagementInGroupException;
+import com.patrykdankowski.financeflock.common.AppConstants;
+import com.patrykdankowski.financeflock.common.ErrorDetails;
+import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
+import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
+import com.patrykdankowski.financeflock.expense.exception.ExpenseValidationException;
 import com.patrykdankowski.financeflock.user.exception.AdminToggleShareDataException;
 import com.patrykdankowski.financeflock.user.exception.BadRoleException;
 import com.patrykdankowski.financeflock.user.exception.ToEarlyShareDataPreferenceException;
-import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
-import com.patrykdankowski.financeflock.expense.exception.ExpenseNotBelongToUserException;
-import com.patrykdankowski.financeflock.expense.exception.ExpenseNotFoundException;
-import com.patrykdankowski.financeflock.expense.exception.ExpenseValidationException;
-import com.patrykdankowski.financeflock.expense_category.exception.ExpenseCategoryNotFoundException;
 import com.patrykdankowski.financeflock.user.exception.UserAlreadyExistsException;
 import com.patrykdankowski.financeflock.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,10 +55,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpenseNotFoundException.class)
     ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseNotFoundException expenseNotFoundException) {
-        String message = String.format("Expense with id %d, doesnt exist in our db", expenseNotFoundException.getId());
-
         return setErrorDetails("Cannot find expense",
-                message,
+                expenseNotFoundException.getDetails(),
                 HttpStatus.CONFLICT);
 
     }
@@ -85,23 +79,12 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<ErrorDetails> handleNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) throws JsonProcessingException {
+    ResponseEntity<ErrorDetails> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
         List<String> result = methodArgumentNotValidException.getFieldErrors()
                 .stream().map(
                         error -> error.getDefaultMessage()
                 ).collect(Collectors.toList());
 
-//        Map<String, String> result = new HashMap<>();
-//        methodArgumentNotValidException.getBindingResult().getAllErrors().forEach(
-//                error -> {
-//                    String field = ((FieldError) error).getField();
-//                    String message = error.getDefaultMessage();
-//                    result.put(field, message);
-//                }
-
-//        );
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonErrors = objectMapper.writeValueAsString(result);
         return setErrorDetails("Exception occurred during validation",
                 result.toString(),
                 HttpStatus.BAD_REQUEST);
@@ -109,7 +92,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    ResponseEntity<ErrorDetails> handleNotValidException(Authentication authentication) {
+    ResponseEntity<ErrorDetails> handleAccessDeniedException() {
 
         return setErrorDetails("Access denied",
                 "You dont have right permissions",
@@ -118,7 +101,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    ResponseEntity<ErrorDetails> handleNotValidCredentialsException() {
+    ResponseEntity<ErrorDetails> handleBadCredentialsException() {
 
         return setErrorDetails("Exception occurred during logging in",
                 "Username or password is incorrect",
@@ -135,8 +118,9 @@ class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED);
     }
 
+
     @ExceptionHandler(CustomJwtException.class)
-    ResponseEntity<ErrorDetails> handleJwtExceptions(CustomJwtException customJwtException) {
+    ResponseEntity<ErrorDetails> handleCustomJwtExceptions(CustomJwtException customJwtException) {
 
         return setErrorDetails(AppConstants.ENTER_VALID_JWT_TOKEN_MESSAGE,
                 customJwtException.getMessage(),
@@ -153,11 +137,10 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUserCountInBudgetGroupException.class)
-    ResponseEntity<ErrorDetails> handleMaxSubUsersCountException() {
-        String details = String.format("You are only allowed to add up %d  users. Remove one of existing users first", AppConstants.MAX_BUDGET_GROUP_SIZE - 1);
+    ResponseEntity<ErrorDetails> handleMaxSubUsersCountException(MaxUserCountInBudgetGroupException maxUserCountInBudgetGroupException) {
         return setErrorDetails(
                 "You've reached the maximum amount of users in group",
-                details,
+                maxUserCountInBudgetGroupException.getDetails(),
                 HttpStatus.FORBIDDEN
         );
     }
@@ -170,25 +153,15 @@ class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ExpenseNotBelongToUserException.class)
-    ResponseEntity<ErrorDetails> handleResourceNotBelongToUserException(ExpenseNotBelongToUserException expenseNotBelongToUserException) {
-
-        String message = String.format("Expense with id %d does not belong to you", expenseNotBelongToUserException.getResourceId());
-        String details = String.format("That expense belong to user with id %d", expenseNotBelongToUserException.getUserId());
-        return setErrorDetails(message,
-                details,
-                HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(UserAlreadyExistsException.class)
-    ResponseEntity<ErrorDetails> handleResourceAlreadyExistsException(UserAlreadyExistsException userAlreadyExistsException) {
+    ResponseEntity<ErrorDetails> handleUserAlreadyExistsException(UserAlreadyExistsException userAlreadyExistsException) {
         return setErrorDetails(userAlreadyExistsException.getMessage() + "  already exists in out db",
-                "Please enter a different email address.",
+                userAlreadyExistsException.getDetails(),
                 HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(BudgetGroupValidationException.class)
-    ResponseEntity<ErrorDetails> handleGroupValidationException(BudgetGroupValidationException budgetGroupValidationException) {
+    ResponseEntity<ErrorDetails> handleBudgetGroupValidationException(BudgetGroupValidationException budgetGroupValidationException) {
         return setErrorDetails("Exception occurred during budget group validation",
                 budgetGroupValidationException.getMessage(),
                 HttpStatus.CONFLICT);
@@ -196,13 +169,13 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRoleException.class)
     ResponseEntity<ErrorDetails> handleBadRoleException(BadRoleException badRoleException) {
-        return setErrorDetails("User has wrong role",
+        return setErrorDetails("Exception occurred during bad role",
                 badRoleException.getName() + " has wrong role (" + badRoleException.getRoleName() + ")",
                 HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ToEarlyShareDataPreferenceException.class)
-    ResponseEntity<ErrorDetails> handleShareDataPreferenceException(ToEarlyShareDataPreferenceException toEarlyShareDataPreferenceException) {
+    ResponseEntity<ErrorDetails> handleToEarlyShareDataPreferenceException(ToEarlyShareDataPreferenceException toEarlyShareDataPreferenceException) {
         return setErrorDetails("Error during toggling share data",
                 "Your last request was at " + toEarlyShareDataPreferenceException.getLastSharedData() + " try again at " + toEarlyShareDataPreferenceException.getNextPossibleShareData(),
                 HttpStatus.TOO_EARLY);
@@ -215,18 +188,9 @@ class GlobalExceptionHandler {
                 HttpStatus.BAD_GATEWAY);
     }
 
-    @ExceptionHandler(ExpenseCategoryNotFoundException.class)
-    ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseCategoryNotFoundException expenseCategoryNotFoundException) {
-        String message = String.format("Expense category with id %d, doesnt exist in our db", expenseCategoryNotFoundException.getId());
-
-        return setErrorDetails("Cannot find expense category",
-                message,
-                HttpStatus.CONFLICT);
-
-    }
 
     @ExceptionHandler(ExpenseValidationException.class)
-    ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseValidationException expenseValidationException) {
+    ResponseEntity<ErrorDetails> handleExpenseValidationException(ExpenseValidationException expenseValidationException) {
 
         return setErrorDetails("Exception occurred",
                 expenseValidationException.getMessage(),
@@ -237,7 +201,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(SelfManagementInGroupException.class)
     ResponseEntity<ErrorDetails> handleSelfManagementInGroupException(SelfManagementInGroupException selfManagementInGroupException) {
 
-        return setErrorDetails("Cannot add user to group",
+        return setErrorDetails("Exception occurred",
                 selfManagementInGroupException.getExceptionDescription(),
                 HttpStatus.CONFLICT);
 

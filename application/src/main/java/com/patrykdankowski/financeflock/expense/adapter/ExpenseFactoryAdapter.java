@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
-public class ExpenseFactoryAdapter implements ExpenseFactoryPort {
+class ExpenseFactoryAdapter implements ExpenseFactoryPort {
     @Override
-    public ExpenseDomainEntity createExpanseFromRequest(final Long id,final Long userId, final BigDecimal amount, final LocalDateTime expenseDate, final String description, final String location) {
+    public ExpenseDomainEntity createExpanseFromRequest(final Long id, final Long userId, final BigDecimal amount, final LocalDateTime expenseDate, final String description, final String location) {
 
         return ExpenseDomainEntity.buildExpense(id, userId, amount, expenseDate, description, location);
 

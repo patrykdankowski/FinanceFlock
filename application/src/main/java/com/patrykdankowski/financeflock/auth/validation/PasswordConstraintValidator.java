@@ -24,10 +24,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         boolean hasDigit = passwordToValid.matches(".*\\d.*");
         boolean isLongEnough = passwordToValid.length() >= 10;
 
-        boolean isPasswordValid = hasUpperCase && hasSpecialChar && hasDigit && isLongEnough;
-
         List<String> errorMessages = new ArrayList<>();
-//        List<String> errorMessages = new ArrayList<>();
 
         if (!isLongEnough) {
             errorMessages.add("10 characters long");

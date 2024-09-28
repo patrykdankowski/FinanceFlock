@@ -22,24 +22,17 @@ class TokenCommandServiceAdapter implements TokenCommandServicePort {
         {
             Optional<TokenSqlEntity> existingToken = tokenCommandRepositoryAdapter.findByUserEmail(userEmail);
             if (existingToken.isPresent()) {
-                // Nadpisujemy token
                 TokenSqlEntity tokenEntity = existingToken.get();
                 tokenEntity.setToken(token);
-                tokenEntity.setRevoked(false); // Możemy resetować flagę revoked, jeśli użytkownik się loguje ponownie
+                tokenEntity.setRevoked(false);
                 tokenCommandRepositoryAdapter.save(tokenEntity);
             } else {
-                // Tworzymy nowy token
                 TokenSqlEntity newToken = new TokenSqlEntity();
                 newToken.setToken(token);
                 newToken.setUserEmail(userEmail);
                 newToken.setRevoked(false);
                 tokenCommandRepositoryAdapter.save(newToken);
             }
-//        TokenSqlEntity tokenEntity = new TokenSqlEntity();
-//        tokenEntity.setToken(token);
-//        tokenEntity.setUserEmail(userEmail);
-//        tokenEntity.setRevoked(false);
-//        tokenCommandRepositoryAdapter.save(tokenEntity);
         }
     }
 

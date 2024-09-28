@@ -10,7 +10,7 @@ public class AppConstants {
 
     public static final String EXPENSE_NOT_FOUND = "Expense with given ID %s does not exist on our database";
 
-    public static final String VALID_EMAIL_MESSAGE = " Enter valid email";
+    public static final String VALID_EMAIL_MESSAGE = "Please enter a different email address";
 
     public static final String BUDGET_GROUP_NOT_FOUND = "Budget group with given ID %s does not exist in our database";
 

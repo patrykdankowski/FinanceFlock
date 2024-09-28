@@ -4,12 +4,14 @@ import com.patrykdankowski.financeflock.expense.dto.ApiExpenseDto;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 class ExpenseGeolocationServiceAdapter implements ExpenseGeolocationServicePort {
 
     ExpenseGeolocationServiceAdapter(final RestTemplate restTemplate) {
@@ -40,7 +42,9 @@ class ExpenseGeolocationServiceAdapter implements ExpenseGeolocationServicePort 
         try {
             String city = getLocationFromUserIp(userIp);
             expenseCreateDto.setLocation(city);
+            log.info("Location set successfully");
         } catch (Exception e) {
+            log.error("Exception occurred during connecting to external API");
             throw new ErrorDuringFetchingLocationFromIpException();
         }
     }
@@ -56,15 +60,5 @@ class ExpenseGeolocationServiceAdapter implements ExpenseGeolocationServicePort 
             return "Unknown";
         }
     }
-//    @Override
-//    public ExpenseDtoWriteModel prepareExpense(final ExpenseDtoWriteModel expenseDtoWriteModel,
-//                                               final String userIp) {
-//        if (expenseDtoWriteModel.getLocation() == null || expenseDtoWriteModel.getLocation().isEmpty()) {
-//            setLocationForExpenseFromUserIp(expenseDtoWriteModel, userIp);
-//
-//        }
-//        return expenseDtoWriteModel;
-//
-//
-//    }
+
 }

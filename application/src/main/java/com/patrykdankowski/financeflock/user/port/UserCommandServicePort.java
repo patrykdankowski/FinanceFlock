@@ -8,8 +8,6 @@ import java.util.List;
 public interface UserCommandServicePort {
     UserDomainEntity findUserByEmail(String email);
 
-    UserDomainEntity findUserById(Long id);
-
     void checkIfUserExists(String userEmail);
 
     UserDomainEntity saveUser(UserDomainEntity user);

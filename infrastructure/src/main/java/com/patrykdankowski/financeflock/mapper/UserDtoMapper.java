@@ -47,33 +47,6 @@ public class UserDtoMapper {
     }
 
 
-    public List<UserDto> toUserWithExpenseListDto(List<Map<String, Object>> results) {
-
-        Map<Long, UserDto> userDtoMap = new HashMap<>();
-
-        results.forEach(row -> {
-            Long userId = ((Number) row.get("userId")).longValue();
-            String userName = (String) row.get("name");
-            BigDecimal totalExpenses = (BigDecimal) row.get("totalExpenses");
-
-            ExpenseDto expenseDto = new ExpenseDto(
-                    (String) row.get("description"),
-                    (BigDecimal) row.get("amount"),
-                    (String) row.get("location")
-            );
-
-            if (userDtoMap.containsKey(userId)) {
-                userDtoMap.get(userId).getExpenses().add(expenseDto);
-            } else {
-                UserDto userDto = new UserDto(userName, new ArrayList<>(), totalExpenses);
-                userDto.getExpenses().add(expenseDto);
-                userDtoMap.put(userId, userDto);
-            }
-        });
-
-        return new ArrayList<>(userDtoMap.values());
-
-    }
 
     public List<UserDto> toUserDtos(List<Object[]> results) {
         Map<Long, UserDto> userDtoMap = new LinkedHashMap<>();
@@ -117,31 +90,6 @@ public class UserDtoMapper {
         }
     }
 
-    //    public List<UserLightDto> toUserLightDtos(List<UserSqlEntity> users) {
-//        List<UserLightDto> userLightDtos = new ArrayList<>();
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        for (UserSqlEntity user : users) {
-//            LocalDateTime lastLoggedInAt = user.getLastLoggedInAt();
-//            String formattedTime;
-//
-//            if (lastLoggedInAt != null) {
-//                long minutesBetween = ChronoUnit.MINUTES.between(lastLoggedInAt, now);
-//
-//                if (minutesBetween >= 60) {
-//                    long hours = minutesBetween / minutesInHour;
-//                    long minutes = minutesBetween % minutesInHour;
-//                    formattedTime = String.format("%dh %dmin", hours, minutes);
-//                } else {
-//                    formattedTime = String.format("%dmin", minutesBetween);
-//                }
-//            } else {
-//                formattedTime = "N/A";
-//            }
-//
-//            userLightDtos.add(new UserLightDto(user.getName(), formattedTime));
-//        }
-//        return userLightDtos;
 //    }
     public List<UserLightDto> toUserLightDtos(List<UserSqlEntity> users) {
         List<UserLightDto> userLightDtos = new ArrayList<>();

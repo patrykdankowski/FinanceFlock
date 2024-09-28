@@ -1,15 +1,12 @@
 package com.patrykdankowski.financeflock.mapper;
 
-import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.entity.BudgetGroupSqlEntity;
-import com.patrykdankowski.financeflock.expense.entity.ExpenseSqlEntity;
-import com.patrykdankowski.financeflock.expense_category.entity.ExpenseCategorySqlEntity;
+import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,19 +49,7 @@ public class BudgetGroupMapper {
                     }
             ).collect(Collectors.toSet());
             budgetGroupSqlEntity.setListOfMembers(users);
-//            Set<ExpenseCategorySqlEntity> sqlCategories = new HashSet<>();
-//            if (domainEntity.getListOfCategoriesId() != null) {
-//                sqlCategories = domainEntity.getListOfCategoriesId().stream().map(
-//                        categoryId -> {
-//                            ExpenseCategorySqlEntity categorySql = entityManager.find(ExpenseCategorySqlEntity.class, categoryId);
-//                            if (categorySql != null) {
-//                                categorySql.setBudgetGroup(budgetGroupSqlEntity);
-//                            }
-//                            return categorySql;
-//                        }
-//                ).collect(Collectors.toSet());
-//            }
-//            budgetGroupSqlEntity.setListOfCategories(sqlCategories);
+
         }
 
         return budgetGroupSqlEntity;
@@ -79,15 +64,7 @@ public class BudgetGroupMapper {
                 budgetGroupSql.getDescription(),
                 budgetGroupSql.getOwner().getId());
 
-//        if (budgetGroupSql.getListOfCategories() != null) {
-//
-//            budgetGroupSql.getListOfCategories().forEach(
-//                    category -> {
-//                        domainEntity.addCategory(category.getId());
-//                    }
-//            );
-//
-//        }
+
         if (budgetGroupSql.getListOfMembers() != null) {
             budgetGroupSql.getListOfMembers().forEach(
                     member -> {

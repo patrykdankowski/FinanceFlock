@@ -10,7 +10,7 @@ import org.springframework.data.repository.Repository;
 import java.util.Optional;
 
 
-public interface ExpenseCommandRepositoryAdapter extends Repository<ExpenseSqlEntity, Long> {
+ interface ExpenseCommandRepositoryAdapter extends Repository<ExpenseSqlEntity, Long> {
 
     ExpenseSqlEntity save(ExpenseSqlEntity expenseSqlEntity);
 

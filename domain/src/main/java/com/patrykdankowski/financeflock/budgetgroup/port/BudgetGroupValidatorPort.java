@@ -5,7 +5,6 @@ import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 
 public interface BudgetGroupValidatorPort {
 
-    boolean belongsToSameBudgetGroup(UserDomainEntity user, UserDomainEntity otherUser);
 
     void validateGroupForPotentialOwner(UserDomainEntity potentialOwner,
                                         Long groupId,

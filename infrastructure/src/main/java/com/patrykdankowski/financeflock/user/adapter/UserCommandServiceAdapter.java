@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.patrykdankowski.financeflock.common.AppConstants.VALID_EMAIL_MESSAGE;
 
 @Service
 @Slf4j
@@ -35,20 +34,10 @@ public class UserCommandServiceAdapter implements UserCommandServicePort {
     }
 
     @Override
-    public UserDomainEntity findUserById(final Long id) {
-        return userCommandRepository.findById(id)
-                .orElseThrow(
-                        () -> {
-                            log.warn("User with id {} not found", id);
-                            return new UserNotFoundException(id);
-                        });
-    }
-
-    @Override
     public void checkIfUserExists(String userEmail) {
         if (userCommandRepository.existsUserByEmail(userEmail)) {
             log.warn("User with email {} already exists", userEmail);
-            throw new UserAlreadyExistsException(userEmail, VALID_EMAIL_MESSAGE);
+            throw new UserAlreadyExistsException(userEmail);
 
         }
 

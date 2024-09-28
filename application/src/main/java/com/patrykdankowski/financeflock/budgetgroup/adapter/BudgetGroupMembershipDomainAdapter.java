@@ -3,10 +3,9 @@ package com.patrykdankowski.financeflock.budgetgroup.adapter;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupMembershipDomainPort;
+import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupValidatorPort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
-import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupValidatorPort;
-import com.patrykdankowski.financeflock.user.port.UserValidatorPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +16,9 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
 
 
     private final BudgetGroupValidatorPort budgetGroupValidator;
-    private final UserValidatorPort userValidator;
 
-    private BudgetGroupMembershipDomainAdapter(final BudgetGroupValidatorPort budgetGroupValidator,
-                                               final UserValidatorPort userValidator) {
+    private BudgetGroupMembershipDomainAdapter(final BudgetGroupValidatorPort budgetGroupValidator) {
         this.budgetGroupValidator = budgetGroupValidator;
-        this.userValidator = userValidator;
     }
 
     @Override
@@ -57,8 +53,7 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
 
 
         final boolean isAbleToRemove = budgetGroupValidator.isMemberOfGivenIdGroup(userToRemove, budgetGroup, givenGroupId);
-//        budgetGroupValidator.isMemberOfGivenGroup(userToRemove, budgetGroup, givenGroupId);
-//        userValidator.validateRole(userToRemove, Role.GROUP_MEMBER);
+
         if (isAbleToRemove) {
 
             userToRemove.manageGroupMembership(null, Role.USER);
@@ -68,19 +63,6 @@ class BudgetGroupMembershipDomainAdapter implements BudgetGroupMembershipDomainP
             throw new BudgetGroupValidationException("Cannot remove user from group" +
                     " because this user is not a member of your group");
         }
-
-//        budgetGroupValidator.validateGroupForPotentialOwner(potentialOwner, givenGroupId, budgetGroup);
-//        userValidator.hasGivenRole(potentialOwner, Role.GROUP_ADMIN);
-//
-//
-//        boolean hasRole = userValidator.hasGivenRole(userToRemove, Role.GROUP_MEMBER);
-//        boolean GroupIsNull = userValidator.groupIsNull(userToRemove);
-//
-//        if (hasRole && !GroupIsNull) {
-//            budgetGroup.removeUser(userToRemove.getId());
-//            userToRemove.manageGroupMembership(null, Role.USER);
-//        }
-
 
     }
 }

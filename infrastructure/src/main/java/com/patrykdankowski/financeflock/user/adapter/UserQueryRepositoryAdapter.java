@@ -4,7 +4,6 @@ import com.patrykdankowski.financeflock.mapper.UserDtoMapper;
 import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
 import com.patrykdankowski.financeflock.user.dto.UserDetailsDto;
 import com.patrykdankowski.financeflock.user.dto.UserDto;
-import com.patrykdankowski.financeflock.user.dto.UserLight;
 import com.patrykdankowski.financeflock.user.dto.UserLightDto;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
 import com.patrykdankowski.financeflock.user.port.UserQueryRepositoryPort;
@@ -27,40 +26,6 @@ public interface UserQueryRepositoryAdapter extends Repository<UserSqlEntity, Lo
     @Query("SELECT u FROM UserSqlEntity u WHERE u.email = :email")
     Optional<UserSqlEntity> findUserDetailsByEmail(String email);
 
-    //    @EntityGraph(attributePaths = "expenseList")
-//    @Query("SELECT u FROM UserSqlEntity u WHERE u.budgetGroup.id = :groupId")
-//    List<UserSqlEntity> findUsersWithTotalExpenses(@Param("groupId") Long groupId);
-//    @Query(value = "SELECT u.id AS userId, u.name, e.id AS expenseId, e.description, e.amount, e.location, " +
-//            "s.total_expenses AS totalExpenses " +
-//            "FROM users u " +
-//            "JOIN user_expenses_summary s ON s.user_id = u.id " +
-//            "LEFT JOIN expanses e ON e.user_id = u.id " +
-//            "WHERE u.group_id = :groupId AND s.share_data = TRUE " +
-//            "ORDER BY s.total_expenses DESC " +
-//            "LIMIT :limit OFFSET :offset",
-//            nativeQuery = true)
-//    List<Map<String, Object>> findUsersWithTotalExpenses(@Param("groupId") Long groupId,
-//                                                         @Param("limit") int limit,
-//                                                         @Param("offset") int offset);
-//}
-
-    // działa 2 wersja
-//    @Query(value = "SELECT u.userId, u.name, e.id AS expenseId, e.description, e.amount, e.location, u.totalExpenses " +
-//            "FROM (" +
-//            "   SELECT u.id AS userId, u.name, s.total_expenses AS totalExpenses " +
-//            "   FROM users u " +
-//            "   JOIN user_expenses_summary s ON s.user_id = u.id " +
-//            "   WHERE u.group_id = :groupId AND s.share_data = TRUE " +
-//            "   ORDER BY s.total_expenses DESC " +
-//            "   LIMIT :limit OFFSET :offset" +
-//            ") u " +
-//            "LEFT JOIN expanses e ON e.user_id = u.userId " +
-//            "ORDER BY u.totalExpenses DESC",
-//            nativeQuery = true)
-//    List<Map<String, Object>> findUsersWithTotalExpenses(@Param("groupId") Long groupId,
-//                                                         @Param("limit") int limit,
-//                                                         @Param("offset") int offset);
-
     @org.springframework.stereotype.Repository
     class UserQueryRepositoryImpl implements UserQueryRepositoryPort {
         private final UserQueryRepositoryAdapter userQueryRepository;
@@ -81,9 +46,6 @@ public interface UserQueryRepositoryAdapter extends Repository<UserSqlEntity, Lo
             final List<UserSqlEntity> allUsersFromGroup = userQueryRepository.findAllByBudgetGroup_Id(id, pageable);
             return userDtoMapper.toUserLightDtos(allUsersFromGroup);
 
-//        return userQueryRepository.findAllByBudgetGroup_Id(id, pageable).stream().map(
-//                userSql -> userMapper.toDomainEntity(userSql)
-//        ).collect(Collectors.toList());
         }
 
         @Override
@@ -98,39 +60,7 @@ public interface UserQueryRepositoryAdapter extends Repository<UserSqlEntity, Lo
 
         @Override
         public List<UserDto> findUserExpenseSummaries(final Long groupId, final Pageable pageable) {
-            // Pobieramy surowe dane z repozytorium
-//            int offset = (int) pageable.getOffset();
-//            int limit = pageable.getPageSize();
-//
-//            List<Map<String, Object>> rawResults = userQueryRepository.findUsersWithTotalExpenses(groupId, limit, offset);
-//
-//            // Mapujemy na DTO za pomocą mappera
-//            return userDtoMapper.toUserWithExpenseListDto(rawResults);
-            // Pobieramy limit i offset z Pageable
-            // działa 2 wersja
-//            int limit = pageable.getPageSize();
-//            int offset = (int) pageable.getOffset();
-//
-//            // Pobieramy dane z bazy danych
-//            List<Map<String, Object>> rawResults = userQueryRepository.findUsersWithTotalExpenses(groupId, limit, offset);
-//
-//            // Wywołujemy mapper, aby zmapować wyniki na UserDto
-//            return userDtoMapper.toUserWithExpenseListDto(rawResults);
-            // Pobieramy limit i offset z Pageable
-            // Pobieramy kierunek sortowania z Pageable
 
-            // Tworzenie natywnego zapytania z dynamicznym sortowaniem
-//            String sql = "SELECT u.userId, u.name, e.id AS expenseId, e.description, e.amount, e.location, u.totalExpenses " +
-//                    "FROM (" +
-//                    "   SELECT u.id AS userId, u.name, s.total_expenses AS totalExpenses " +
-//                    "   FROM users u " +
-//                    "   JOIN user_expenses_summary s ON s.user_id = u.id " +
-//                    "   WHERE u.group_id = :groupId AND s.share_data = TRUE " +
-//                    "   ORDER BY s.total_expenses " + sortDirection + " " +
-//                    "   LIMIT :limit OFFSET :offset" +
-//                    ") u " +
-//                    "LEFT JOIN expanses e ON e.user_id = u.userId " +
-//                    "ORDER BY u.totalExpenses " + sortDirection;
             String sql = getSqlPrompt(pageable);
 
 
@@ -164,13 +94,7 @@ public interface UserQueryRepositoryAdapter extends Repository<UserSqlEntity, Lo
                     ") u " +
                     "LEFT JOIN expanses e ON e.user_id = u.userId " +
                     "ORDER BY u.totalExpenses " + sortDirection;
-//            String sql = "SELECT u.id, u.name, e.id AS expenseId, e.description, e.amount, e.location, s.total_expenses AS totalExpenses " +
-//                    "FROM users u " +
-//                    "JOIN user_expenses_summary s ON s.user_id = u.id " +
-//                    "LEFT JOIN expanses e ON e.user_id = u.id " +
-//                    "WHERE u.group_id = :groupId AND u.share_data = TRUE " +
-//                    "ORDER BY s.total_expenses " + sortDirection + " " +
-//                    "LIMIT :limit OFFSET :offset";
+
             return sql;
         }
 

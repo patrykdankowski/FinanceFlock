@@ -36,7 +36,6 @@ public class ExpenseSqlEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserSqlEntity user;
 
-    // kategoria wydatku
     @Column(precision = 9, scale = 2)
     private BigDecimal amount;
     private LocalDateTime expenseDate;

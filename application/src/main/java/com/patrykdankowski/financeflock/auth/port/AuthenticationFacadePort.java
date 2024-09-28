@@ -14,5 +14,4 @@ public interface AuthenticationFacadePort {
 
     void logout(HttpServletRequest request);
 
-//    void updateLastLoginAsync(Authentication authentication);
 }

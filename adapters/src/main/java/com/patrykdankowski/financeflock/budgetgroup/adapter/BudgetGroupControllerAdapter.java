@@ -64,7 +64,7 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
     }
 
     @Override
-    @GetMapping("/listOfMembers/{id}")
+    @GetMapping("/members/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public List<UserLightDto> listOfMembers(Long id,

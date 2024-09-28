@@ -52,11 +52,11 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
     @Override
     @Transactional
     public Long createExpense(final ExpenseCreateDto expenseCreateDto, final String userIp) {
+        log.info("Starting process of create expense");
 
         final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
 
 
-//        final ExpenseDtoWriteModel expenseDtoValidated = expenseGeolocationService.prepareExpense(expenseDtoWriteModel, userIp);
         prepareExpenseIfLocationIsNull(expenseCreateDto, userIp);
 
         ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
@@ -74,6 +74,7 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
         loggedUser.addExpense(savedExpense.getId());
         // saving user must be after saving expense because we need expense id to connect expense with user
         userCommandService.saveUser(loggedUser);
+        log.info("Successfully finished process of creating expense with ID: {}", savedExpense.getId());
 
         return savedExpense.getId();
 
@@ -82,12 +83,10 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
     @Override
     @Transactional
     public void updateExpense(final Long id, final ExpenseUpdateDto expenseUpdateDto) {
+        log.info("Starting process of update expense");
+
         final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
-
-
-        // its used to check if expense is in same group but u are not a owner (u are admin) - different response
-//        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
 
         expenseValidator.validateAccessToExpense(loggedUser, expenseById);
 
@@ -100,38 +99,16 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 
         expenseManagementDomain.updateExpense(expenseUpdateVO, expenseById);
 
-        // connection between user and expense already exists so we don't have to save user separately
-
         expenseCommandService.saveExpense(expenseById);
+        log.info("Successfully finished process of updating expense with ID: {}", expenseById.getId());
     }
-//    @Override
-//    public void updateExpense(final Long id, final ExpenseCreateDto expenseSourceDto) {
-//        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
-//        final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
-//
-//
-//        // its used to check if expense is in same group but u are not a owner (u are admin) - different response
-//        final UserDomainEntity userFromGivenIdExpense = userCommandService.findUserById(expenseById.getUserId());
-//
-//        expenseValidator.validateAccessToExpense(loggedUser, userFromGivenIdExpense, expenseById);
-//
-//        ExpenseCreateVO expenseCreateVO = new ExpenseCreateVO(
-//                expenseSourceDto.getDescription(),
-//                new AmountVO(expenseSourceDto.getAmount()),
-//                expenseSourceDto.getLocation(),
-//                expenseSourceDto.getExpenseDate()
-//        );
-//
-//        expenseManagementDomain.updateExpense(expenseCreateVO, expenseById);
-//
-//        // connection between user and expense already exists so we don't have to save user separately
-//
-//        expenseCommandService.saveExpense(expenseById);
-//    }
 
     @Override
     @Transactional
     public void deleteExpense(final Long id) {
+
+        log.info("Starting process of delete expense");
+
         final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
 
@@ -141,11 +118,13 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
         userCommandService.saveUser(loggedUser);
         expenseCommandService.deleteExpense(id);
 
+        log.info("Successfully finished process of deleting expense with ID: {}", expenseById.getId());
 
     }
 
     private void prepareExpenseIfLocationIsNull(final ExpenseCreateDto expenseCreateDto, final String userIp) {
         if (expenseCreateDto.getLocation() == null || expenseCreateDto.getLocation().isEmpty()) {
+            log.info("Location is null, connecting to external API");
             expenseGeolocationService.setLocationForExpenseFromUserIp(expenseCreateDto, userIp);
 
         }

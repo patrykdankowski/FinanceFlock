@@ -58,9 +58,7 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
         updateLastLoginAsync(LocalDateTime.now(), userLoginVO.email());
         final String token = jwtTokenManagement.generateJwtToken(authentication);
         JwtAuthenticationResponse response = new JwtAuthenticationResponse(token);
-//        response.setToken(token);
         tokenCommandService.saveToken(token, userLoginVO.email());
-//        tokenCommandService.saveToken(token);
 
         return response;
     }
@@ -93,7 +91,7 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
         try {
             userCommandService.updateLastLoggedInAt(now, email);
         } catch (Exception e) {
-            log.error("Error updating last login time for user {}", email, e);
+            log.error("Error updating last login time for user {}", email);
         }
 
     }

@@ -47,9 +47,6 @@ public class UserDomainEntity {
         this.createdAt = createdAt;
     }
 
-    public void login() {
-        this.lastLoggedInAt = LocalDateTime.now();
-    }
 
     public void updateInfo(boolean shareData,
                            LocalDateTime lastToggledShareData,
@@ -76,19 +73,6 @@ public class UserDomainEntity {
             throw new IllegalStateException("Given id group is less than 0");
         }
     }
-//    public void manageGroupMembership(Long budgetGroupId, Role role) {
-//        if (budgetGroupId > 0) {
-//            this.budgetGroupId = budgetGroupId;
-//            this.role = role;
-//        } else if (budgetGroupId == null) {
-//            this.budgetGroupId = null;
-//            this.role = Role.USER;
-//        } else {
-//            throw new IllegalStateException("Given id group is less than 0");
-//        }
-//    }
-
-
     public void addExpense(Long expenseDomainId) {
         if (expenseListId.contains(expenseDomainId)) {
             return;

@@ -89,7 +89,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         log.info("Starting process of close group");
 
         UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
-//        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
         budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
@@ -106,13 +105,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
     }
 
-//    private void validateIfUserIsAdmin(final UserDomainEntity loggedUser,
-//                                       final Long id, final BudgetGroupDomainEntity budgetGroup) {
-//
-//        budgetGroupValidator.validateGroupForPotentialOwner(loggedUser, id, budgetGroup);
-//        userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
-//    }
-
     private void saveEntities(final BudgetGroupDomainEntity budgetGroupFromLoggedUser, final List<UserDomainEntity> mappedEntities) {
         budgetGroupCommandService.deleteBudgetGroup(budgetGroupFromLoggedUser);
         userCommandService.saveAllUsers(mappedEntities);
@@ -121,13 +113,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
     private List<UserDomainEntity> getUsersFromGroup(final BudgetGroupDomainEntity budgetGroupFromLoggedUser) {
         return userCommandService.listOfUsersFromIds(budgetGroupFromLoggedUser.getListOfMembersId().stream().toList());
     }
-
-//    private BudgetGroupDomainEntity retrieveBudgetGroupFromUser(final UserDomainEntity loggedUser) {
-//        Long groupIdFromLoggedUser = loggedUser.getBudgetGroupId();
-//
-//        BudgetGroupDomainEntity budgetGroupFromLoggedUser = budgetGroupCommandService.findBudgetGroupById(groupIdFromLoggedUser);
-//        return budgetGroupFromLoggedUser;
-//    }
 
     @Transactional
     @Override
@@ -141,7 +126,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         if (loggedUser.getId().equals(userToAdd.getId())) {
             throw new SelfManagementInGroupException("You cannot add yourself to the group where you are already an admin.");
         }
-//        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
         budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
@@ -152,36 +136,6 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
         saveGroupAndUser(budgetGroupById, userToAdd);
 
     }
-//    @Transactional
-//    @Override
-//    public void addUserToGroup(final EmailDto email,
-//                               final Long id) {
-//
-//        log.info("Starting process to add user to group");
-//        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
-//
-////        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
-//        BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
-//
-//        budgetGroupValidator.validateIfUserIsAdmin(loggedUser, id, budgetGroupById);
-//
-//        UserDomainEntity userToAdd = getUserFromEmail(email);
-//
-//
-//        boolean isAbleToJoinGroup = budgetGroupValidator.isNotMemberOfAnyGroup(userToAdd);
-//
-//        if (isAbleToJoinGroup) {
-//            budgetGroupMembershipDomain.addUserToGroup(userToAdd, budgetGroupById);
-//
-//            saveGroupAndUser(budgetGroupById, userToAdd);
-//
-//        } else {
-//            log.warn("User is not able to join budget group");
-//            throw new BudgetGroupValidationException("Cannot add user to budget group" +
-//                    " because user is already member of some group");
-//        }
-//
-//    }
 
     private void saveGroupAndUser(final BudgetGroupDomainEntity budgetGroupFromLoggedUser, final UserDomainEntity userToAdd) {
         budgetGroupCommandService.saveBudgetGroup(budgetGroupFromLoggedUser);
@@ -219,21 +173,5 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
     }
-//        if (canBeRemovedFromGroup) {
-//            budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
-//                    userToRemove,
-//                    budgetGroupById,
-//                    groupId);
-//
-//            saveGroupAndUser(budgetGroupById, userToRemove);
-//
-//            log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
-//        } else {
-//            log.warn("User cannot be remove from budget group");
-//            throw new BudgetGroupValidationException("Cannot remove user from group" +
-//                    " because this user is not a member of your group");
-//        }
-
-
 }
 

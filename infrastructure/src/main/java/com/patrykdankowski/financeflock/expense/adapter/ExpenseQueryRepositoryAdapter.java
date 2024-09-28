@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ExpenseQueryRepositoryAdapter extends ExpenseQueryRepositoryPort, Repository<ExpenseSqlEntity, Long> {
+ interface ExpenseQueryRepositoryAdapter extends ExpenseQueryRepositoryPort, Repository<ExpenseSqlEntity, Long> {
 
 
     @Query("SELECT new com.patrykdankowski.financeflock.expense.dto.ExpenseDto(e.description, e.amount, e.location) " +

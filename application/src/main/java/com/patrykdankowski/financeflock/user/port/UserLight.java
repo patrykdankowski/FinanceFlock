@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.user.dto;
+package com.patrykdankowski.financeflock.user.port;
 
 import lombok.Getter;
 import lombok.Setter;

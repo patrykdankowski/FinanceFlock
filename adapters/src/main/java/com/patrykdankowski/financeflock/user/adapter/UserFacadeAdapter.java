@@ -40,34 +40,50 @@ class UserFacadeAdapter implements UserFacadePort {
     @Override
     public void leaveBudgetGroup(final Long id) {
 
+        log.info("Starting process of leave budget group");
+
+
         final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final BudgetGroupDomainEntity budgetGroup = budgetGroupCommandService.findBudgetGroupById(loggedUser.getBudgetGroupId());
 
         boolean hasRole = userValidator.hasGivenRole(loggedUser, Role.GROUP_MEMBER);
 
         if (!hasRole) {
+            log.warn("Cannot leave budget group because the user is a admin of group");
             throw new BudgetGroupValidationException("Cannot leave budget group as admin");
         }
 
-        userMembershipDomain.leaveBudgetGroup(loggedUser, budgetGroup, hasRole, id);
+        userMembershipDomain.leaveBudgetGroup(loggedUser, budgetGroup, id);
 
 
         userCommandService.saveUser(loggedUser);
         budgetGroupCommandService.saveBudgetGroup(budgetGroup);
+
+        log.info("Successfully finished process of leaving budget group with ID: {}", budgetGroup.getId());
+
     }
 
     @Override
     public boolean toggleShareData() {
 
+        log.info("Starting process of toggle share data");
+
+
         final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
+        checkIfUserIsNotAGroupAdmin(loggedUser);
+        boolean isSharingData = userMembershipDomain.toggleShareData(loggedUser);
+        userCommandService.saveUser(loggedUser);
+
+        log.info("Toggled share data for user with id {} ", loggedUser.getId());
+
+        return isSharingData;
+    }
+
+    private void checkIfUserIsNotAGroupAdmin(final UserDomainEntity loggedUser) {
         final boolean isAdmin = userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
         final boolean groupNotNull = !userValidator.groupIsNull(loggedUser);
         if (isAdmin && groupNotNull) {
             throw new AdminToggleShareDataException();
         }
-        boolean isSharingData = userMembershipDomain.toggleShareData(loggedUser);
-        userCommandService.saveUser(loggedUser);
-
-        return isSharingData;
     }
 }

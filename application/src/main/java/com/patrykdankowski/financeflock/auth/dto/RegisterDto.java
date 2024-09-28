@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
 
 @EqualsPassword
+@Getter
 public class RegisterDto {
 
     @NotNull(message = "Name cannot be null")
@@ -22,19 +24,4 @@ public class RegisterDto {
     @ValidPassword
     private String confirmPassword;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
 }

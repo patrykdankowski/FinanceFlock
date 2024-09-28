@@ -29,13 +29,6 @@ class ExpenseManagementDomainAdapter implements ExpenseManagementDomainPort {
                 expenseCreateVO.description(),
                 expenseCreateVO.location());
 
-//        return buildExpense(null,
-//                userFromContext.getId(),
-//                expenseValueObject.getAmount(),
-//                expenseValueObject.getExpenseDate(),
-//                expenseValueObject.getDescription(),
-//                expenseValueObject.getLocation());
-
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.springframework.data.repository.Repository;
 import java.util.Optional;
 
 
-public interface BudgetGroupCommandRepositoryAdapter extends Repository<BudgetGroupSqlEntity, Long> {
+ interface BudgetGroupCommandRepositoryAdapter extends Repository<BudgetGroupSqlEntity, Long> {
 
     @Query("SELECT u FROM BudgetGroupSqlEntity u " +
             "LEFT JOIN FETCH u.listOfMembers " +

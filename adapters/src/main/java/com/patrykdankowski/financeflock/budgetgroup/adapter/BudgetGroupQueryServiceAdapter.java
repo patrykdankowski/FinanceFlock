@@ -36,13 +36,18 @@ class BudgetGroupQueryServiceAdapter implements BudgetGroupQueryServicePort {
 
     @Override
     public List<UserLightDto> listOfUsersInGroup(final Long id, final int page, final int size, final String sortBy, final String sortDirection) {
+        log.info("Starting process of retrieving list of users in group with ID: {}", id);
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         SimpleUserDomainEntity loggedUser = authenticationService.getSimpleUserFromContext();
 
         final Long groupId = loggedUser.getBudgetGroupId();
 
-        return getListOfMembers(groupId, pageable);
+        final List<UserLightDto> members = getListOfMembers(groupId, pageable);
+
+        log.info("Successfully retrieved {} members from budget group ID: {}", members.size(), groupId);
+
+        return members;
     }
 
 
@@ -60,73 +65,19 @@ class BudgetGroupQueryServiceAdapter implements BudgetGroupQueryServicePort {
 
     }
 
-    //        @Override
-//    public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
-//        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-//
-//        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection),"totalExpenses");
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//
-//
-//        final List<UserDto> userExpenseSummaries = userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId());
-//
-//        userExpenseSummaries.forEach(userDto -> {
-//            BigDecimal totalExpenses = userDto.getExpenses().stream()
-//                    .map(ExpenseDto::getAmount)
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//            userDto.setTotalExpensesForUser(totalExpenses);
-//        });
-//        if ("asc".equalsIgnoreCase(sortDirection)) {
-//            userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser));
-//        } else if ("desc".equalsIgnoreCase(sortDirection)) {
-//            userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser).reversed());
-//        }
-//
-//        return userExpenseSummaries;
-//    }
-//@Override
-//public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
-//    UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-//
-//    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection),"totalExpenses");
-//    Pageable pageable = PageRequest.of(page, size, sort);
-//
-//
-//    final List<UserDto> userExpenseSummaries = userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
-//
-//    userExpenseSummaries.forEach(userDto -> {
-//        BigDecimal totalExpenses = userDto.getExpenses().stream()
-//                .map(ExpenseDto::getAmount)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        userDto.setTotalExpensesForUser(totalExpenses);
-//    });
-//    if ("asc".equalsIgnoreCase(sortDirection)) {
-//        userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser));
-//    } else if ("desc".equalsIgnoreCase(sortDirection)) {
-//        userExpenseSummaries.sort(Comparator.comparing(UserDto::getTotalExpensesForUser).reversed());
-//    }
-//
-//    return userExpenseSummaries;
-//}
     @Override
     public List<UserDto> getBudgetGroupExpenses(final Long id, final int page, final int size, final String sortDirection) {
-//        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
-//        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "totalExpensesForUser");
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//        // Ustawienie paginacji
-////        Pageable pageable = PageRequest.of(page, size);
-//
-//        // Wywołanie metody repozytorium, która zwraca mapowane DTO
-//        return userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+        log.info("Starting process of retrieving expenses for budget group with ID: {}", id);
+
         UserDomainEntity userFromContext = authenticationService.getFullUserFromContext();
 
-        // Tworzymy Pageable z sortowaniem i paginacją
         Pageable pageable = getPageable(page, size, sortDirection);
 
-        // Wywołujemy repozytorium, które zwraca już zmapowane DTO
-        return userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+        final List<UserDto> usersExpanses = userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
+
+        log.info("Successfully retrieved expenses for group ID: {} with size: {}", userFromContext.getBudgetGroupId(), usersExpanses.size());
+
+        return usersExpanses;
     }
 
     private Pageable getPageable(final int page, final int size, final String sortDirection) {

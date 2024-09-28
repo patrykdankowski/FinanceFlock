@@ -1,5 +1,8 @@
 package com.patrykdankowski.financeflock.user.exception;
 
+import lombok.Getter;
+
+@Getter
 public class BadRoleException extends RuntimeException{
     private String name;
     private String roleName;
@@ -9,11 +12,4 @@ public class BadRoleException extends RuntimeException{
         this.roleName = roleName;
     }
 
-    public String getName () {
-        return name;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
 }
