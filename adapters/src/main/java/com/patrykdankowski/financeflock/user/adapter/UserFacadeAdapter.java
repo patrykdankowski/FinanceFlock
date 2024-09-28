@@ -4,7 +4,6 @@ import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupValidationException;
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupCommandServicePort;
-import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupValidatorPort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.exception.AdminToggleShareDataException;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
@@ -41,7 +40,7 @@ class UserFacadeAdapter implements UserFacadePort {
     @Override
     public void leaveBudgetGroup(final Long id) {
 
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final BudgetGroupDomainEntity budgetGroup = budgetGroupCommandService.findBudgetGroupById(loggedUser.getBudgetGroupId());
 
         boolean hasRole = userValidator.hasGivenRole(loggedUser, Role.GROUP_MEMBER);
@@ -55,16 +54,15 @@ class UserFacadeAdapter implements UserFacadePort {
 
         userCommandService.saveUser(loggedUser);
         budgetGroupCommandService.saveBudgetGroup(budgetGroup);
-        //TODO -> informowanie założyciela przez wysłanie mail'a, że user opuścił grupę
     }
 
     @Override
     public boolean toggleShareData() {
 
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final boolean isAdmin = userValidator.hasGivenRole(loggedUser, Role.GROUP_ADMIN);
         final boolean groupNotNull = !userValidator.groupIsNull(loggedUser);
-        if(isAdmin && groupNotNull) {
+        if (isAdmin && groupNotNull) {
             throw new AdminToggleShareDataException();
         }
         boolean isSharingData = userMembershipDomain.toggleShareData(loggedUser);

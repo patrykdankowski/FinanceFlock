@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface BudgetGroupCommandRepositoryPort {
 
-    Optional<BudgetGroupDomainEntity> findById(long id);
+    Optional<BudgetGroupDomainEntity> findById(Long id);
 
     BudgetGroupDomainEntity save(BudgetGroupDomainEntity budgetGroupDomainEntity);
 

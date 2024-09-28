@@ -1,8 +1,6 @@
 package com.patrykdankowski.financeflock.auth.adapter;
 
-import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
 import com.patrykdankowski.financeflock.user.dto.UserDetailsDto;
-import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.port.UserQueryRepositoryPort;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

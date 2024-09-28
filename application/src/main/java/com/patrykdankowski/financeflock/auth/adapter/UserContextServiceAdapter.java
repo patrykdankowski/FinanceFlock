@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.auth;
+package com.patrykdankowski.financeflock.auth.adapter;
 
 import com.patrykdankowski.financeflock.auth.port.UserContextServicePort;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;

@@ -19,9 +19,9 @@ class ExpenseValidatorAdapter implements ExpenseValidatorPort {
                                         final ExpenseDomainEntity expenseDomainEntity) {
 
 
-        if (!loggedUser.getExpenseListId().contains(expenseDomainEntity.getId()) &&
-                !expenseDomainEntity.getUserId().equals(expenseDomainEntity.getId())) ;
-        throw new ExpenseValidationException("Cannot access expense");
-
+        if (!loggedUser.getExpenseListId().contains(expenseDomainEntity.getId()) ||
+                !expenseDomainEntity.getUserId().equals(loggedUser.getId())) {
+            throw new ExpenseValidationException("Cannot access expense");
+        }
     }
 }

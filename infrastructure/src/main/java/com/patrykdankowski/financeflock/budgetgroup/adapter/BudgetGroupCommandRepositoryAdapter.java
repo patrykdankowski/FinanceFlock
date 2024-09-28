@@ -5,6 +5,7 @@ import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDoma
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupCommandRepositoryPort;
 import com.patrykdankowski.financeflock.mapper.BudgetGroupMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
@@ -12,6 +13,9 @@ import java.util.Optional;
 
 public interface BudgetGroupCommandRepositoryAdapter extends Repository<BudgetGroupSqlEntity, Long> {
 
+    @Query("SELECT u FROM BudgetGroupSqlEntity u " +
+            "LEFT JOIN FETCH u.listOfMembers " +
+            "WHERE u.id = :id")
     Optional<BudgetGroupSqlEntity> findById(Long id);
 
     BudgetGroupSqlEntity save(BudgetGroupSqlEntity budgetGroupDomainEntity);
@@ -36,7 +40,7 @@ class BudgetGroupCommandRepositoryImpl implements BudgetGroupCommandRepositoryPo
 
 
     @Override
-    public Optional<BudgetGroupDomainEntity> findById(final long id) {
+    public Optional<BudgetGroupDomainEntity> findById(final Long id) {
 
         return budgetGroupCommandRepository.findById(id)
                 .map(group -> mapper.toDomainEntity(group));

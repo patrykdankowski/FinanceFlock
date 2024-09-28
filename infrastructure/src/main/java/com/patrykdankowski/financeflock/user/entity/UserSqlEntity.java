@@ -34,7 +34,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 public class UserSqlEntity {
 
     @Id

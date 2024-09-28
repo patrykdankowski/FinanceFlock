@@ -112,7 +112,7 @@ class GlobalExceptionHandler {
     ResponseEntity<ErrorDetails> handleNotValidException(Authentication authentication) {
 
         return setErrorDetails("Access denied",
-                "You dont have permission to enter here with " + authentication.getAuthorities(),
+                "You dont have right permissions",
                 HttpStatus.FORBIDDEN);
 
     }
@@ -193,17 +193,19 @@ class GlobalExceptionHandler {
                 budgetGroupValidationException.getMessage(),
                 HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(BadRoleException.class)
     ResponseEntity<ErrorDetails> handleBadRoleException(BadRoleException badRoleException) {
         return setErrorDetails("User has wrong role",
-                badRoleException.getName()+" has wrong role ("+badRoleException.getRoleName()+")",
+                badRoleException.getName() + " has wrong role (" + badRoleException.getRoleName() + ")",
                 HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(ToEarlyShareDataPreferenceException.class)
     ResponseEntity<ErrorDetails> handleShareDataPreferenceException(ToEarlyShareDataPreferenceException toEarlyShareDataPreferenceException) {
         return setErrorDetails("Error during toggling share data",
-                "Your last request was at "+ toEarlyShareDataPreferenceException.getLastSharedData() + " try again at "+ toEarlyShareDataPreferenceException.getNextPossibleShareData(),
-                HttpStatus.TOO_EARLY );
+                "Your last request was at " + toEarlyShareDataPreferenceException.getLastSharedData() + " try again at " + toEarlyShareDataPreferenceException.getNextPossibleShareData(),
+                HttpStatus.TOO_EARLY);
     }
 
     @ExceptionHandler(ErrorDuringFetchingLocationFromIpException.class)
@@ -226,7 +228,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ExpenseValidationException.class)
     ResponseEntity<ErrorDetails> handleExpenseNotFoundException(ExpenseValidationException expenseValidationException) {
 
-        return setErrorDetails("Cannot create expense",
+        return setErrorDetails("Exception occurred",
                 expenseValidationException.getMessage(),
                 HttpStatus.CONFLICT);
 
@@ -249,8 +251,6 @@ class GlobalExceptionHandler {
                 HttpStatus.CONFLICT);
 
     }
-
-
 
 
     @ExceptionHandler(Exception.class)

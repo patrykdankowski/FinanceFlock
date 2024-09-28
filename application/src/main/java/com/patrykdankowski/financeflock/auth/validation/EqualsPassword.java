@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.auth.dto.validation;
+package com.patrykdankowski.financeflock.auth.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

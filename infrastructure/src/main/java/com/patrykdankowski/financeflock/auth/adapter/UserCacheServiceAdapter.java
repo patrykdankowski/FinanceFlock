@@ -26,7 +26,7 @@ class UserCacheServiceAdapter implements UserCacheServicePort {
     }
 
 
-        @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
+//    @Cacheable(cacheNames = "userEmailCache", key = "#userEmail")
     @Override
     public UserDomainEntity getUserFromEmail(String userEmail) {
         var user = userCommandService.findUserByEmail(userEmail);

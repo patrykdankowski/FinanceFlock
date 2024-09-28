@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface AuthenticationControllerPort {
 
-@PostMapping("/login")
-ResponseEntity<JwtAuthenticationResponse> login(@RequestBody LoginDto loginDto);
+    @PostMapping("/login")
+    ResponseEntity<JwtAuthenticationResponse> login(@RequestBody LoginDto loginDto);
 
-@PostMapping("/register")
-ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto);
+    @PostMapping("/register")
+    ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto);
+
+//    @PostMapping("/logout")
+//    ResponseEntity<String> logout(String token);
 }

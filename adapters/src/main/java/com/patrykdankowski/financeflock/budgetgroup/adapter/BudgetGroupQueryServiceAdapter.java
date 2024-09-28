@@ -5,7 +5,6 @@ import com.patrykdankowski.financeflock.budgetgroup.exception.BudgetGroupNotFoun
 import com.patrykdankowski.financeflock.budgetgroup.model.entity.BudgetGroupDomainEntity;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryRepositoryPort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupQueryServicePort;
-import com.patrykdankowski.financeflock.expense.port.ExpenseQueryRepositoryPort;
 import com.patrykdankowski.financeflock.user.dto.UserDto;
 import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
 import com.patrykdankowski.financeflock.user.dto.UserLightDto;
@@ -121,7 +120,7 @@ class BudgetGroupQueryServiceAdapter implements BudgetGroupQueryServicePort {
 //
 //        // Wywołanie metody repozytorium, która zwraca mapowane DTO
 //        return userQueryRepository.findUserExpenseSummaries(userFromContext.getBudgetGroupId(), pageable);
-        UserDomainEntity userFromContext = authenticationService.getUserFromContext();
+        UserDomainEntity userFromContext = authenticationService.getFullUserFromContext();
 
         // Tworzymy Pageable z sortowaniem i paginacją
         Pageable pageable = getPageable(page, size, sortDirection);

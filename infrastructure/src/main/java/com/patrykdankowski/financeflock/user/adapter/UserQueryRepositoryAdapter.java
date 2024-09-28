@@ -24,7 +24,7 @@ public interface UserQueryRepositoryAdapter extends Repository<UserSqlEntity, Lo
 
     Optional<UserSqlEntity> findSimpleUserByEmail(String email);
 
-    @Query("SELECT u FROM UserSqlEntity u LEFT JOIN FETCH u.expenseList WHERE u.email = :email")
+    @Query("SELECT u FROM UserSqlEntity u WHERE u.email = :email")
     Optional<UserSqlEntity> findUserDetailsByEmail(String email);
 
     //    @EntityGraph(attributePaths = "expenseList")

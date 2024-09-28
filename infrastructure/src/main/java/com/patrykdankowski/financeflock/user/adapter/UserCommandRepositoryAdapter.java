@@ -19,7 +19,11 @@ import java.util.stream.Collectors;
 
 interface UserCommandRepositoryAdapter extends JpaRepository<UserSqlEntity, Long> {
 
-    @Query("SELECT u FROM UserSqlEntity u LEFT JOIN FETCH u.expenseList WHERE u.email = :email")
+    @Query("SELECT u FROM UserSqlEntity u " +
+            "LEFT JOIN FETCH u.expenseList " +
+            "LEFT JOIN FETCH u.budgetGroup g " +
+            "LEFT JOIN FETCH g.listOfMembers " +
+            "WHERE u.email = :email")
     Optional<UserSqlEntity> findByEmail(String email);
 
     //
@@ -48,7 +52,7 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
     private final UserMapper mapper;
     private final UserDtoMapper userDtoMapper;
 
-    public UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
+     UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
                                      final UserMapper mapper,
                                      final UserDtoMapper userDtoMapper) {
         this.userCommandRepository = userCommandRepository;

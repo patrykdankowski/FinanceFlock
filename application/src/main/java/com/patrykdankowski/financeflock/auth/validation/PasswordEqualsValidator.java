@@ -1,11 +1,9 @@
-package com.patrykdankowski.financeflock.auth.dto.validation;
+package com.patrykdankowski.financeflock.auth.validation;
 
 import com.patrykdankowski.financeflock.auth.dto.RegisterDto;
 import com.patrykdankowski.financeflock.auth.exception.PasswordValidationException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
-import java.util.List;
 
 public class PasswordEqualsValidator implements ConstraintValidator<EqualsPassword, RegisterDto> {
     @Override

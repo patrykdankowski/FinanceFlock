@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class UserLight {
+ class UserLight {
     private String name;
     private LocalDateTime lastLoggedInAt;
 }

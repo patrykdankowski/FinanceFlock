@@ -14,7 +14,6 @@ import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupMembershipDo
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
-import com.patrykdankowski.financeflock.user.port.UserValidatorPort;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         log.info("Starting process of create budget group");
 
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final BudgetGroupDescription budgetGroupDescription = new BudgetGroupDescription(budgetGroupDto.getDescription());
 
         boolean isAbleToCreateGroup = budgetGroupValidator.isNotMemberOfAnyGroup(loggedUser);
@@ -89,7 +88,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         log.info("Starting process of close group");
 
-        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
 //        BudgetGroupDomainEntity budgetGroupById = retrieveBudgetGroupFromUser(loggedUser);
         BudgetGroupDomainEntity budgetGroupById = budgetGroupCommandService.findBudgetGroupById(id);
 
@@ -136,7 +135,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
                                final Long id) {
 
         log.info("Starting process to add user to group");
-        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         UserDomainEntity userToAdd = getUserFromEmail(email);
 
         if (loggedUser.getId().equals(userToAdd.getId())) {
@@ -202,7 +201,7 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         log.info("Starting process to remove user from group");
 
-        UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         UserDomainEntity userToRemove = getUserFromEmail(email);
 
         if (loggedUser.getId().equals(userToRemove.getId())) {
@@ -213,15 +212,13 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 
         budgetGroupValidator.validateIfUserIsAdmin(loggedUser, groupId, budgetGroupById);
 
-        budgetGroupMembershipDomain.removeUserFromGroup(userToRemove,budgetGroupById,groupId);
+        budgetGroupMembershipDomain.removeUserFromGroup(userToRemove, budgetGroupById, groupId);
 
 
+        saveGroupAndUser(budgetGroupById, userToRemove);
 
-
-            saveGroupAndUser(budgetGroupById, userToRemove);
-
-            log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
-        }
+        log.info("Successfully removed user with email {} from group with ID: {}", email.getEmail(), groupId);
+    }
 //        if (canBeRemovedFromGroup) {
 //            budgetGroupMembershipDomain.removeUserFromGroup(loggedUser,
 //                    userToRemove,
@@ -238,5 +235,5 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
 //        }
 
 
-    }
+}
 

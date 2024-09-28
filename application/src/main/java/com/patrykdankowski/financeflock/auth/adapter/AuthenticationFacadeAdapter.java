@@ -1,29 +1,26 @@
-package com.patrykdankowski.financeflock.auth;
+package com.patrykdankowski.financeflock.auth.adapter;
 
 import com.patrykdankowski.financeflock.auth.dto.JwtAuthenticationResponse;
 import com.patrykdankowski.financeflock.auth.dto.LoginDto;
 import com.patrykdankowski.financeflock.auth.dto.RegisterDto;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationFacadePort;
-import com.patrykdankowski.financeflock.auth.port.JwtTokenProviderPort;
-import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import com.patrykdankowski.financeflock.auth.port.JwtTokenManagementPort;
+import com.patrykdankowski.financeflock.auth.port.TokeProviderFromRequestPort;
+import com.patrykdankowski.financeflock.auth.port.TokenCommandServicePort;
 import com.patrykdankowski.financeflock.user.model.record.UserLoginVO;
 import com.patrykdankowski.financeflock.user.model.record.UserRegisterVO;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.port.UserFactoryPort;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Driver;
 import java.time.LocalDateTime;
 
 @Service
@@ -31,19 +28,23 @@ import java.time.LocalDateTime;
 class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
 
     AuthenticationFacadeAdapter(final AuthenticationManager authenticationManager,
-                                final JwtTokenProviderPort jwtTokenProvider,
+                                final JwtTokenManagementPort jwtTokenManagement,
                                 final UserCommandServicePort userCommandService,
-                                final UserFactoryPort userFactory) {
+                                final UserFactoryPort userFactory, final TokeProviderFromRequestPort tokeProviderFromRequest, final TokenCommandServicePort tokenCommandService) {
         this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtTokenManagement = jwtTokenManagement;
         this.userCommandService = userCommandService;
         this.userFactory = userFactory;
+        this.tokeProviderFromRequest = tokeProviderFromRequest;
+        this.tokenCommandService = tokenCommandService;
     }
 
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProviderPort jwtTokenProvider;
+    private final JwtTokenManagementPort jwtTokenManagement;
     private final UserCommandServicePort userCommandService;
     private final UserFactoryPort userFactory;
+    private final TokeProviderFromRequestPort tokeProviderFromRequest;
+    private final TokenCommandServicePort tokenCommandService;
 
     @Override
     @Transactional
@@ -55,9 +56,11 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
                 userLoginVO.email(), userLoginVO.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         updateLastLoginAsync(LocalDateTime.now(), userLoginVO.email());
-        JwtAuthenticationResponse response = new JwtAuthenticationResponse();
-        final String token = jwtTokenProvider.generateJwtToken(authentication);
-        response.setToken(token);
+        final String token = jwtTokenManagement.generateJwtToken(authentication);
+        JwtAuthenticationResponse response = new JwtAuthenticationResponse(token);
+//        response.setToken(token);
+        tokenCommandService.saveToken(token, userLoginVO.email());
+//        tokenCommandService.saveToken(token);
 
         return response;
     }
@@ -78,6 +81,12 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
         return "Registered";
     }
 
+    public void logout(HttpServletRequest request) {
+        final String tokenFromRequest = tokeProviderFromRequest.getTokenFromRequest(request);
+        jwtTokenManagement.deactivateToken(tokenFromRequest);
+
+    }
+
 
     @Async
     void updateLastLoginAsync(LocalDateTime now, String email) {
@@ -86,16 +95,6 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
         } catch (Exception e) {
             log.error("Error updating last login time for user {}", email, e);
         }
-
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
-//        }
-//        String userMail = authentication.getName();
-//        var user = userCommandService.findUserByEmail(userMail);
-//        user.login();
-//        userCommandService.saveUser(user);
-//    }
-
 
     }
 }

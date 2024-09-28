@@ -1,7 +1,8 @@
 package com.patrykdankowski.financeflock.auth.adapter;
 
 import com.patrykdankowski.financeflock.auth.exception.CustomJwtException;
-import com.patrykdankowski.financeflock.auth.port.JwtTokenProviderPort;
+import com.patrykdankowski.financeflock.auth.port.JwtTokenManagementPort;
+import com.patrykdankowski.financeflock.auth.port.TokenCommandServicePort;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -16,11 +17,19 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-class JwtTokenProviderAdapter implements JwtTokenProviderPort {
+class JwtTokenManagementAdapter implements JwtTokenManagementPort {
     @Value("${FinanceFlock-secret-key}")
     private String jwtSecretKey;
     @Value("${FinanceFlock-expiration-time}")
     private long jwtExpirationDate;
+
+    private final TokenCommandServicePort tokenCommandService;
+
+
+    JwtTokenManagementAdapter(final TokenCommandServicePort tokenCommandService) {
+        this.tokenCommandService = tokenCommandService;
+    }
+
 
     @Override
     public String generateJwtToken(Authentication authentication) {
@@ -49,7 +58,9 @@ class JwtTokenProviderAdapter implements JwtTokenProviderPort {
                     .verifyWith((SecretKey) key())
                     .build()
                     .parse(token);
-            return true;
+
+            tokenCommandService.verifyTokenNotRevoked(token);
+
         } catch (MalformedJwtException malformedJwtException) {
             throw new CustomJwtException(HttpStatus.BAD_REQUEST, "Invalid JWT Token");
 
@@ -68,6 +79,7 @@ class JwtTokenProviderAdapter implements JwtTokenProviderPort {
         } catch (ClaimJwtException claimJwtException) {
             throw new CustomJwtException(HttpStatus.FORBIDDEN, "JWT claims in the token is not valid");
         }
+        return true;
     }
 
     @Override
@@ -78,6 +90,11 @@ class JwtTokenProviderAdapter implements JwtTokenProviderPort {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    @Override
+    public void deactivateToken(String token) {
+        tokenCommandService.revokeToken(token);
     }
 
 }

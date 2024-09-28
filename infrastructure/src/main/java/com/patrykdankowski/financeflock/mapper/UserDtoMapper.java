@@ -1,12 +1,11 @@
 package com.patrykdankowski.financeflock.mapper;
 
 import com.patrykdankowski.financeflock.expense.dto.ExpenseDto;
+import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
 import com.patrykdankowski.financeflock.user.dto.UserDetailsDto;
 import com.patrykdankowski.financeflock.user.dto.UserDto;
-import com.patrykdankowski.financeflock.user.dto.UserLight;
 import com.patrykdankowski.financeflock.user.dto.UserLightDto;
 import com.patrykdankowski.financeflock.user.entity.UserSqlEntity;
-import com.patrykdankowski.financeflock.user.dto.SimpleUserDomainEntity;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.patrykdankowski.financeflock.common.AppConstants.minutesInHour;
 
@@ -48,33 +46,9 @@ public class UserDtoMapper {
         }
     }
 
+
     public List<UserDto> toUserWithExpenseListDto(List<Map<String, Object>> results) {
-//        Map<Long, UserDto> userDtoMap = new HashMap<>();
-//
-//        results.forEach(row -> {
-//            Long userId = ((Number) row.get("userId")).longValue();
-//            String userName = (String) row.get("name");
-//            BigDecimal totalExpenses = (BigDecimal) row.get("totalExpenses");
-//
-//            // Mapowanie wydatku
-//            ExpenseDto expenseDto = new ExpenseDto(
-//                    (String) row.get("description"),
-//                    (BigDecimal) row.get("amount"),
-//                    (String) row.get("location")
-//            );
-//
-//            // Jeśli użytkownik już jest w mapie, dodajemy wydatek do jego listy
-//            if (userDtoMap.containsKey(userId)) {
-//                userDtoMap.get(userId).getExpenses().add(expenseDto);
-//            } else {
-//                // Tworzymy nowego użytkownika i dodajemy wydatek do jego listy
-//                UserDto userDto = new UserDto(userName, new ArrayList<>(), totalExpenses);
-//                userDto.getExpenses().add(expenseDto);
-//                userDtoMap.put(userId, userDto);
-//            }
-//        });
-//
-//        return new ArrayList<>(userDtoMap.values());
+
         Map<Long, UserDto> userDtoMap = new HashMap<>();
 
         results.forEach(row -> {
@@ -88,11 +62,9 @@ public class UserDtoMapper {
                     (String) row.get("location")
             );
 
-            // Jeśli użytkownik już jest w mapie, dodajemy wydatek do jego listy
             if (userDtoMap.containsKey(userId)) {
                 userDtoMap.get(userId).getExpenses().add(expenseDto);
             } else {
-                // Tworzymy nowego użytkownika i dodajemy wydatek do jego listy
                 UserDto userDto = new UserDto(userName, new ArrayList<>(), totalExpenses);
                 userDto.getExpenses().add(expenseDto);
                 userDtoMap.put(userId, userDto);

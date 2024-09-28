@@ -88,18 +88,14 @@ public class BudgetGroupMapper {
 //            );
 //
 //        }
-        log.info("before");
         if (budgetGroupSql.getListOfMembers() != null) {
-            log.info("przed dodawaniem");
             budgetGroupSql.getListOfMembers().forEach(
                     member -> {
-                        log.info("dodawanie usera");
                         domainEntity.addUser(member.getId());
                     }
             );
 
         }
-        log.info("after");
         return domainEntity;
     }
 }

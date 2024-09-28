@@ -14,6 +14,7 @@ import com.patrykdankowski.financeflock.expense.model.vo.ExpenseCreateVO;
 import com.patrykdankowski.financeflock.expense.port.ExpenseValidatorPort;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -49,9 +50,10 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 
 
     @Override
+    @Transactional
     public Long createExpense(final ExpenseCreateDto expenseCreateDto, final String userIp) {
 
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
 
 
 //        final ExpenseDtoWriteModel expenseDtoValidated = expenseGeolocationService.prepareExpense(expenseDtoWriteModel, userIp);
@@ -78,8 +80,9 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
     }
 
     @Override
+    @Transactional
     public void updateExpense(final Long id, final ExpenseUpdateDto expenseUpdateDto) {
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
 
 
@@ -127,8 +130,9 @@ class ExpenseFacadeAdapter implements ExpenseFacadePort {
 //    }
 
     @Override
+    @Transactional
     public void deleteExpense(final Long id) {
-        final UserDomainEntity loggedUser = authenticationService.getUserFromContext();
+        final UserDomainEntity loggedUser = authenticationService.getFullUserFromContext();
         final ExpenseDomainEntity expenseById = expenseCommandService.findExpenseById(id);
 
         expenseValidator.validateAccessToExpense(loggedUser, expenseById);

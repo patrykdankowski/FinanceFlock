@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.auth.security;
 
-import com.patrykdankowski.financeflock.auth.port.JwtTokenProviderPort;
+import com.patrykdankowski.financeflock.auth.port.JwtTokenManagementPort;
+import com.patrykdankowski.financeflock.auth.port.TokeProviderFromRequestPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,9 +24,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenProviderPort jwtTokenProvider;
+    private final JwtTokenManagementPort jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final TokeProviderFromRequestPort tokeProviderFromRequest;
 
 
     @Override
@@ -33,7 +35,7 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String token = getTokenFromRequest(request);
+            String token = tokeProviderFromRequest.getTokenFromRequest(request);
             if (StringUtils.hasText(token) && jwtTokenProvider.validateJwtToken(token)) {
                 String usernameFromJwtToken = jwtTokenProvider.getUsernameFromJwtToken(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(usernameFromJwtToken);
@@ -49,11 +51,11 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
+//    private String getTokenFromRequest(HttpServletRequest request) {
+//        String bearerToken = request.getHeader("Authorization");
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//            return bearerToken.substring(7);
+//        }
+//        return null;
+//    }
 }

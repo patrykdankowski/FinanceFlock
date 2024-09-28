@@ -36,7 +36,6 @@ class BudgetGroupManagementDomainAdapter implements BudgetGroupManagementDomainP
 
     @Override
     public List<UserDomainEntity> closeBudgetGroup(final List<UserDomainEntity> listOfUsers) {
-        //TODO zaimplementować metode informujaca all userów z grupy ze grupa została zamknięta
 
         List<UserDomainEntity> mapppedEntities = resetUsersRolesAndDetachFromGroup(listOfUsers);
 

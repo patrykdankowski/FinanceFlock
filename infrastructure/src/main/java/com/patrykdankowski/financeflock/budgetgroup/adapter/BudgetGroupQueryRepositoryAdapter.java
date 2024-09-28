@@ -33,11 +33,9 @@ class BudgetGroupQueryRepositoryImpl implements BudgetGroupQueryRepositoryPort {
     }
 
     public Optional<BudgetGroupDomainEntity> findBudgetGroupById(final Long id) {
-        log.info("before mapping rezpoturoium");
         final Optional<BudgetGroupDomainEntity> budgetGroupDomainEntity = budgetGroupQueryRepositoryAdapter.findBudgetGroupById(id)
 //                .map(group -> mapper.toDomainEntity(group));
                 .map(group -> mapper.toDomainEntity(group));
-        log.info("after mapping repo");
         return budgetGroupDomainEntity;
     }
 }
