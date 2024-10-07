@@ -1,14 +1,14 @@
 package com.patrykdankowski.financeflock.expense.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
+@AllArgsConstructor
 public class ExpenseCreateDto {
 
     @NotBlank
@@ -17,4 +17,7 @@ public class ExpenseCreateDto {
     private String location;
     private LocalDateTime expenseDate;
 
+    public void setLocation(final String location) {
+        this.location = location;
+    }
 }

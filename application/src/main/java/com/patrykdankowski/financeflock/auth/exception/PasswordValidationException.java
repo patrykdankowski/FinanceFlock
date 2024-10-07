@@ -4,6 +4,7 @@ public class PasswordValidationException extends RuntimeException {
     private final String errorMessage;
 
     public PasswordValidationException(String errorMessage) {
+        super(errorMessage);
         this.errorMessage = errorMessage;
     }
 

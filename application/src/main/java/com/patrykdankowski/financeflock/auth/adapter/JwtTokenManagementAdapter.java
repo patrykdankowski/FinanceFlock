@@ -7,7 +7,9 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.Priority;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,6 @@ class JwtTokenManagementAdapter implements JwtTokenManagementPort {
     private long jwtExpirationDate;
 
     private final TokenCommandServicePort tokenCommandService;
-
 
     JwtTokenManagementAdapter(final TokenCommandServicePort tokenCommandService) {
         this.tokenCommandService = tokenCommandService;
@@ -47,7 +48,7 @@ class JwtTokenManagementAdapter implements JwtTokenManagementPort {
         return token;
     }
 
-    private Key key() {
+    Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecretKey));
     }
 

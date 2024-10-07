@@ -66,7 +66,8 @@ class BudgetGroupValidatorAdapter implements BudgetGroupValidatorPort {
 
     private void checkUserIdGroupWithGivenId(final Long givenIdGroup,
                                              final Long idFromUserObject) {
-        if (!idFromUserObject.equals(givenIdGroup)) {
+//        if (!idFromUserObject.equals(givenIdGroup)) {
+        if (idFromUserObject == null || !idFromUserObject.equals(givenIdGroup)) {
             log.warn("Given id group {} is not the same as your group", givenIdGroup);
             throw new BudgetGroupValidationException("U are not a member of given id group");
         }

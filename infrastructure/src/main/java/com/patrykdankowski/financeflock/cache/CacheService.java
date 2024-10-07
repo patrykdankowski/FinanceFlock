@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class CacheService {
+ class CacheService {
 
     CacheService(final CaffeineCacheManager cacheManager) {
         this.cacheManager = cacheManager;

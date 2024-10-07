@@ -14,10 +14,9 @@ public interface ExpenseControllerPort {
 
     String addExpense(ExpenseCreateDto expenseCreateDto, HttpServletRequest request);
 
-    @PatchMapping("/update/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    String updateExpense(@PathVariable Long id,
-                         @RequestBody ExpenseUpdateDto expenseUpdateDto);
+
+    String updateExpense(Long id,
+                         ExpenseUpdateDto expenseUpdateDto);
 
     void deleteExpense(Long id);
 }

@@ -44,8 +44,8 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
     private final UserCommandRepositoryAdapter userCommandRepository;
     private final UserMapper mapper;
 
-     UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
-                                     final UserMapper mapper) {
+    UserCommandRepositoryImpl(UserCommandRepositoryAdapter userCommandRepository,
+                              final UserMapper mapper) {
         this.userCommandRepository = userCommandRepository;
         this.mapper = mapper;
     }
@@ -57,13 +57,6 @@ class UserCommandRepositoryImpl implements UserCommandRepositoryPort {
         return userCommandRepository.findByEmail(email)
                 .map(user -> mapper.toDomainEntity(user));
     }
-
-    @Override
-    public Optional<UserDomainEntity> findById(final Long id) {
-        return userCommandRepository.findById(id)
-                .map(user -> mapper.toDomainEntity(user));
-    }
-
 
     @Override
     public UserDomainEntity save(UserDomainEntity user) {

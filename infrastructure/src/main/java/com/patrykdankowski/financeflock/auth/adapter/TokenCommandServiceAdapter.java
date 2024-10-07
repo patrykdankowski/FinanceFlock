@@ -13,7 +13,7 @@ class TokenCommandServiceAdapter implements TokenCommandServicePort {
 
     private final TokenCommandRepositoryAdapter tokenCommandRepositoryAdapter;
 
-    public TokenCommandServiceAdapter(final TokenCommandRepositoryAdapter tokenCommandRepositoryAdapter) {
+     TokenCommandServiceAdapter(final TokenCommandRepositoryAdapter tokenCommandRepositoryAdapter) {
         this.tokenCommandRepositoryAdapter = tokenCommandRepositoryAdapter;
     }
 

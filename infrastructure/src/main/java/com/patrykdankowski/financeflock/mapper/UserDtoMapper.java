@@ -26,10 +26,11 @@ public class UserDtoMapper {
         if (userSqlEntity == null) {
             return null;
         } else {
+            Long budgetGroupId = userSqlEntity.getBudgetGroup() != null ? userSqlEntity.getBudgetGroup().getId() : null;
             return SimpleUserDomainEntity.buildUser(userSqlEntity.getId(),
                     userSqlEntity.getName(),
                     userSqlEntity.getEmail(),
-                    userSqlEntity.getBudgetGroup().getId(),
+                    budgetGroupId,
                     userSqlEntity.getRole(),
                     userSqlEntity.getLastLoggedInAt(),
                     userSqlEntity.isShareData(),

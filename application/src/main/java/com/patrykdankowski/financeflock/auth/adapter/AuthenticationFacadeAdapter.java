@@ -5,7 +5,7 @@ import com.patrykdankowski.financeflock.auth.dto.LoginDto;
 import com.patrykdankowski.financeflock.auth.dto.RegisterDto;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationFacadePort;
 import com.patrykdankowski.financeflock.auth.port.JwtTokenManagementPort;
-import com.patrykdankowski.financeflock.auth.port.TokeProviderFromRequestPort;
+import com.patrykdankowski.financeflock.auth.port.TokenProviderFromRequestPort;
 import com.patrykdankowski.financeflock.auth.port.TokenCommandServicePort;
 import com.patrykdankowski.financeflock.user.model.record.UserLoginVO;
 import com.patrykdankowski.financeflock.user.model.record.UserRegisterVO;
@@ -30,7 +30,7 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
     AuthenticationFacadeAdapter(final AuthenticationManager authenticationManager,
                                 final JwtTokenManagementPort jwtTokenManagement,
                                 final UserCommandServicePort userCommandService,
-                                final UserFactoryPort userFactory, final TokeProviderFromRequestPort tokeProviderFromRequest, final TokenCommandServicePort tokenCommandService) {
+                                final UserFactoryPort userFactory, final TokenProviderFromRequestPort tokeProviderFromRequest, final TokenCommandServicePort tokenCommandService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenManagement = jwtTokenManagement;
         this.userCommandService = userCommandService;
@@ -43,7 +43,7 @@ class AuthenticationFacadeAdapter implements AuthenticationFacadePort {
     private final JwtTokenManagementPort jwtTokenManagement;
     private final UserCommandServicePort userCommandService;
     private final UserFactoryPort userFactory;
-    private final TokeProviderFromRequestPort tokeProviderFromRequest;
+    private final TokenProviderFromRequestPort tokeProviderFromRequest;
     private final TokenCommandServicePort tokenCommandService;
 
     @Override

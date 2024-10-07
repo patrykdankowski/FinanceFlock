@@ -1,7 +1,7 @@
 package com.patrykdankowski.financeflock.auth.security;
 
 import com.patrykdankowski.financeflock.auth.port.JwtTokenManagementPort;
-import com.patrykdankowski.financeflock.auth.port.TokeProviderFromRequestPort;
+import com.patrykdankowski.financeflock.auth.port.TokenProviderFromRequestPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenManagementPort jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    private final TokeProviderFromRequestPort tokeProviderFromRequest;
+    private final TokenProviderFromRequestPort tokeProviderFromRequest;
 
 
     @Override

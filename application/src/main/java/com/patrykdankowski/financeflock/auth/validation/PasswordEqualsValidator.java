@@ -13,11 +13,14 @@ public class PasswordEqualsValidator implements ConstraintValidator<EqualsPasswo
 
     @Override
     public boolean isValid(RegisterDto registerDto, ConstraintValidatorContext constraintValidatorContext) {
+        if (registerDto == null || registerDto.getPassword() == null || registerDto.getConfirmPassword() == null) {
+            throw new PasswordValidationException("Passwords must be provided and cannot be null");
+        }
+
         if (!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
             throw new PasswordValidationException("Passwords must be equal");
         }
+
         return true;
-
-
     }
 }

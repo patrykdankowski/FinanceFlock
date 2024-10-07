@@ -8,6 +8,7 @@ public class ExpenseNotFoundException extends RuntimeException {
     private String details;
 
     public ExpenseNotFoundException(final Long id) {
+        super("Expense  with ID " + id + " not found");
         this.details = String.format(AppConstants.EXPENSE_NOT_FOUND, id);
     }
 }

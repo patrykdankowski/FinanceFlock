@@ -1,11 +1,11 @@
 package com.patrykdankowski.financeflock.budgetgroup.model.entity;
 
-import lombok.ToString;
+import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@ToString
+@Getter
 public class BudgetGroupDomainEntity {
 
     public static BudgetGroupDomainEntity buildBudgetGroup(final Long id,
@@ -24,7 +24,6 @@ public class BudgetGroupDomainEntity {
 
     private Set<Long> listOfMembersId = new HashSet<>();
 
-    private Set<Long> listOfCategoriesId = new HashSet<>();
 
     public void updateInfo(String description) {
         if (description != null && !description.isBlank()) {
@@ -32,10 +31,10 @@ public class BudgetGroupDomainEntity {
         }
     }
 
-
-
-
     public void updateListOfMembers(Set<Long> listOfIds) {
+        if (listOfIds == null) {
+            return;
+        }
         listOfIds.forEach(element -> {
             if (element > 0) {
                 this.listOfMembersId.add(element);
@@ -43,13 +42,6 @@ public class BudgetGroupDomainEntity {
         });
     }
 
-    public void updateListOfCategories(Set<Long> listOfIds) {
-        listOfIds.forEach(element -> {
-            if (element > 0) {
-                this.listOfMembersId.add(element);
-            }
-        });
-    }
 
     public void addUser(Long userId) {
         if (userId > 0 && !listOfMembersId.contains(userId)) {
@@ -58,20 +50,8 @@ public class BudgetGroupDomainEntity {
     }
 
     public void removeUser(Long userId) {
-        if (userId > 0 && listOfMembersId.contains(userId)) {
+        if (userId != null && userId > 0 && listOfMembersId.contains(userId)) {
             listOfMembersId.remove(userId);
-        }
-    }
-
-    public void addCategory(Long categoryId) {
-        if (categoryId > 0) {
-            listOfCategoriesId.add(categoryId);
-        }
-    }
-
-    public void removeCategory(Long categoryId) {
-        if (categoryId > 0) {
-            this.listOfCategoriesId.remove(categoryId);
         }
     }
 
@@ -84,27 +64,6 @@ public class BudgetGroupDomainEntity {
         this.ownerId = ownerId;
 
     }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Set<Long> getListOfMembersId() {
-        return listOfMembersId;
-    }
-
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Set<Long> getListOfCategoriesId() {
-        return listOfCategoriesId;
-    }
-
 }
+
+

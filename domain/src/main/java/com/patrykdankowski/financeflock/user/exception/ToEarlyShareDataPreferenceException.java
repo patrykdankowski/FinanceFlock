@@ -7,6 +7,7 @@ public class ToEarlyShareDataPreferenceException extends RuntimeException {
     private LocalDateTime lastSharedData;
 
     public ToEarlyShareDataPreferenceException(LocalDateTime lastSharedData) {
+        super("Cannot toggle sharing preference before 5 minutes have passed since: " + lastSharedData.toString());
         this.lastSharedData = lastSharedData;
     }
 

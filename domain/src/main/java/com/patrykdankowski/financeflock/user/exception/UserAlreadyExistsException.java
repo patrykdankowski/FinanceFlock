@@ -5,11 +5,12 @@ import lombok.Getter;
 
 @Getter
 public class UserAlreadyExistsException extends RuntimeException {
-    private String message;
+    private String email;
     private String details;
 
-    public UserAlreadyExistsException(final String message) {
-        this.message = message;
+    public UserAlreadyExistsException(final String email) {
+        super("User with email with email already exists");
+        this.email = email;
         this.details = AppConstants.VALID_EMAIL_MESSAGE;
     }
 }

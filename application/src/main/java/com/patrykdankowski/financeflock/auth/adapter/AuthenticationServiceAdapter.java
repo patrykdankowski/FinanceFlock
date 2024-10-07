@@ -13,9 +13,9 @@ class AuthenticationServiceAdapter implements AuthenticationServicePort {
     private final UserContextServicePort userContextService;
     private final UserCacheServicePort userCacheService;
 
-    AuthenticationServiceAdapter(final UserContextServiceAdapter userContextServiceAdapter,
+    AuthenticationServiceAdapter(final UserContextServicePort userContextService,
                                  final UserCacheServicePort userCacheService) {
-        this.userContextService = userContextServiceAdapter;
+        this.userContextService = userContextService;
         this.userCacheService = userCacheService;
     }
 

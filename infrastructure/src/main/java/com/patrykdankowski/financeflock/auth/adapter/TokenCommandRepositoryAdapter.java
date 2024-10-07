@@ -5,7 +5,7 @@ import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 
-interface TokenCommandRepositoryAdapter extends Repository<TokenSqlEntity, Long> {
+public interface TokenCommandRepositoryAdapter extends Repository<TokenSqlEntity, Long> {
     Optional<TokenSqlEntity> findByToken(String token);
 
     void save(TokenSqlEntity tokenSqlEntity);

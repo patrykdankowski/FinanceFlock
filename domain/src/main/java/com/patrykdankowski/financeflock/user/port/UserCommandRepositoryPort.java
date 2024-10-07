@@ -9,8 +9,6 @@ import java.util.Optional;
 public interface UserCommandRepositoryPort {
     Optional<UserDomainEntity> findByEmail(String email);
 
-    Optional<UserDomainEntity> findById(Long id);
-
     UserDomainEntity save(UserDomainEntity user);
 
     List<UserDomainEntity> saveAll(List<UserDomainEntity> entities);

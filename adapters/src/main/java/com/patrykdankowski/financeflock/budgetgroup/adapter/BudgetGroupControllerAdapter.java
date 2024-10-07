@@ -67,11 +67,11 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
     @GetMapping("/members/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserLightDto> listOfMembers(Long id,
-                                            int page,
-                                            int size,
-                                            String sortBy,
-                                            String sortDirection) {
+    public List<UserLightDto> listOfMembers(@PathVariable("id") Long id,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "5") int size,
+    @RequestParam(defaultValue = "name") String sortBy,
+    @RequestParam(defaultValue = "asc") String sortDirection) {
         return budgetGroupQueryService.listOfUsersInGroup(id, page, size, sortBy, sortDirection);
     }
 
@@ -79,12 +79,13 @@ class BudgetGroupControllerAdapter implements BudgetGroupControllerPort {
     @GetMapping("/listOfExpanses/{id}")
     @PreAuthorize("hasAnyAuthority('GROUP_MEMBER','GROUP_ADMIN','USER')")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> listOfExpansesInGroup(Long id,
-                                               int page,
-                                               int size,
-                                               String sortDirection) {
+    public List<UserDto> listOfExpansesInGroup(
+            @PathVariable("id") Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
 
-        return budgetGroupQueryService.getBudgetGroupExpenses(id, page, size,sortDirection);
+        return budgetGroupQueryService.getBudgetGroupExpenses(id, page, size, sortDirection);
 
     }
 

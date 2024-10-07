@@ -8,6 +8,7 @@ public class BadRoleException extends RuntimeException{
     private String roleName;
 
     public BadRoleException(String name, String roleName) {
+        super("Bad role");
         this.name = name;
         this.roleName = roleName;
     }

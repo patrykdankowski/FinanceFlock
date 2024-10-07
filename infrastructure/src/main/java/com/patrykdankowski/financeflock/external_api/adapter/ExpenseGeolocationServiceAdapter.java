@@ -1,8 +1,9 @@
-package com.patrykdankowski.financeflock.external_api;
+package com.patrykdankowski.financeflock.external_api.adapter;
 
 import com.patrykdankowski.financeflock.expense.dto.ApiExpenseDto;
 import com.patrykdankowski.financeflock.expense.dto.ExpenseCreateDto;
 import com.patrykdankowski.financeflock.expense.exception.ErrorDuringFetchingLocationFromIpException;
+import com.patrykdankowski.financeflock.external_api.ExpenseGeolocationServicePort;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

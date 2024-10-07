@@ -20,15 +20,14 @@ public interface BudgetGroupControllerPort {
     String removeUserFromGroup(Long id, EmailDto emailDto);
 
     List<UserDto> listOfExpansesInGroup(
-            @PathVariable("id") Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "asc") String sortDirection);
+            Long id,
+            int page,
+            int size,
+            String sortDirection);
 
-    List<UserLightDto> listOfMembers(
-            @PathVariable("id") Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection);
+    List<UserLightDto> listOfMembers(Long id,
+                                     int page,
+                                     int size,
+                                     String sortBy,
+                                     String sortDirection);
 }
