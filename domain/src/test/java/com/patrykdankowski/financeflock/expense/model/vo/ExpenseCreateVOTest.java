@@ -9,12 +9,9 @@ import java.time.LocalDateTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.within;
 
-public class ExpenseCreateVOTest {
+class ExpenseCreateVOTest {
 
-
-    // 1. Test poprawnego utworzenia ExpenseCreateVO
     @Test
     void whenAllFieldsAreValid_thenExpenseCreateVOIsCreatedSuccessfully() {
         // given
@@ -33,7 +30,6 @@ public class ExpenseCreateVOTest {
         assertThat(expenseCreateVO.expenseDate()).isEqualTo(expenseDate);
     }
 
-    // 2. Test dla opisu o długości poniżej 5 znaków
     @Test
     void givenDescriptionTooShort_whenCreateExpenseCreateVO_thenThrowExpenseValidationException() {
         // given
@@ -48,7 +44,6 @@ public class ExpenseCreateVOTest {
                 .hasMessage("Expense description name must be at least 5 characters length and cannot be longer than 25 characters");
     }
 
-    // 3. Test dla opisu o długości powyżej 25 znaków
     @Test
     void givenDescriptionTooLong_whenCreateExpenseCreateVO_thenThrowExpenseValidationException() {
         // given
@@ -63,7 +58,6 @@ public class ExpenseCreateVOTest {
                 .hasMessage("Expense description name must be at least 5 characters length and cannot be longer than 25 characters");
     }
 
-    // 4. Test dla opisu o poprawnej długości granicznej
     @Test
     void givenDescriptionOfBoundaryLength_whenCreateExpenseCreateVO_thenExpenseCreateVOIsCreatedSuccessfully() {
         // given
@@ -97,7 +91,7 @@ public class ExpenseCreateVOTest {
         assertThat(SECONDS.between(expenseCreateVO.expenseDate(), now))
                 .isLessThanOrEqualTo(1);
     }
-    // 6. Test dla opisu dokładnie 5-znakowego
+
     @Test
     void givenDescriptionOfFiveCharacters_whenCreateExpenseCreateVO_thenExpenseCreateVOIsCreatedSuccessfully() {
         // given

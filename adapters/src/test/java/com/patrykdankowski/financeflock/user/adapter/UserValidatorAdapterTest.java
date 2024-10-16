@@ -18,8 +18,6 @@ class UserValidatorAdapterTest {
         userValidatorAdapter = new UserValidatorAdapter();
     }
 
-    // Testy dla metody hasGivenRole
-
     @Test
     void hasGivenRole_shouldReturnTrue_whenUserHasGivenRole() {
         // Arrange
@@ -46,7 +44,6 @@ class UserValidatorAdapterTest {
         assertThat(result).isFalse();
     }
 
-    // Testy dla metody groupIsNull
 
     @Test
     void groupIsNull_shouldReturnTrue_whenUserHasNoGroup() {
@@ -73,8 +70,6 @@ class UserValidatorAdapterTest {
         // Assert
         assertThat(result).isFalse();
     }
-
-    // Testy dla metody validateRole
 
     @Test
     void validateRole_shouldNotThrowException_whenUserHasGivenRole() {

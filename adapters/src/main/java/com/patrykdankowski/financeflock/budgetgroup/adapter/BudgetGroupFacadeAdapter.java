@@ -11,6 +11,7 @@ import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupCommandServi
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupFacadePort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupManagementDomainPort;
 import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupMembershipDomainPort;
+import com.patrykdankowski.financeflock.budgetgroup.port.BudgetGroupValidatorPort;
 import com.patrykdankowski.financeflock.common.Role;
 import com.patrykdankowski.financeflock.user.model.entity.UserDomainEntity;
 import com.patrykdankowski.financeflock.user.port.UserCommandServicePort;
@@ -28,14 +29,14 @@ class BudgetGroupFacadeAdapter implements BudgetGroupFacadePort {
     private final UserCommandServicePort userCommandService;
     private final BudgetGroupCommandServicePort budgetGroupCommandService;
     private final AuthenticationServicePort authenticationService;
-    private final BudgetGroupValidatorAdapter budgetGroupValidator;
+    private final BudgetGroupValidatorPort budgetGroupValidator;
 
     BudgetGroupFacadeAdapter(final BudgetGroupMembershipDomainPort budgetGroupMembershipDomain,
                              final UserCommandServicePort userCommandService,
                              final BudgetGroupCommandServicePort budgetGroupCommandService,
                              final AuthenticationServicePort authenticationService,
                              final BudgetGroupManagementDomainPort budgetGroupManagementDomain,
-                             final BudgetGroupValidatorAdapter budgetGroupValidator) {
+                             final BudgetGroupValidatorPort budgetGroupValidator) {
         this.budgetGroupMembershipDomain = budgetGroupMembershipDomain;
         this.authenticationService = authenticationService;
         this.userCommandService = userCommandService;

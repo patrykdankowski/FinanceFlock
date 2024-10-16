@@ -226,7 +226,6 @@ class ExpenseDomainEntityTest {
         assertThat(expense.getLocation()).isNull();
     }
 
-    // 14. Test updateInfo z null amount
     @Test
     void givenExistingExpense_whenUpdateInfoWithNullAmount_thenAmountRemainsUnchanged() {
         // Given

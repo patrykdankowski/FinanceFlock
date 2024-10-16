@@ -30,7 +30,6 @@ class CustomUserDetailsServiceAdapterTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Test na poprawne znalezienie użytkownika po adresie email
     @Test
     void whenUserExists_thenReturnUserDetails() {
         // given
@@ -54,7 +53,6 @@ class CustomUserDetailsServiceAdapterTest {
         verify(userQueryRepositoryPort).retrieveUserFromEmail(email);
     }
 
-    // Test na przypadek, gdy użytkownik nie istnieje
     @Test
     void whenUserDoesNotExist_thenThrowUsernameNotFoundException() {
         // given
@@ -70,7 +68,6 @@ class CustomUserDetailsServiceAdapterTest {
         verify(userQueryRepositoryPort).retrieveUserFromEmail(email);
     }
 
-    // Test na przypadek, gdy użytkownik ma więcej niż jedną rolę
     @Test
     void whenUserExistsWithMultipleRoles_thenReturnUserDetailsWithAuthorities() {
         // given

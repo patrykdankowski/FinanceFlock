@@ -1,4 +1,4 @@
-package com.patrykdankowski.financeflock.auth.security;
+package com.patrykdankowski.financeflock.auth.adapter;
 
 
 import com.patrykdankowski.financeflock.auth.port.TokenProviderFromRequestPort;

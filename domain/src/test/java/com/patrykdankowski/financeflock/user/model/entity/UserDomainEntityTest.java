@@ -283,7 +283,7 @@ class UserDomainEntityTest {
     @Test
     void givenShareDataToggled_whenToggleAfterFiveMinutes_thenTogglesSuccessfully() {
         // Given
-        user.toggleShareData(); // Toggle to initialize state
+        user.toggleShareData();
         LocalDateTime fiveMinutesLater = user.getLastToggledShareData().minusMinutes(5);
         user.updateInfo(user.isShareData(), fiveMinutesLater, user.getLastLoggedInAt());
 

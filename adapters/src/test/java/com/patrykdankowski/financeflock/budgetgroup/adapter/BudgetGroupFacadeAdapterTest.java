@@ -1,6 +1,7 @@
 package com.patrykdankowski.financeflock.budgetgroup.adapter;
 
 
+import com.patrykdankowski.financeflock.budgetgroup.adapter.BudgetGroupFacadeAdapter;
 import com.patrykdankowski.financeflock.auth.port.AuthenticationServicePort;
 import com.patrykdankowski.financeflock.budgetgroup.dto.BudgetGroupDto;
 import com.patrykdankowski.financeflock.budgetgroup.dto.EmailDto;
